@@ -32,11 +32,11 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ..
-.Dd May 13, 2004
+.Dd Nov 29, 2004
 .Dt NSD 8 
 .Sh NAME
 nsd
-.Nd Name Server Daemon (NSD) version 2.1.0.
+.Nd Name Server Daemon (NSD) version 2.1.5.
 .Sh SYNOPSIS
 .Nm nsd
 .Op Fl 4
@@ -49,6 +49,7 @@ nsd
 .Op Fl l Ar logfile
 .Op Fl N Ar server-count
 .Op Fl n Ar concurrent-tcp-count
+.Op Fl P Ar pidfile
 .Op Fl p Ar port
 .Op Fl s Ar secondss
 .Op Fl t Ar chrootdir
@@ -148,6 +149,12 @@ The maximum
 of concurrent TCP connection that can be handled by each server.  The
 default is 10.
 
+.It Fl P Ar pidfile
+Use the specified
+.Ar pidfile
+instead of the platform specific default, which is mostly
+.Em /var/run/nsd.pid .
+
 .It Fl p Ar port
 Answer the queries on the specified
 .Ar port .
@@ -158,7 +165,7 @@ Produce statistics dump every
 .Ar seconds
 seconds.
 This is equal to sending
-.Em SIGILL
+.Em SIGUSR1
 to the daemon periodically.
 
 .It Fl t Ar chroot
@@ -208,7 +215,7 @@ reacts to the following signals:
 Stop answering queries, shutdown, and exit normally.
 .It Dv SIGHUP
 Reload the database.
-.It Dv SIGILL
+.It Dv SIGUSR1
 Dump BIND8-style statistics into the log. Ignored otherwise.
 .El
 .\" .Sh IMPLEMENTATION NOTES

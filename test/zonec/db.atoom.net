@@ -2,7 +2,6 @@
 ; BIND data file for atoom.net for internal use
 ;
 $ORIGIN miek.nl.
-$bla
 $TTL    1H
 @       IN      SOA     elektron.atoom.net. miekg.atoom.net. (
                      2003062700         ; Serial
@@ -25,10 +24,21 @@ goffert			IN	A	192.168.1.3
 kuip			IN	A	192.168.1.4
 arena			IN	A	192.168.1.5
 mail                    IN      A	192.168.1.2
-
+text			IN	txt	"hallo \000 ik ben miek"
+text2			IN	txt	"hallo \001 ik ben miek"
 www                     IN      CNAME   elektron
 
-kasteel.wireless	IN	A	172.16.1.1
+
+
+
+\[b11010000011101]	IN	A	172.16.1.1
+\[o64072/14]		IN	A	172.16.1.1
+\[xd074/14]		IN	A	172.16.1.1
+\[208.116.0.0/14]	IN	A	172.16.1.1
+kasteel.\[208.116.0.0/14]	IN	A	172.16.1.1
+
+kasteel.wireless	IN	A	127.\[b11010000011101]
+kasteel.wireless	IN	NS	\[208.116.0.0/14]
 kopje.wireless		IN	A	172.16.1.1
 ufo.wireless		IN	A	172.16.1.2
 wap11.wireless		IN	A	172.16.1.3

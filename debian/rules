@@ -8,15 +8,54 @@ CPPFLAGS = -Wall -g -D_XOPEN_SOURCE=600
 
 DEB_MAKE_CLEAN_TARGET := clean
 
+DEB_STRIP_EXCLUDE := usr/sbin/nsd-xfer
+
 DEB_CONFIGURE_EXTRA_FLAGS := \
 	--with-configfile=/etc/default/nsd --with-pidfile=/var/run/nsd.pid \
 	--with-configdir=/etc/nsd/ --sysconfdir=/etc --localstatedir=/var \
 	--enable-ipv6 --with-dbfile=/var/lib/nsd/nsd.db
 
+clean::
+	rm -f config.h Makefile config.sub
+
+
+######################################################
+#
+# Kludge until nsd gets its own zone transfer utility.
+# To update the bind source, say
+#  rm debian/bind.tar.uu
+#  ./debian/rules debian/bind.tar.uu
+#
+# When this hack is removed, also remove flex and groff
+# from Build-Depends.
+#
+######################################################
+
+debian/bind.tar.uu:
+	install -d $@.dir
+	cd $@.dir && apt-get source -d -t unstable bind
+	( cd $@.dir && tar cf - * ) >$@.1.tmp
+	rm -rf $@.dir
+	uuencode $(basename $@) <$@.1.tmp >$@.2.tmp
+	rm $@.1.tmp
+	mv $@.2.tmp $@
+
+debian/bind: debian/bind.tar.uu
+	install -d $@.unpack
+	uudecode -o /dev/stdout $< | tar xf - -C $@.unpack
+	cd $@.unpack && dpkg-source -x *.dsc
+	mv $@.unpack/bind-* $@
+	rm -rf $@.unpack
+
+build/nsd:: debian/bind
+	cd debian/bind && ./debian/rules build
+
 install/nsd::
-	./install-sh -c /usr/sbin/named-xfer $(CURDIR)/debian/nsd/usr/sbin/nsd-xfer
-	gunzip -c /usr/share/man/man8/named-xfer.8.gz | sed "s/named-xfer/nsd-xfer/g" > $(CURDIR)/debian/nsd/usr/share/man/man8/nsd-xfer.8
+	cd debian/bind && ./debian/rules install
+	./install-sh -c debian/bind/debian/bind/usr/sbin/named-xfer $(CURDIR)/debian/nsd/usr/sbin/nsd-xfer
+	gunzip -c debian/bind/debian/bind/usr/share/man/man8/named-xfer.8.gz | sed "s/named-xfer/nsd-xfer/g" > $(CURDIR)/debian/nsd/usr/share/man/man8/nsd-xfer.8
 	chmod 644 $(CURDIR)/debian/nsd/usr/share/man/man8/nsd-xfer.8
 
 clean::
-	rm -f config.h Makefile config.sub
+	rm -rf debian/bind
+

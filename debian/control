@@ -2,12 +2,13 @@ Source: nsd
 Section: net
 Priority: optional
 Maintainer: Ondřej Surý <ondrej@debian.org>
-Build-Depends: debhelper (>> 4.0.0), libwrap0-dev | libwrap-dev, cdbs, bind
+Build-Depends: debhelper (>> 4.0.0), libwrap0-dev | libwrap-dev, cdbs, bison, flex, groff, sharutils
 Standards-Version: 3.6.1
 
 Package: nsd
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: aolserver, mico
 Description: authoritative name domain server
  NSD is an fast, authoritative only, high performance, simple
  and open source name server.
