@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+if [ "${1}" = "configure" ]
+then
+	TEMPFILE=`mktemp /var/tmp/nsd.XXXXXXXX`
+	chgrp nsd ${TEMPFILE} >/dev/null 2>&1 || \
+		/usr/sbin/addgroup --system nsd
+	chown nsd ${TEMPFILE} >/dev/null 2>&1 || \
+		/usr/sbin/adduser --system --home /etc/nsd --no-create-home --disabled-password --ingroup nsd nsd
+	rm -f ${TEMPFILE}
+	mkdir -p /var/lib/nsd/
+	chown nsd.nsd /var/lib/nsd
+	. /etc/default/nsd
+	if ${rebuild} && [ "${zonesfile}" -nt "${dbfile}" ]; then
+	  /sbin/start-stop-daemon --start -c nsd:nsd --exec /usr/sbin/nsdc -- rebuild
+	fi
+fi
+
+#DEBHELPER#

@@ -1,0 +1,9 @@
+nsd for Debian
+--------------
+
+- I have moved /etc/nsd/nsdc.conf to /etc/default/nsdc
+- Zone file is rebuild automaticaly on nsd startup.
+- I have copied named-xfer binary from bind 8.4.4 package and renamed
+  it to nsd-xfer along with man page.
+
+ -- Ondrej Sury <ondrej@debian.org>, Wed,  9 Jul 2003 15:52:33 +0200

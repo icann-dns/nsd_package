@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$1" = "purge" ] ; then
+	rm /var/lib/nsd/nsd.db
+	rmdir --ignore-fail-on-non-empty /var/lib/nsd
+fi
+
+#DEBHELPER#

@@ -1,0 +1,36 @@
+--- nsd-1.2.2/Makefile.in.orig	2003-07-21 15:51:43.000000000 +0200
++++ nsd-1.2.2/Makefile.in	2003-10-31 11:22:22.000000000 +0100
+@@ -99,20 +99,19 @@
+ 	$(EDIT) nsdc.conf.sample.in > nsdc.conf.sample
+ 
+ install: all
+-	$(INSTALL) -d $(sbindir)
+-	$(INSTALL) -d $(configdir)
+-	$(INSTALL) -d $(mandir)
+-	$(INSTALL) -d $(mandir)/man8
+-	$(INSTALL) nsd $(sbindir)/nsd
+-	$(INSTALL) zonec $(sbindir)/zonec
+-	$(INSTALL) nsdc.sh $(sbindir)/nsdc
+-	$(INSTALL) nsd-notify $(sbindir)/nsd-notify
+-	$(INSTALL_DATA) nsd.8 $(mandir)/man8
+-	$(INSTALL_DATA) nsdc.8 $(mandir)/man8
+-	$(INSTALL_DATA) zonec.8 $(mandir)/man8
+-	$(INSTALL_DATA) nsd-notify.8 $(mandir)/man8/nsd-notify.8
+-	$(INSTALL_DATA) nsdc.conf.sample $(configfile).sample
+-	$(INSTALL_DATA) nsd.zones.sample $(zonesfile).sample
++	$(INSTALL) -d $(DESTDIR)/$(sbindir)
++	$(INSTALL) -d $(DESTDIR)/$(configdir)
++	$(INSTALL) -d $(DESTDIR)/$(mandir)
++	$(INSTALL) -d $(DESTDIR)/$(mandir)/man8
++	$(INSTALL) nsd $(DESTDIR)/$(sbindir)/nsd
++	$(INSTALL) zonec $(DESTDIR)/$(sbindir)/zonec
++	$(INSTALL) nsdc.sh $(DESTDIR)/$(sbindir)/nsdc
++	$(INSTALL) nsd-notify $(DESTDIR)/$(sbindir)/nsd-notify
++	$(INSTALL_DATA) nsd.8 $(DESTDIR)/$(mandir)/man8
++	$(INSTALL_DATA) nsdc.8 $(DESTDIR)/$(mandir)/man8
++	$(INSTALL_DATA) zonec.8 $(DESTDIR)/$(mandir)/man8
++	$(INSTALL_DATA) nsd-notify.8 $(DESTDIR)/$(mandir)/man8/nsd-notify.8
++	$(INSTALL_DATA) nsd.zones.sample $(DESTDIR)/$(zonesfile)
+ 
+ uninstall:
+ 	@echo

@@ -1,0 +1,35 @@
+# Rebuild zone file at startup
+rebuild=true
+
+# Pathname to the directory containing zone file. De facto NSD ``home''
+configdir="/etc/nsd"
+
+# The directory where NSD binaries reside
+sbindir="/usr/sbin"
+
+# Flags to pass to nsd on startup
+flags="-u nsd"
+
+# Pathname of the database
+dbfile="/var/lib/nsd/nsd.db"
+
+# List of the configured zones
+zonesfile="/etc/nsd/nsd.zones"
+
+# The directory containing NSD keys
+keysdir="/etc/nsd/keys"
+
+# Pathname of nsd-notify binary
+notify="/usr/sbin/nsd-notify"
+
+# Pathname of named-xfer(8) binary from BIND8 distribution
+namedxfer="/usr/sbin/nsd-xfer"
+
+# Verbosity of "nsdc update". Set ZONEC_VERBOSE to -v, -vv or to a
+# null string ZONEC_VERBOSE=-v
+
+# Force verbosity to "true" or "false",
+# default is verbose when run from a tty, quiet otherwise.
+# this is compatibility option and is deprecated and will be removed
+# from future version, since upstream use ZONEC_VERBOSE
+# verbose=true

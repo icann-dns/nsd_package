@@ -1,0 +1,189 @@
+nsd (2.1.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 18 May 2004 14:18:38 +0200
+
+nsd (2.0.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 29 Mar 2004 09:44:42 +0200
+
+nsd (2.0.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 15 Mar 2004 15:43:52 +0100
+
+nsd (2.0.0-2) unstable; urgency=low
+
+  * nsdc rebuild in postinst is run as nsd:nsd user (Closes: #234508).
+  * nsd-xfer is included, so no need to depend on bind (Closes: #171184).
+
+ -- Ondrej Sury <ondrej@debian.org>  Tue, 24 Feb 2004 15:56:24 +0100
+
+nsd (2.0.0-1) unstable; urgency=low
+
+  * New upstream stable release.
+  * Now includes nsd-xfer which is nothing more then renamed named-xfer
+    binary from bind 8.4.4 package.
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 23 Feb 2004 14:14:47 +0100
+
+nsd (1.2.4-1) unstable; urgency=low
+
+  * New upstream bugfix release.
+  * Never uploaded.
+
+ -- Ondrej Sury <ondrej@debian.org>  Thu,  8 Jan 2004 11:29:55 +0100
+
+nsd (1.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Change policy to 3.6.1
+
+ -- Ondrej Sury <ondrej@debian.org>  Tue, 18 Nov 2003 09:41:17 +0100
+
+nsd (1.2.2-2) unstable; urgency=low
+
+  * Add check for IPv6 to /etc/default/nsd to make 'nsdc start' work
+    on IPv4 only hosts.
+  * Fix s/==/=/ in test condition in shell script (Closes: #218412)
+  * Switched to cdbs build system.
+
+ -- Ondrej Sury <ondrej@debian.org>  Fri, 31 Oct 2003 10:09:30 +0100
+
+nsd (1.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Merges #59, #60 upstream bugs and #184570 verbosity patch.
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon,  4 Aug 2003 13:29:42 +0200
+
+nsd (1.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fix #59: NSD returns FORMERR when the query name is >= 246 bytes.
+  * Fix #60: Zonec runs out of file descriptors with many zones
+
+ -- Ondrej Sury <ondrej@debian.org>  Thu, 17 Jul 2003 12:23:18 +0200
+
+nsd (1.2.0-5) unstable; urgency=low
+
+  * Enable IPv6 support (Closes: #201541,#186368)
+  * Check for pidfile for 5 seconds after startup, so we can let user
+    know, that startup failed (Closes: #169750)
+  * Add creation of nsd user and group to postinst again.
+  * Moved database file to /var/lib/nsd/nsd.db, updated man page.
+  * Automagickaly detect (-d /proc/sys/net/ipv6/) IPv6 and set -4 flag
+    if not enabled.  NSD won't run without it.
+  * Fix more lintian errors.
+  * Applied patch from Paul Slootman <paul@debian.org> to make nsdc
+    less verbose (configurable). (Closes: #184570)
+
+ -- Ondrej Sury <ondrej@debian.org>  Wed, 16 Jul 2003 15:45:45 +0200
+
+nsd (1.2.0-4) unstable; urgency=low
+
+  * 'Uh, oh, /etc/nsd/ is not packaged when empty' release.
+  * Add new debian specific parameter 'rebuild' for startup script,
+    when set to 'true' it rebuilds zone database on startup.
+  * fix options in /etc/init.d/nsd, because upstream changed parameters,
+    please check your /etc/default/nsd
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 14 Jul 2003 12:43:21 +0200
+
+nsd (1.2.0-3) unstable; urgency=low
+
+  * Moved /etc/nsd/nsd.zones.sample to /usr/share/doc/nsd/examples/
+  * Unlink /etc/default/nsd.sample after make install.
+  * Change policy version to 3.6.0
+  * Fix all lintian warnings and errors.
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 14 Jul 2003 12:28:25 +0200
+
+nsd (1.2.0-2) unstable; urgency=low
+
+  * Fix debian/rules install target. (Closes: #200637)
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 14 Jul 2003 11:40:54 +0200
+
+nsd (1.2.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Distributed CREDITS file into debian/copyright and debian/control.
+
+ -- Ondrej Sury <ondrej@debian.org>  Wed,  9 Jul 2003 15:52:33 +0200
+
+nsd (1.0.3-2) unstable; urgency=low
+
+  * Fixed mandir location to /usr/share/man (Closes: #199652)
+
+ -- Ondrej Sury <ondrej@debian.org>  Wed,  2 Jul 2003 15:31:53 +0200
+
+nsd (1.0.3-1) unstable; urgency=low
+
+  * New upstream stable release.
+  * Fix multiline string in rfc1876.c, patch from Joshua Kwan (Closes: #195162)
+  * Fix references from /etc/nsd/nsdc.conf to /etc/default/nsd (Closes: #184575)
+
+ -- Ondrej Sury <ondrej@debian.org>  Thu, 19 Jun 2003 12:03:46 +0200
+
+nsd (1.0.2final-1) unstable; urgency=low
+
+  * New upstrem release.
+
+ -- Ondrej Sury <ondrej@debian.org>  Thu,  9 Jan 2003 12:24:31 +0100
+
+nsd (1.0.2b2-1) unstable; urgency=low
+
+  * New upstream release.  (no BTS bugs fixed.)
+
+ -- Ondrej Sury <ondrej@debian.org>  Wed, 11 Dec 2002 22:31:51 +0100
+
+nsd (1.0.2b1-7) unstable; urgency=low
+
+  * Modified /etc/init.d/nsd to use start-stop-daemon, but I am still unable
+    to convice start-stop-daemon to check whether nsd has started succesfully.
+  * Add creation of nsd group and user to postinst (same as in bind9 postinst),
+    nsd will now setuid by default to nsd user, for chroot it requires setting
+    up additional syslogd socket, so it cannot be made as default :(
+
+ -- Ondrej Sury <ondrej@debian.org>  Wed, 20 Nov 2002 15:50:17 +0100
+
+nsd (1.0.2b1-5) unstable; urgency=low
+
+  * Put nsdc back in /usr/sbin, /etc/init.d/nsd is just wrapper around it.
+    (really really fix that force-reload lintian error)
+  * Add libwrap0-dev | libwrap-dev to Build-Depends: (I hope it closes #169703)
+
+ -- Ondrej Sury <ondrej@debian.org>  Tue, 19 Nov 2002 09:54:54 +0100
+
+nsd (1.0.2b1-4) unstable; urgency=low
+
+  * wrote man page for nsd-notify (lintian error)
+  * removed executable #!/bin/sh line from /etc/default/nsd (lintian warning)
+  * add force-reload to /etc/init.d/nsd script (lintian error)
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 18 Nov 2002 11:42:15 +0100
+
+nsd (1.0.2b1-3) unstable; urgency=low
+
+  * Fixed /etc/default/nsdc -> /etc/default/nsd in /etc/init.d/nsd
+
+ -- Ondrej Sury <ondrej@debian.org>  Mon, 18 Nov 2002 10:56:55 +0100
+
+nsd (1.0.2b1-2) unstable; urgency=low
+
+  * Fixed some lintian errors.
+
+ -- Ondrej Sury <ondrej@debian.org>  Fri, 15 Nov 2002 21:52:02 +0100
+
+nsd (1.0.2b1-1) unstable; urgency=low
+
+  * Initial Release.
+  * Disable ipv6 for a while, nsd refuses to start on machines without ipv6.
+
+ -- Ondrej Sury <ondrej@debian.org>  Fri, 15 Nov 2002 13:42:55 +0100
+

@@ -1,0 +1,13 @@
+--- nsd-1.2.2.orig/nsdc.sh.in
++++ nsd-1.2.2/nsdc.sh.in
+@@ -68,6 +68,10 @@
+ 	. ${configfile}
+ fi
+ 
++if [ "${verbose}" = true ]; then
++  ZONEC_VERBOSE=-v
++fi
++
+ #
+ # You sure heard this many times before: NO USER SERVICEABLE PARTS BELOW
+ #

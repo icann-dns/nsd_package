@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+CFLAGS = -Wall -g -D_XOPEN_SOURCE=600
+CPPFLAGS = -Wall -g -D_XOPEN_SOURCE=600
+
+DEB_MAKE_CLEAN_TARGET := clean
+
+DEB_CONFIGURE_EXTRA_FLAGS := \
+	--with-configfile=/etc/default/nsd --with-pidfile=/var/run/nsd.pid \
+	--with-configdir=/etc/nsd/ --sysconfdir=/etc --localstatedir=/var \
+	--enable-ipv6 --with-dbfile=/var/lib/nsd/nsd.db
+
+install/nsd::
+	./install-sh -c /usr/sbin/named-xfer $(CURDIR)/debian/nsd/usr/sbin/nsd-xfer
+	gunzip -c /usr/share/man/man8/named-xfer.8.gz | sed "s/named-xfer/nsd-xfer/g" > $(CURDIR)/debian/nsd/usr/share/man/man8/nsd-xfer.8
+	chmod 644 $(CURDIR)/debian/nsd/usr/share/man/man8/nsd-xfer.8
+
+clean::
+	rm -f config.h Makefile config.sub

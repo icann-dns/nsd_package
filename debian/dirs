@@ -1,0 +1,5 @@
+etc/nsd
+etc/nsd/keys
+usr/sbin
+etc/default
+var/lib/nsd

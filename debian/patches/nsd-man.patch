@@ -1,0 +1,20 @@
+--- nsd-1.2.2.orig/nsd.8
++++ nsd-1.2.2/nsd.8
+@@ -87,7 +87,7 @@
+ .Xr nsdc 8
+ start
+ command invoked from a
+-.Em /etc/rc.d/nsd.sh
++.Em /etc/init.d/nsd
+ script or similar at the operating system startup.
+ .Pp
+ The available options are:
+@@ -116,7 +116,7 @@
+ Use the specified
+ .Ar database
+ instead of the default of
+-.Em /etc/nsd/nsd.db .
++.Em /var/lib/nsd/nsd.db .
+ 
+ .It Fl h
+ Print help information and exit.
