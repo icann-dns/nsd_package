@@ -99,12 +99,13 @@ usage (void)
 		"  -l filename     Specify the log file.\n"
 		"  -N udp-servers  Specify the number of child UDP servers.\n"
 		"  -n tcp-servers  Specify the number of child TCP servers.\n"
+		"  -P pidfile      Specify the PID file to write.\n"
 		"  -p port         Specify the port to listen to.\n"
 		"  -s seconds      Dump statistics every SECONDS seconds.\n"
 		"  -t chrootdir    Change root to specified directory on startup.\n"
-		"  -u user         Change effective uid to the specified user.\n"
 		);
 	fprintf(stderr,
+		"  -u user         Change effective uid to the specified user.\n"
 		"  -v              Print version information.\n"
 		"  -X plugin       Load a plugin (may be specified multiple times).\n\n"
 		);
@@ -218,6 +219,7 @@ sig_handler (int sig)
 			nsd.mode = NSD_QUIT;
 			break;
 		case SIGILL:
+		case SIGUSR1:	/* Dump stats on SIGUSR1.  */
 			nsd.mode = NSD_STATS;
 			break;
 		default:
@@ -237,8 +239,17 @@ sig_handler (int sig)
 #ifdef BIND8_STATS
 		alarm(nsd.st.period);
 #endif
-		sig = SIGILL;
+		sig = SIGUSR1;
+		break;
 	case SIGILL:
+		/*
+		 * For backwards compatibility with BIND 8 and older
+		 * versions of NSD.
+		 */
+		sig = SIGUSR1;
+		break;
+	case SIGUSR1:
+		/* Dump statistics.  */
 		break;
 	case SIGINT:
 		/* Silent shutdown... */
@@ -248,6 +259,7 @@ sig_handler (int sig)
 	default:
 		nsd.mode = NSD_SHUTDOWN;
 		log_msg(LOG_WARNING, "signal %d received, shutting down...", sig);
+		sig = SIGTERM;
 		break;
 	}
 
@@ -367,6 +379,21 @@ bind8_stats (struct nsd *nsd)
 extern char *optarg;
 extern int optind;
 
+static void
+initialize_edns(struct edns_data *data, uint16_t max_length)
+{
+	memset(data, 0, sizeof(struct edns_data));
+	data->ok[1] = (TYPE_OPT & 0xff00) >> 8;	/* type_hi */
+	data->ok[2] = TYPE_OPT & 0x00ff;	/* type_lo */
+	data->ok[3] = (max_length & 0xff00) >> 8; /* size_hi */
+	data->ok[4] = max_length & 0x00ff;	  /* size_lo */
+	data->error[1] = (TYPE_OPT & 0xff00) >> 8;	/* type_hi */
+	data->error[2] = TYPE_OPT & 0x00ff;		/* type_lo */
+	data->error[3] = (max_length & 0xff00) >> 8;	/* size_hi */
+	data->error[4] = max_length & 0x00ff;		/* size_lo */
+	data->error[5] = 1;	/* XXX Extended RCODE=BAD VERS */
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -386,7 +413,7 @@ main (int argc, char *argv[])
 	
 #ifdef PLUGINS
 	nsd_plugin_id_type plugin_count = 0;
-	char **plugins = xalloc(sizeof(char *));
+	char **plugins = (char **) xalloc(sizeof(char *));
 	maximum_plugin_count = 1;
 #endif /* PLUGINS */
 
@@ -421,17 +448,14 @@ main (int argc, char *argv[])
 	nsd.current_tcp_count = 0;
 	
 	/* EDNS0 */
-	nsd.edns.max_msglen = EDNS_MAX_MESSAGE_LEN;
-	nsd.edns.opt_ok[1] = (TYPE_OPT & 0xff00) >> 8;	/* type_hi */
-	nsd.edns.opt_ok[2] = TYPE_OPT & 0x00ff;	/* type_lo */
-	nsd.edns.opt_ok[3] = (nsd.edns.max_msglen & 0xff00) >> 8; 	/* size_hi */
-	nsd.edns.opt_ok[4] = nsd.edns.max_msglen & 0x00ff; 	/* size_lo */
-
-	nsd.edns.opt_err[1] = (TYPE_OPT & 0xff00) >> 8;	/* type_hi */
-	nsd.edns.opt_err[2] = TYPE_OPT & 0x00ff;	/* type_lo */
-	nsd.edns.opt_err[3] = (nsd.edns.max_msglen & 0xff00) >> 8; 	/* size_hi */
-	nsd.edns.opt_err[4] = nsd.edns.max_msglen & 0x00ff; 	/* size_lo */
-	nsd.edns.opt_err[5] = 1;			/* XXX Extended RCODE=BAD VERS */
+	initialize_edns(&nsd.edns_ipv4, EDNS_MAX_MESSAGE_LEN);
+#if defined(INET6)
+# if defined(IPV6_USE_MIN_MTU)
+	initialize_edns(&nsd.edns_ipv6, EDNS_MAX_MESSAGE_LEN);
+# else /* !defined(IPV6_USE_MIN_MTU) */
+	initialize_edns(&nsd.edns_ipv6, IPV6_MIN_MTU);
+# endif
+#endif
 
 	/* Set up our default identity to gethostname(2) */
 	if (gethostname(hostname, MAXHOSTNAMELEN) == 0) {
@@ -444,7 +468,7 @@ main (int argc, char *argv[])
 
 
 	/* Parse the command line... */
-	while ((c = getopt(argc, argv, "46a:df:hi:l:N:n:p:s:u:t:X:vF:L:")) != -1) {
+	while ((c = getopt(argc, argv, "46a:df:P:hi:l:N:n:p:s:u:t:X:vF:L:")) != -1) {
 		switch (c) {
 		case '4':
 			for (i = 0; i < MAX_INTERFACES; ++i) {
@@ -469,6 +493,9 @@ main (int argc, char *argv[])
 			break;
 		case 'f':
 			nsd.dbfile = optarg;
+			break;
+		case 'P':
+			nsd.pidfile = optarg;
 			break;
 		case 'h':
 			usage();
@@ -520,7 +547,9 @@ main (int argc, char *argv[])
 #ifdef PLUGINS
 			if (plugin_count == maximum_plugin_count) {
 				maximum_plugin_count *= 2;
-				plugins = xrealloc(plugins, maximum_plugin_count * sizeof(char *));
+				plugins = (char **) xrealloc(
+					plugins,
+					maximum_plugin_count * sizeof(char *));
 			}
 			plugins[plugin_count] = optarg;
 			++plugin_count;
@@ -556,7 +585,7 @@ main (int argc, char *argv[])
 	}
 	
 	/* Number of child servers to fork.  */
-	nsd.children = region_alloc(
+	nsd.children = (struct nsd_child *) region_alloc(
 		nsd.region, nsd.child_count * sizeof(struct nsd_child));
 	for (i = 0; i < nsd.child_count; ++i) {
 		nsd.children[i].kind = NSD_SERVER_BOTH;
@@ -724,6 +753,7 @@ main (int argc, char *argv[])
 	sigaction(SIGHUP, &action, NULL);
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGILL, &action, NULL);
+	sigaction(SIGUSR1, &action, NULL);
 	sigaction(SIGALRM, &action, NULL);
 	sigaction(SIGCHLD, &action, NULL);
 	action.sa_handler = SIG_IGN;

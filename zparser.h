@@ -29,164 +29,169 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     A = 258,
-     NS = 259,
-     MX = 260,
-     TXT = 261,
-     CNAME = 262,
-     AAAA = 263,
-     PTR = 264,
-     NXT = 265,
-     KEY = 266,
-     SOA = 267,
-     SIG = 268,
-     SRV = 269,
-     CERT = 270,
-     LOC = 271,
-     MD = 272,
-     MF = 273,
-     MB = 274,
-     MG = 275,
-     MR = 276,
-     YYNULL = 277,
-     WKS = 278,
-     HINFO = 279,
-     MINFO = 280,
-     RP = 281,
-     AFSDB = 282,
-     X25 = 283,
-     ISDN = 284,
-     RT = 285,
-     NSAP = 286,
-     NSAP_PTR = 287,
-     PX = 288,
-     GPOS = 289,
-     EID = 290,
-     NIMLOC = 291,
-     ATMA = 292,
-     NAPTR = 293,
-     KX = 294,
-     A6 = 295,
-     DNAME = 296,
-     SINK = 297,
-     OPT = 298,
-     APL = 299,
-     UINFO = 300,
-     UID = 301,
-     GID = 302,
-     UNSPEC = 303,
-     TKEY = 304,
-     TSIG = 305,
-     IXFR = 306,
-     AXFR = 307,
-     MAILB = 308,
-     MAILA = 309,
-     DS = 310,
-     SSHFP = 311,
-     RRSIG = 312,
-     NSEC = 313,
-     DNSKEY = 314,
+     T_A = 258,
+     T_NS = 259,
+     T_MX = 260,
+     T_TXT = 261,
+     T_CNAME = 262,
+     T_AAAA = 263,
+     T_PTR = 264,
+     T_NXT = 265,
+     T_KEY = 266,
+     T_SOA = 267,
+     T_SIG = 268,
+     T_SRV = 269,
+     T_CERT = 270,
+     T_LOC = 271,
+     T_MD = 272,
+     T_MF = 273,
+     T_MB = 274,
+     T_MG = 275,
+     T_MR = 276,
+     T_NULL = 277,
+     T_WKS = 278,
+     T_HINFO = 279,
+     T_MINFO = 280,
+     T_RP = 281,
+     T_AFSDB = 282,
+     T_X25 = 283,
+     T_ISDN = 284,
+     T_RT = 285,
+     T_NSAP = 286,
+     T_NSAP_PTR = 287,
+     T_PX = 288,
+     T_GPOS = 289,
+     T_EID = 290,
+     T_NIMLOC = 291,
+     T_ATMA = 292,
+     T_NAPTR = 293,
+     T_KX = 294,
+     T_A6 = 295,
+     T_DNAME = 296,
+     T_SINK = 297,
+     T_OPT = 298,
+     T_APL = 299,
+     T_UINFO = 300,
+     T_UID = 301,
+     T_GID = 302,
+     T_UNSPEC = 303,
+     T_TKEY = 304,
+     T_TSIG = 305,
+     T_IXFR = 306,
+     T_AXFR = 307,
+     T_MAILB = 308,
+     T_MAILA = 309,
+     T_DS = 310,
+     T_SSHFP = 311,
+     T_RRSIG = 312,
+     T_NSEC = 313,
+     T_DNSKEY = 314,
      DIR_TTL = 315,
      DIR_ORIG = 316,
      NL = 317,
      ORIGIN = 318,
      SP = 319,
-     STR = 320,
-     PREV = 321,
-     TTL = 322,
-     IN = 323,
-     CH = 324,
-     HS = 325,
-     URR = 326,
-     UTYPE = 327
+     RD_ORIGIN = 320,
+     STR = 321,
+     PREV = 322,
+     TTL = 323,
+     BITLAB = 324,
+     T_IN = 325,
+     T_CH = 326,
+     T_HS = 327,
+     URR = 328,
+     T_UTYPE = 329
    };
 #endif
-#define A 258
-#define NS 259
-#define MX 260
-#define TXT 261
-#define CNAME 262
-#define AAAA 263
-#define PTR 264
-#define NXT 265
-#define KEY 266
-#define SOA 267
-#define SIG 268
-#define SRV 269
-#define CERT 270
-#define LOC 271
-#define MD 272
-#define MF 273
-#define MB 274
-#define MG 275
-#define MR 276
-#define YYNULL 277
-#define WKS 278
-#define HINFO 279
-#define MINFO 280
-#define RP 281
-#define AFSDB 282
-#define X25 283
-#define ISDN 284
-#define RT 285
-#define NSAP 286
-#define NSAP_PTR 287
-#define PX 288
-#define GPOS 289
-#define EID 290
-#define NIMLOC 291
-#define ATMA 292
-#define NAPTR 293
-#define KX 294
-#define A6 295
-#define DNAME 296
-#define SINK 297
-#define OPT 298
-#define APL 299
-#define UINFO 300
-#define UID 301
-#define GID 302
-#define UNSPEC 303
-#define TKEY 304
-#define TSIG 305
-#define IXFR 306
-#define AXFR 307
-#define MAILB 308
-#define MAILA 309
-#define DS 310
-#define SSHFP 311
-#define RRSIG 312
-#define NSEC 313
-#define DNSKEY 314
+#define T_A 258
+#define T_NS 259
+#define T_MX 260
+#define T_TXT 261
+#define T_CNAME 262
+#define T_AAAA 263
+#define T_PTR 264
+#define T_NXT 265
+#define T_KEY 266
+#define T_SOA 267
+#define T_SIG 268
+#define T_SRV 269
+#define T_CERT 270
+#define T_LOC 271
+#define T_MD 272
+#define T_MF 273
+#define T_MB 274
+#define T_MG 275
+#define T_MR 276
+#define T_NULL 277
+#define T_WKS 278
+#define T_HINFO 279
+#define T_MINFO 280
+#define T_RP 281
+#define T_AFSDB 282
+#define T_X25 283
+#define T_ISDN 284
+#define T_RT 285
+#define T_NSAP 286
+#define T_NSAP_PTR 287
+#define T_PX 288
+#define T_GPOS 289
+#define T_EID 290
+#define T_NIMLOC 291
+#define T_ATMA 292
+#define T_NAPTR 293
+#define T_KX 294
+#define T_A6 295
+#define T_DNAME 296
+#define T_SINK 297
+#define T_OPT 298
+#define T_APL 299
+#define T_UINFO 300
+#define T_UID 301
+#define T_GID 302
+#define T_UNSPEC 303
+#define T_TKEY 304
+#define T_TSIG 305
+#define T_IXFR 306
+#define T_AXFR 307
+#define T_MAILB 308
+#define T_MAILA 309
+#define T_DS 310
+#define T_SSHFP 311
+#define T_RRSIG 312
+#define T_NSEC 313
+#define T_DNSKEY 314
 #define DIR_TTL 315
 #define DIR_ORIG 316
 #define NL 317
 #define ORIGIN 318
 #define SP 319
-#define STR 320
-#define PREV 321
-#define TTL 322
-#define IN 323
-#define CH 324
-#define HS 325
-#define URR 326
-#define UTYPE 327
+#define RD_ORIGIN 320
+#define STR 321
+#define PREV 322
+#define TTL 323
+#define BITLAB 324
+#define T_IN 325
+#define T_CH 326
+#define T_HS 327
+#define URR 328
+#define T_UTYPE 329
 
 
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 37 "zparser.y"
+#line 36 "zparser.y"
 typedef union YYSTYPE {
 	domain_type      *domain;
 	const dname_type *dname;
 	struct lex_data   data;
 	uint32_t          ttl;
-	uint16_t          class;
+	uint16_t          klass;
 	uint16_t          type;
+	uint16_t         *unknown;
 } YYSTYPE;
-/* Line 1240 of yacc.c.  */
-#line 189 "zparser.h"
+/* Line 1248 of yacc.c.  */
+#line 194 "zparser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
