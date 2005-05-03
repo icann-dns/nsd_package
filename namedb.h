@@ -1,38 +1,9 @@
 /*
  * namedb.h -- nsd(8) internal namespace database definitions
  *
- * Alexis Yushin, <alexis@nlnetlabs.nl>
- *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
@@ -44,21 +15,13 @@
 #include "dname.h"
 #include "dns.h"
 #include "heap.h"
-#include "region-allocator.h"
 
 #define	NAMEDB_MAGIC		"NSDdbV06"
 #define	NAMEDB_MAGIC_SIZE	8
 
-#if defined(NAMEDB_UPPERCASE) || defined(USE_NAMEDB_UPPERCASE)
-#define	NAMEDB_NORMALIZE	toupper
-#else
-#define	NAMEDB_NORMALIZE	tolower
-#endif
-
-
 typedef union rdata_atom rdata_atom_type;
 typedef struct rrset rrset_type;
-typedef struct rrdata rrdata_type;
+typedef struct rr rr_type;
 
 /*
  * A domain name table supporting fast insert and search operations.
@@ -80,15 +43,16 @@ struct domain
 	domain_type *parent;
 	domain_type *wildcard_child_closest_match;
 	rrset_type  *rrsets;
-	uint32_t     number; /* Unique domain name number.  */
 #ifdef PLUGINS
 	void       **plugin_data;
 #endif
+	uint32_t     number; /* Unique domain name number.  */
 	
 	/*
 	 * This domain name exists (see wildcard clarification draft).
 	 */
 	unsigned     is_existing : 1;
+	unsigned     is_apex : 1;
 };
 
 struct zone
@@ -101,14 +65,26 @@ struct zone
 	unsigned     is_secure : 1;
 };
 
+/* a RR in DNS */
+struct rr {
+	domain_type     *owner;
+	rdata_atom_type *rdatas;
+	uint32_t         ttl;
+	uint16_t         type;
+	uint16_t         klass;
+	uint16_t         rdata_count;
+};
+
+/*
+ * An RRset consists of at least one RR.  All RRs are from the same
+ * zone.
+ */
 struct rrset
 {
-	rrset_type   *next;
-	zone_type    *zone;
-	uint16_t      type;
-	uint16_t      klass;	/* Avoid conflict with C++ keyword.  */
-	uint16_t      rrslen;
-	rrdata_type **rrs;
+	rrset_type *next;
+	zone_type  *zone;
+	rr_type    *rrs;
+	uint16_t    rr_count;
 };
 
 /*
@@ -123,13 +99,6 @@ union rdata_atom
 
 	/* Default.  */
 	uint16_t    *data;
-};
-
-struct rrdata
-{
-	int32_t         ttl;
-	uint16_t        rdata_count;
-	rdata_atom_type rdata[1];
 };
 
 /*
@@ -163,11 +132,11 @@ domain_type *domain_table_find(domain_table_type *table,
 			       const dname_type  *dname);
 
 /*
- * Insert a domain name in the domain table.  If the domain name is not
- * yet present in the table it is copied and a new dname_info node is
- * created (as well as for the missing parent domain names, if any).
- * Otherwise the domain_info that is already in the domain_table is
- * returned.
+ * Insert a domain name in the domain table.  If the domain name is
+ * not yet present in the table it is copied and a new dname_info node
+ * is created (as well as for the missing parent domain names, if
+ * any).  Otherwise the domain_type that is already in the
+ * domain_table is returned.
  */
 domain_type *domain_table_insert(domain_table_type *table,
 				 const dname_type  *dname);
@@ -209,12 +178,24 @@ domain_dname(domain_type *domain)
 	return (const dname_type *) domain->node.key;
 }
 
+static inline domain_type *
+domain_previous(domain_type *domain)
+{
+	rbnode_t *prev = heap_previous((rbnode_t *) domain);
+	return prev == RBTREE_NULL ? NULL : (domain_type *) prev;
+}
+
+static inline domain_type *
+domain_next(domain_type *domain)
+{
+	rbnode_t *prev = heap_next((rbnode_t *) domain);
+	return prev == RBTREE_NULL ? NULL : (domain_type *) prev;
+}
 
 /*
- * The type covered by the signature in the specified RR in the RRSIG
- * RRset.
+ * The type covered by the signature in the specified RRSIG RR.
  */
-uint16_t rrset_rrsig_type_covered(rrset_type *rrset, uint16_t rr);
+uint16_t rr_rrsig_type_covered(rr_type *rr);
 
 typedef struct namedb namedb_type;
 struct namedb
@@ -240,16 +221,10 @@ rdata_atom_size(rdata_atom_type atom)
 	return *atom.data;
 }
 
-static inline void *
+static inline uint8_t *
 rdata_atom_data(rdata_atom_type atom)
 {
-	return atom.data + 1;
-}
-
-static inline size_t
-rrdata_size(uint16_t rdcount)
-{
-	return sizeof(rrdata_type) + (rdcount - 1) * sizeof(rdata_atom_type);
+	return (uint8_t *) (atom.data + 1);
 }
 
 
@@ -290,5 +265,22 @@ rdata_atom_wireformat_type(uint16_t type, size_t index)
 	assert(index < descriptor->maximum);
 	return (rdata_wireformat_type) descriptor->wireformat[index];
 }
+
+static inline uint16_t
+rrset_rrtype(rrset_type *rrset)
+{
+	assert(rrset);
+	assert(rrset->rr_count > 0);
+	return rrset->rrs[0].type;
+}
+
+static inline uint16_t
+rrset_rrclass(rrset_type *rrset)
+{
+	assert(rrset);
+	assert(rrset->rr_count > 0);
+	return rrset->rrs[0].klass;
+}
+
 
 #endif

@@ -278,30 +278,23 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
  */
 #define YY_DO_BEFORE_ACTION \
 	yytext_ptr = yy_bp; \
-	yyleng = (int) (yy_cp - yy_bp); \
+	yytext_ptr -= yy_more_len; \
+	yyleng = (int) (yy_cp - yytext_ptr); \
 	yy_hold_char = *yy_cp; \
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 20
-#define YY_END_OF_BUFFER 21
-static yyconst short int yy_accept[133] =
+#define YY_NUM_RULES 25
+#define YY_END_OF_BUFFER 26
+static yyconst short int yy_accept[68] =
     {   0,
-        0,    0,    0,    0,   21,   19,   15,   12,   18,   19,
-       13,   14,    9,    1,   19,   11,   19,    8,    2,    6,
-        6,    6,    6,    6,    6,    6,    1,    6,    6,    6,
-        6,    2,   15,   13,   14,    1,   18,    0,    0,   17,
-        0,   13,   14,    1,   18,   10,   18,   11,    7,    7,
-        7,    7,    6,    6,    6,    6,    1,    6,    6,    6,
-        6,    6,    6,    6,    1,    6,    6,    6,    6,    6,
-        6,    6,    6,    0,   17,    0,    0,   18,    0,   16,
-        7,    7,    7,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    0,   16,   18,   18,   16,    7,    7,
-
-        3,    6,    6,    6,    6,    6,    6,    6,    3,    0,
-        0,   16,    0,    7,    7,    6,    6,    6,    6,    6,
-        6,    7,    7,    6,    6,    7,    4,    6,    4,    5,
-        5,    0
+        0,    0,    0,    0,   16,   16,   20,   20,   26,   23,
+       14,   11,   19,   24,   12,   13,    8,    1,    9,   23,
+       24,    6,    5,   16,   17,   16,   18,   20,   21,   22,
+       20,   23,   23,   14,    1,    1,   23,   10,   15,   23,
+        7,    7,    7,    7,    6,   16,   16,   16,   16,   20,
+       20,   20,   20,    7,    7,    7,    7,    7,    2,    7,
+        7,    7,    7,    7,    3,    4,    0
     } ;
 
 static yyconst int yy_ec[256] =
@@ -309,17 +302,17 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    4,    5,    6,    7,    4,    4,    1,    8,
-        9,    4,    4,    1,    4,   10,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4,    4,   11,    1,
-        4,    1,    4,   12,   16,   16,   17,   18,   19,   16,
-       20,   16,   21,   16,   16,   22,   16,   23,   24,   16,
-       16,   25,   16,   26,   27,   16,   16,   16,   16,   16,
-       13,   14,   15,    4,    4,    1,   16,   16,   17,   18,
+        1,    2,    1,    4,    5,    6,    1,    1,    1,    7,
+        8,    1,    1,    1,    1,    9,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,   10,    1,
+        1,    1,    1,   11,   15,   15,   16,   17,   18,   15,
+       19,   15,   20,   15,   15,   21,   15,   22,   23,   15,
+       15,   24,   15,   25,   26,   15,   15,   15,   15,   15,
+       12,   13,   14,    1,    1,    1,   15,   15,   16,   17,
 
-       19,   16,   20,   16,   21,   16,   16,   22,   16,   23,
-       24,   16,   16,   25,   16,   26,   27,   16,   16,   16,
-       16,   16,    1,    1,    1,    1,    1,    1,    1,    1,
+       18,   15,   19,   15,   20,   15,   15,   21,   15,   22,
+       23,   15,   15,   24,   15,   25,   26,   15,   15,   15,
+       15,   15,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -336,163 +329,87 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst int yy_meta[28] =
+static yyconst int yy_meta[27] =
     {   0,
-        1,    1,    2,    3,    1,    3,    1,    1,    1,    1,
-        1,    3,    3,    3,    3,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4
+        1,    2,    3,    4,    1,    2,    2,    2,    2,    2,
+        1,    1,    1,    5,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6
     } ;
 
-static yyconst short int yy_base[153] =
+static yyconst short int yy_base[80] =
     {   0,
-        0,   14,   28,   42,  324,  443,   53,  443,  294,   13,
-      301,  300,  443,    0,    0,   57,   46,  443,  282,    0,
-       67,   78,   43,  292,  286,    0,    0,   28,   82,   78,
-        0,  105,  109,  283,  282,    0,  262,  120,   68,  443,
-      121,  267,  265,    0,  239,  238,  135,  161,    0,  226,
-      206,  192,    0,  165,  215,  184,    0,    0,    0,  161,
-        0,  174,  181,  166,    0,    0,    0,  188,  176,  195,
-      199,  203,  209,  118,  166,  229,   94,    0,  223,  151,
-       64,   56,   52,  236,  237,  241,  233,    0,  242,    0,
-      237,  238,  244,  257,  443,    0,  272,    0,   49,   43,
-
-        0,  275,    0,    0,  290,    0,  285,  292,  293,  119,
-      307,  167,  312,   33,   37,  317,  320,  322,  325,  317,
-      321,   22,    9,  328,  327,    1,    0,  336,  335,    0,
-      342,  443,  368,  372,  374,  378,  382,  386,    0,  390,
-      394,  398,  402,  406,  410,  414,  418,  422,  426,  430,
-      434,  438
+        0,   12,  163,  162,   14,   21,   26,   28,  164,  150,
+       34,  167,  167,  167,  167,  167,  167,    0,  149,   44,
+       17,    0,  167,  148,  167,   58,  167,  147,  167,  167,
+       69,  146,    0,   73,    0,    0,  145,  144,  140,   21,
+        0,  126,  123,  116,    0,  124,   63,  122,   65,  116,
+       76,  110,   77,  102,   97,   95,   67,   68,    0,   60,
+       65,   67,   52,   25,    0,    0,  167,   90,   96,  102,
+      108,  114,  120,   32,  126,  132,  138,  144,  150
     } ;
 
-static yyconst short int yy_def[153] =
+static yyconst short int yy_def[80] =
     {   0,
-      133,  133,  134,  134,  132,  132,  132,  132,  135,  136,
-      132,  132,  132,  137,  138,  132,  139,  132,  135,  140,
-      140,  141,  142,  140,  140,  140,  143,  144,  140,  140,
-      140,  141,  132,  132,  132,  137,  135,  135,  136,  132,
-      145,  132,  132,  137,  135,  135,  132,  132,  139,  139,
-      139,  139,  140,  140,  140,  140,  143,   32,  141,  142,
-      140,  146,  140,  140,  143,   32,   32,  132,  140,   30,
-       30,   30,   30,  136,  136,  145,  147,   47,  148,  135,
-      139,  139,  139,  142,  142,  146,  149,   68,  150,   32,
-       30,   30,   30,  151,  132,   47,  148,   47,  139,  139,
-
-      139,  152,  140,   68,  150,   68,   30,   30,   30,  147,
-      151,  147,  148,  139,  139,  149,  152,  149,  150,   30,
-       30,  139,  139,   30,   30,  139,  139,   30,   30,  139,
-       30,    0,  132,  132,  132,  132,  132,  132,  132,  132,
-      132,  132,  132,  132,  132,  132,  132,  132,  132,  132,
-      132,  132
+       68,   68,   69,   69,   70,   70,   71,   71,   67,   72,
+       67,   67,   67,   67,   67,   67,   67,   73,   72,   67,
+       74,   75,   67,   76,   67,   77,   67,   78,   67,   67,
+       79,   72,   20,   67,   73,   73,   72,   72,   72,   20,
+       74,   74,   74,   74,   75,   76,   77,   76,   77,   78,
+       79,   78,   79,   74,   74,   74,   74,   74,   74,   74,
+       74,   74,   74,   74,   74,   74,    0,   67,   67,   67,
+       67,   67,   67,   67,   67,   67,   67,   67,   67
     } ;
 
-static yyconst short int yy_nxt[471] =
+static yyconst short int yy_nxt[194] =
     {   0,
-        6,    7,    8,   49,   10,   46,    6,   11,   12,   13,
-       14,  132,   47,   15,    6,   16,    8,   40,   10,  130,
-       17,   11,   12,   18,   14,   19,   41,   15,   20,   21,
-        8,  127,   23,   67,   20,   24,   25,   26,   27,  126,
-       68,   28,   20,   29,    8,   39,   23,   61,   30,   24,
-       25,   31,   27,   32,   33,   28,   62,  123,   48,  122,
-       34,   35,  115,   36,   34,   35,   50,   36,   54,   51,
-      114,   52,   40,  101,   55,   56,  100,   57,   53,   53,
-       99,   41,   53,   69,   53,   53,   53,   53,   53,   55,
-       56,   59,   57,   70,   70,   70,   70,   70,   71,   70,
+       67,   11,   12,   13,   37,   14,   15,   16,   17,   18,
+       19,   37,   20,   11,   12,   13,   25,   21,   15,   16,
+       17,   18,   19,   25,   20,   37,   26,   27,   29,   30,
+       29,   30,   37,   26,   27,   34,   42,   41,   31,   43,
+       31,   44,   66,   35,   37,   32,   32,   32,   38,   32,
+       32,   32,   32,   32,   37,   39,   40,   37,   37,   37,
+       37,   37,   37,   37,   37,   37,   37,   37,   37,   37,
+       49,   46,   50,   65,   34,   49,   46,   49,   46,   50,
+       50,   53,   35,   64,   63,   62,   61,   60,   53,   53,
+       10,   10,   10,   10,   10,   10,   22,   22,   22,   22,
 
-       70,   72,   70,   73,   70,   53,   53,   94,   95,   53,
-       33,   53,   53,   53,   53,   53,   34,   35,   59,   36,
-       37,   37,   40,   39,   37,   75,   37,   37,   37,   37,
-       37,   41,   94,   95,   76,   77,   77,   77,   78,   77,
-       78,   77,   77,   77,   77,   77,   78,   78,   79,   80,
-       78,   78,   78,   78,   78,   78,   78,   78,   78,   78,
-       78,   78,   48,   39,   38,   61,   54,   64,   34,   35,
-       40,   36,   55,   56,   62,   57,   39,   69,   85,   41,
-       94,   95,   63,   55,   56,   64,   57,   86,   87,   87,
-       77,   88,   87,   88,   87,   87,   87,   87,   87,   88,
+       22,   22,   24,   24,   24,   24,   24,   24,   28,   28,
+       28,   28,   28,   28,   32,   59,   58,   57,   32,   32,
+       36,   36,   51,   36,   36,   36,   45,   45,   51,   45,
+       45,   45,   46,   46,   47,   46,   47,   46,   48,   48,
+       56,   48,   48,   48,   50,   50,   55,   54,   50,   50,
+       52,   52,   33,   52,   52,   52,   33,   33,   33,   51,
+       47,   33,   33,   67,   23,   23,    9,   67,   67,   67,
+       67,   67,   67,   67,   67,   67,   67,   67,   67,   67,
+       67,   67,   67,   67,   67,   67,   67,   67,   67,   67,
+       67,   67,   67
 
-       88,   89,   90,   88,   88,   88,   88,   88,   88,   88,
-       88,   88,   88,   88,   88,   70,   63,   83,   70,   70,
-       70,   91,   70,   70,   70,   77,   70,   92,   70,   70,
-       82,   39,   70,   75,   93,   77,   97,   98,   39,   39,
-       61,   61,   76,   39,   77,   85,  102,  103,   81,   62,
-       62,   38,   38,  107,   86,  105,  106,   70,  108,   77,
-       70,   70,   70,   70,   70,  109,   43,   70,   42,   70,
-      111,  112,  110,  110,   77,   38,  110,   77,  110,  110,
-      110,  110,  110,   43,   42,  113,   98,   64,  117,  118,
-      116,  116,   77,   63,  116,   38,  116,  116,  116,  116,
-
-      116,   43,   42,  119,  106,   70,  120,   38,   70,   77,
-       70,  121,   70,   70,   77,   70,   70,   70,   70,   77,
-      111,  112,   77,  132,   77,   97,   98,   77,  132,  132,
-      102,  103,  132,  117,  118,  102,  103,   70,  105,  106,
-       70,  125,   70,  124,   70,  128,   70,   70,   70,  129,
-       70,   70,   70,   70,  131,   70,   70,  132,   70,   70,
-       70,   70,   70,  132,  132,   70,  132,   70,    9,    9,
-        9,    9,   22,   22,   22,   22,   37,   37,   39,   39,
-       39,   39,   44,  132,   44,   44,   45,  132,   45,   45,
-       53,  132,   53,   53,   58,  132,   58,   58,   60,   60,
-
-       60,   60,   65,  132,   65,   65,   66,  132,   66,   66,
-       74,   74,   74,   74,   84,   84,   84,   84,   77,   77,
-       77,   77,   96,   96,   96,   96,   87,   87,   87,   87,
-      104,  104,  104,  104,  110,  110,  110,  110,  116,  116,
-      116,  116,    5,  132,  132,  132,  132,  132,  132,  132,
-      132,  132,  132,  132,  132,  132,  132,  132,  132,  132,
-      132,  132,  132,  132,  132,  132,  132,  132,  132,  132
     } ;
 
-static yyconst short int yy_chk[471] =
+static yyconst short int yy_chk[194] =
     {   0,
-        1,    1,    1,  139,    1,   15,    1,    1,    1,    1,
-        1,    0,   15,    1,    2,    2,    2,   10,    2,  126,
-        2,    2,    2,    2,    2,    2,   10,    2,    3,    3,
-        3,  123,    3,   28,    3,    3,    3,    3,    3,  122,
-       28,    3,    4,    4,    4,   23,    4,   23,    4,    4,
-        4,    4,    4,    4,    7,    4,   23,  115,   16,  114,
-        7,    7,  100,    7,   16,   16,   17,   16,   21,   17,
-       99,   17,   39,   83,   21,   21,   82,   21,   22,   22,
-       81,   39,   22,   29,   22,   22,   22,   22,   22,   29,
-       29,   22,   29,   30,   30,   30,   30,   30,   30,   30,
+        0,    1,    1,    1,   33,    1,    1,    1,    1,    1,
+        1,   33,    1,    2,    2,    2,    5,    2,    2,    2,
+        2,    2,    2,    6,    2,   40,    5,    5,    7,    7,
+        8,    8,   40,    6,    6,   11,   21,   74,    7,   21,
+        8,   21,   64,   11,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       26,   26,   31,   63,   34,   47,   47,   49,   49,   51,
+       53,   31,   34,   62,   61,   60,   58,   57,   51,   53,
+       68,   68,   68,   68,   68,   68,   69,   69,   69,   69,
 
-       30,   30,   30,   30,   30,   32,   32,   77,   77,   32,
-       33,   32,   32,   32,   32,   32,   33,   33,   32,   33,
-       38,   38,   74,   41,   38,   41,   38,   38,   38,   38,
-       38,   74,  110,  110,   41,   47,   47,   47,   47,   47,
-       47,   47,   47,   47,   47,   47,   47,   47,   47,   47,
-       47,   47,   47,   47,   47,   47,   47,   47,   47,   47,
-       47,   47,   48,   60,   80,   60,   54,   64,   48,   48,
-       75,   48,   54,   54,   60,   54,   62,   69,   62,   75,
-      112,  112,   63,   69,   69,   56,   69,   62,   68,   68,
-       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       69,   69,   70,   70,   70,   70,   70,   70,   71,   71,
+       71,   71,   71,   71,   72,   56,   55,   54,   72,   72,
+       73,   73,   52,   73,   73,   73,   75,   75,   50,   75,
+       75,   75,   76,   76,   48,   76,   46,   76,   77,   77,
+       44,   77,   77,   77,   78,   78,   43,   42,   78,   78,
+       79,   79,   39,   79,   79,   79,   38,   37,   32,   28,
+       24,   19,   10,    9,    4,    3,   67,   67,   67,   67,
+       67,   67,   67,   67,   67,   67,   67,   67,   67,   67,
+       67,   67,   67,   67,   67,   67,   67,   67,   67,   67,
+       67,   67,   67
 
-       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
-       68,   68,   68,   68,   68,   70,   55,   52,   70,   71,
-       70,   71,   71,   72,   71,   79,   72,   72,   72,   73,
-       51,   76,   73,   76,   73,   87,   79,   79,   84,   85,
-       84,   85,   76,   86,   89,   86,   87,   87,   50,   84,
-       85,   46,   45,   91,   86,   89,   89,   91,   92,   94,
-       91,   92,   91,   92,   93,   93,   43,   93,   42,   93,
-       94,   94,   97,   97,   97,   37,   97,  102,   97,   97,
-       97,   97,   97,   35,   34,   97,   97,   25,  102,  102,
-      105,  105,  105,   24,  105,   19,  105,  105,  105,  105,
-
-      105,   12,   11,  105,  105,  107,  107,    9,  107,  111,
-      107,  108,  108,  109,  113,  108,  109,  108,  109,  116,
-      111,  111,  117,    5,  118,  113,  113,  119,    0,    0,
-      116,  116,    0,  117,  117,  118,  118,  120,  119,  119,
-      120,  121,  120,  120,  121,  124,  121,  125,  124,  125,
-      125,  124,  125,  124,  128,  129,  128,    0,  129,  128,
-      129,  128,  131,    0,    0,  131,    0,  131,  133,  133,
-      133,  133,  134,  134,  134,  134,  135,  135,  136,  136,
-      136,  136,  137,    0,  137,  137,  138,    0,  138,  138,
-      140,    0,  140,  140,  141,    0,  141,  141,  142,  142,
-
-      142,  142,  143,    0,  143,  143,  144,    0,  144,  144,
-      145,  145,  145,  145,  146,  146,  146,  146,  147,  147,
-      147,  147,  148,  148,  148,  148,  149,  149,  149,  149,
-      150,  150,  150,  150,  151,  151,  151,  151,  152,  152,
-      152,  152,  132,  132,  132,  132,  132,  132,  132,  132,
-      132,  132,  132,  132,  132,  132,  132,  132,  132,  132,
-      132,  132,  132,  132,  132,  132,  132,  132,  132,  132
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -502,8 +419,10 @@ static char *yy_last_accepting_cpos;
  * any uses of REJECT which flex missed.
  */
 #define REJECT reject_used_but_not_detected
-#define yymore() yymore_used_but_not_detected
-#define YY_MORE_ADJ 0
+static int yy_more_flag = 0;
+static int yy_more_len = 0;
+#define yymore() (yy_more_flag = 1)
+#define YY_MORE_ADJ yy_more_len
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "zlexer.lex"
@@ -514,12 +433,14 @@ char *yytext;
  * 
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved
  *
- * See LICENSE for the license
+ * See LICENSE for the license.
+ *
  */
 
 #include <config.h>
 
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <strings.h>
 
@@ -527,21 +448,60 @@ char *yytext;
 #include "dname.h"
 #include "zparser.h"
 
+#define YY_NO_UNPUT
+
 #if 0
 #define LEXOUT(s)  printf s /* used ONLY when debugging */
 #else
 #define LEXOUT(s)
 #endif
 
-static int parsestr(char * yytext, enum rr_spot *in_rr);
+enum lexer_state {
+	EXPECT_OWNER,
+	PARSING_OWNER,
+	PARSING_TTL_CLASS_TYPE,
+	PARSING_RDATA
+};
+
+static int parse_token(int token, char *yytext, enum lexer_state *lexer_state);
 
 static YY_BUFFER_STATE include_stack[MAXINCLUDES];
 static zparser_type zparser_stack[MAXINCLUDES];
 static int include_stack_ptr = 0;
 
-#define incl 1
+/*
+ * Saves the file specific variables on the include stack.
+ */
+static void
+push_parser_state(FILE *input)
+{
+	zparser_stack[include_stack_ptr].filename = parser->filename;
+	zparser_stack[include_stack_ptr].line = parser->line;
+	zparser_stack[include_stack_ptr].origin = parser->origin;
+	include_stack[include_stack_ptr] = YY_CURRENT_BUFFER;
+	yy_switch_to_buffer(yy_create_buffer(input, YY_BUF_SIZE));
+	++include_stack_ptr;
+}
 
-#line 545 "zlexer.c"
+/*
+ * Restores the file specific variables from the include stack.
+ */
+static void
+pop_parser_state(void)
+{
+	--include_stack_ptr;
+	parser->filename = zparser_stack[include_stack_ptr].filename;
+	parser->line = zparser_stack[include_stack_ptr].line;
+	parser->origin = zparser_stack[include_stack_ptr].origin;
+	yy_delete_buffer(YY_CURRENT_BUFFER);
+	yy_switch_to_buffer(include_stack[include_stack_ptr]);
+}
+	
+#define incl 1
+#define bitlabel 2
+#define quotedstring 3
+
+#line 505 "zlexer.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -695,11 +655,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 48 "zlexer.lex"
+#line 85 "zlexer.lex"
 
-    static int paren_open = 0;
-    static enum rr_spot in_rr = outside;
-#line 703 "zlexer.c"
+	static int paren_open = 0;
+	static enum lexer_state lexer_state = EXPECT_OWNER;
+#line 663 "zlexer.c"
 
 	if ( yy_init )
 		{
@@ -727,6 +687,12 @@ YY_DECL
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
+		yy_more_len = 0;
+		if ( yy_more_flag )
+			{
+			yy_more_len = yy_c_buf_p - yytext_ptr;
+			yy_more_flag = 0;
+			}
 		yy_cp = yy_c_buf_p;
 
 		/* Support of yytext. */
@@ -751,13 +717,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 133 )
+				if ( yy_current_state >= 68 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 443 );
+		while ( yy_base[yy_current_state] != 167 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -785,271 +751,288 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "zlexer.lex"
+#line 88 "zlexer.lex"
 /* ignore */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 52 "zlexer.lex"
-{
-                            in_rr = expecting_dname;
-                            return ORIGIN;
-                        }
+#line 89 "zlexer.lex"
+{ lexer_state = PARSING_RDATA; return DOLLAR_TTL; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 56 "zlexer.lex"
-return DIR_TTL;
+#line 90 "zlexer.lex"
+{ lexer_state = PARSING_RDATA; return DOLLAR_ORIGIN; }
 	YY_BREAK
+/*
+	 * Handle $INCLUDE directives.  See
+	 * http://dinosaur.compilertools.net/flex/flex_12.html#SEC12.
+	 */
 case 4:
 YY_RULE_SETUP
-#line 57 "zlexer.lex"
-return DIR_ORIG;
+#line 96 "zlexer.lex"
+{
+	BEGIN(incl);
+}
 	YY_BREAK
 case 5:
-YY_RULE_SETUP
-#line 58 "zlexer.lex"
-BEGIN(incl);
+#line 100 "zlexer.lex"
+case YY_STATE_EOF(incl):
+#line 100 "zlexer.lex"
+{
+	int error_occurred = parser->error_occurred;
+	BEGIN(INITIAL);
+	zc_error("missing file name in $INCLUDE directive");
+	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
+	++parser->line;
+	parser->error_occurred = error_occurred;
+}
 	YY_BREAK
-/* see
-			* http://dinosaur.compilertools.net/flex/flex_12.html#SEC12
-			*/
 case 6:
 YY_RULE_SETUP
-#line 63 "zlexer.lex"
+#line 108 "zlexer.lex"
 { 	
-				/* Need to fix this so that $INCLUDE * file origin works */
-    				/* got the include file name
-			     	 * open the new filename and continue parsing 
-			     	 */
+	char *tmp;
+	domain_type *origin = parser->origin;
+	int error_occurred = parser->error_occurred;
+	
+	BEGIN(INITIAL);
+	if (include_stack_ptr >= MAXINCLUDES ) {
+		zc_error("includes nested too deeply, skipped (>%d)",
+			 MAXINCLUDES);
+	} else {
+		/* Remove trailing comment.  */
+		tmp = strrchr(yytext, ';');
+		if (tmp) {
+			*tmp = '\0';
+		}
+		strip_string(yytext);
+		
+		/* Parse origin for include file.  */
+		tmp = strrchr(yytext, ' ');
+		if (!tmp) {
+			tmp = strrchr(yytext, '\t');
+		}
+		if (tmp) {
+			const dname_type *dname;
+			
+			/* split the original yytext */
+			*tmp = '\0';
+			strip_string(yytext);
+			
+			dname = dname_parse(parser->region, tmp + 1);
+			if (!dname) {
+				zc_error("incorrect include origin '%s'",
+					 tmp + 1);
+			} else {
+				origin = domain_table_insert(
+					parser->db->domains, dname);
+			}
+		}
+		
+		if (strlen(yytext) == 0) {
+			zc_error("missing file name in $INCLUDE directive");
+		} else if (!(yyin = fopen(yytext, "r"))) {
+			zc_error("cannot open include file '%s': %s",
+				 yytext, strerror(errno));
+		} else {
+			/* Initialize parser for include file.  */
+			char *filename = region_strdup(parser->region, yytext);
+			push_parser_state(yyin); /* Destroys yytext.  */
+			parser->filename = filename;
+			parser->line = 1;
+			parser->origin = origin;
+			lexer_state = EXPECT_OWNER;
+		}
+	}
 
-				char *include_origin;
-				
-				/* eat leading white space */
-				while ( isspace(*yytext) ) 
-					yytext++;
-
-				include_origin = strrchr(yytext, 32); /* search for a space */
-				
-				if ( include_origin != NULL ) {
-					/* split the original yytext */
-					*include_origin = '\0';
-					include_origin++;
-				}
-				
-
-				if ( include_stack_ptr >= MAXINCLUDES ) {
-				    error("Includes nested too deeply (>10)");
-            			    exit(1);
-            			}
-
-				/* push zdefault on the stack (only the
-				 * important values
-				 */
-				zparser_stack[include_stack_ptr].filename = 
-					parser->filename;
-				zparser_stack[include_stack_ptr].line	   = 
-					parser->line;
-
-				/* put the given origin on the stack
-				 * if no origin was present push the current
-				 * origin on it. This way the popping of the
-				 * origin always works ok */
-
-				if ( include_origin != NULL ) {
-					zparser_stack[include_stack_ptr].origin = 
-						domain_table_insert(
-							parser->db->domains,
-							dname_parse(parser->region,
-								    include_origin,
-								    NULL));
-					/* start using this origin */
-					parser->origin = 
-						domain_table_insert(
-							parser->db->domains,
-							dname_parse(parser->region,
-								    include_origin,
-								    NULL));
-				} else {
-					zparser_stack[include_stack_ptr].origin = 
-						parser->origin;
-				}
-
-			        include_stack[include_stack_ptr++] = 
-					YY_CURRENT_BUFFER;
-
-		        	yyin = fopen( yytext, "r" );
-        			if ( ! yyin ) {
-					error("Cannot open $INCLUDE file: %s", yytext);
-				    	exit(1);
-				}
-
-				/* reset for the current file */
-				parser->filename = region_strdup(parser->region, yytext);
-				parser->line = 1;
-        			yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-
-			        BEGIN(INITIAL);
-        		}	
+	parser->error_occurred = error_occurred;
+}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(incl):
-#line 137 "zlexer.lex"
-{	/* end of file is reached - check if we were including */
-				if (include_stack_ptr == 0) {
-					yyterminate();
-        			} else {
-					--include_stack_ptr;
-					
-					/* pop (once you pop, you can not stop) */
-					parser->filename =
-						zparser_stack[include_stack_ptr].filename;
-					parser->line = 
-						zparser_stack[include_stack_ptr].line;
-					/* pop the origin */
-					parser->origin =
-						zparser_stack[include_stack_ptr].origin;
-					
-            				yy_delete_buffer( YY_CURRENT_BUFFER );
-            				yy_switch_to_buffer( include_stack[include_stack_ptr] );
-            			}
-        		}
+#line 165 "zlexer.lex"
+{
+	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
+	if (include_stack_ptr == 0) {
+		yyterminate();
+	} else {
+		fclose(yyin);
+		pop_parser_state();
+	}
+}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 156 "zlexer.lex"
-{ warning("Unknown $directive: %s", yytext); }
+#line 174 "zlexer.lex"
+{ zc_warning("Unknown directive: %s", yytext); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 157 "zlexer.lex"
+#line 175 "zlexer.lex"
 {
-                            /* a ^. means the root zone... also set in_rr */
-                            in_rr = expecting_dname;
-			    LEXOUT((". "));
-                            return '.';
-                        }
+	LEXOUT((". "));
+	return parse_token('.', yytext, &lexer_state);
+}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 163 "zlexer.lex"
-{ LEXOUT((". ")); return '.'; }
+#line 179 "zlexer.lex"
+{
+	LEXOUT(("@ "));
+	return parse_token('@', yytext, &lexer_state);
+}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 164 "zlexer.lex"
-{ LEXOUT(("\\# "));return URR; }
+#line 183 "zlexer.lex"
+{
+	LEXOUT(("\\# "));
+	return parse_token(URR, yytext, &lexer_state);
+}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 165 "zlexer.lex"
+#line 187 "zlexer.lex"
 {
-                            if ( paren_open == 0 ) { 
-                                in_rr = after_dname;
-                                return PREV;
-                            }
-                        }
+	++parser->line;
+	if (!paren_open) { 
+		lexer_state = EXPECT_OWNER;
+		LEXOUT(("NL\n"));
+		return NL;
+	} else {
+		LEXOUT(("SP "));
+		return SP;
+	}
+}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 171 "zlexer.lex"
+#line 198 "zlexer.lex"
 {
-                            parser->line++;
-                            if ( paren_open == 0 ) { 
-                                in_rr = outside;
-				LEXOUT(("NL \n"));
-                                return NL;
-                            } else {
-				    LEXOUT(("SP "));
-				    return SP;
-			    }
-                        }
+	if (paren_open) {
+		zc_error("nested parentheses");
+		yyterminate();
+	}
+	LEXOUT(("( "));
+	paren_open = 1;
+	return SP;
+}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 182 "zlexer.lex"
+#line 207 "zlexer.lex"
 {
-                            if ( paren_open == 1 ) {
-				error("Nested parentheses");
-                                yyterminate();
-                            }
-                            LEXOUT(("SP( "));
-                            paren_open = 1;
-                            return SP;
-                        }
+	if (!paren_open) {
+		zc_error("closing parentheses without opening parentheses");
+		yyterminate();
+	}
+	LEXOUT((") "));
+	paren_open = 0;
+	return SP;
+}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 191 "zlexer.lex"
+#line 216 "zlexer.lex"
 {
-                            if ( paren_open == 0 ) {
-				error("Unterminated parentheses");
-                                yyterminate();
-                            }
-                            LEXOUT(("SP) "));
-                            paren_open = 0;
-                            return SP;
-                        }
+	if (!paren_open && lexer_state == EXPECT_OWNER) {
+		lexer_state = PARSING_TTL_CLASS_TYPE;
+		LEXOUT(("PREV "));
+		return PREV;
+	}
+	if (lexer_state == PARSING_OWNER) {
+		lexer_state = PARSING_TTL_CLASS_TYPE;
+	}
+	LEXOUT(("SP "));
+	return SP;
+}
 	YY_BREAK
+/* Bitlabels.  Strip leading and ending brackets.  */
 case 15:
 YY_RULE_SETUP
-#line 200 "zlexer.lex"
+#line 230 "zlexer.lex"
+{ BEGIN(bitlabel); }
+	YY_BREAK
+case YY_STATE_EOF(bitlabel):
+#line 231 "zlexer.lex"
 {
-                            if ( paren_open == 0 ) {
-                                if (in_rr == expecting_dname)
-                                    in_rr = after_dname;
-                            }
-                            LEXOUT(("SP "));
-                            return SP;
-                        }
+	zc_error("EOF inside bitlabel");
+	BEGIN(INITIAL);
+}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 208 "zlexer.lex"
-{
-			/* bitlabels */
-			yytext[strlen(yytext) - 1] = '\0';
-			yylval.data.len = strlen(yytext + 2);
-			yylval.data.str = region_strdup(parser->rr_region, yytext + 2);
-			if (in_rr == expecting_dname || in_rr == outside) 
-				in_rr = after_dname;
-			return BITLAB;
-		}
+#line 235 "zlexer.lex"
+{ yymore(); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 218 "zlexer.lex"
-{
-                            /* this matches quoted strings */
-			    /* Strip leading and ending quotes.  */
-			    yytext[strlen(yytext) - 1] = '\0';
-                            return parsestr(yytext + 1, &in_rr);
-                        }
+#line 236 "zlexer.lex"
+{ ++parser->line; yymore(); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 224 "zlexer.lex"
+#line 237 "zlexer.lex"
 {
-                            /* any allowed word */
-			    return parsestr(yytext, &in_rr);
-                        }
+	BEGIN(INITIAL);
+	yytext[yyleng - 1] = '\0';
+	return parse_token(BITLAB, yytext, &lexer_state);
+}
 	YY_BREAK
+/* Quoted strings.  Strip leading and ending quotes.  */
 case 19:
 YY_RULE_SETUP
-#line 228 "zlexer.lex"
+#line 244 "zlexer.lex"
+{ BEGIN(quotedstring); }
+	YY_BREAK
+case YY_STATE_EOF(quotedstring):
+#line 245 "zlexer.lex"
 {
-                            /* we should NEVER reach this
-                             * bail out with an error */
-			    error("Unknown character seen - is this a zonefile?");
-                            /*exit(1); [XXX] we should exit... */
-                        }
+	zc_error("EOF inside quoted string");
+	BEGIN(INITIAL);
+}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 234 "zlexer.lex"
+#line 249 "zlexer.lex"
+{ yymore(); }
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 250 "zlexer.lex"
+{ ++parser->line; yymore(); }
+	YY_BREAK
+case 22:
+YY_RULE_SETUP
+#line 251 "zlexer.lex"
+{
+	BEGIN(INITIAL);
+	yytext[yyleng - 1] = '\0';
+	return parse_token(STR, yytext, &lexer_state);
+}
+	YY_BREAK
+case 23:
+YY_RULE_SETUP
+#line 257 "zlexer.lex"
+{
+	/* Any allowed word.  */
+	return parse_token(STR, yytext, &lexer_state);
+}
+	YY_BREAK
+case 24:
+YY_RULE_SETUP
+#line 261 "zlexer.lex"
+{
+	zc_error("unknown character '%c' (\\%03d) seen - is this a zonefile?",
+		 (int) yytext[0], (int) yytext[0]);
+}
+	YY_BREAK
+case 25:
+YY_RULE_SETUP
+#line 265 "zlexer.lex"
 ECHO;
 	YY_BREAK
-#line 1053 "zlexer.c"
+#line 1036 "zlexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1340,7 +1323,7 @@ static yy_state_type yy_get_previous_state()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 133 )
+			if ( yy_current_state >= 68 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1375,11 +1358,11 @@ yy_state_type yy_current_state;
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 133 )
+		if ( yy_current_state >= 68 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 132);
+	yy_is_jam = (yy_current_state == 67);
 
 	return yy_is_jam ? 0 : yy_current_state;
 	}
@@ -1935,7 +1918,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 234 "zlexer.lex"
+#line 265 "zlexer.lex"
 
 
 /*
@@ -1944,9 +1927,9 @@ int main()
  * returned and the TYPE parameter is set to the RR type value.
  */
 static int
-zrrtype (const char *word, uint16_t *type) 
+rrtype_to_token(const char *word, uint16_t *type) 
 {
-	uint16_t t = lookup_type_by_name(word);
+	uint16_t t = rrtype_from_string(word);
 	if (t != 0) {
 		rrtype_descriptor_type *entry = rrtype_descriptor_by_type(t);
 		*type = t;
@@ -1956,136 +1939,89 @@ zrrtype (const char *word, uint16_t *type)
 	return 0;
 }
 
-/* do some preparsing of the stuff */
-static int
-zoctet(char *word) 
+
+/*
+ * Remove \DDD constructs from the input. See RFC 1035, section 5.1.
+ */
+static size_t
+zoctet(char *text) 
 {
-    /* remove \DDD constructs from the input. See RFC 1035, section 5.1 */
-    /* s follows the string, p lags behind and rebuilds the new string */
-    char * s; char * p;
-    unsigned int length = 0;
-
-    for (s = p = word; *s != '\0'; s++,p++ ) {
-        switch ( *s ) {
-            case '.':
-		/* [XXX] is empty label handled correctly? */
-                if (s[1] == '.') {
-                    warning("Empty label");
-                    break;
-                }
-                *p = *s;
-                length++; 
-                break;
-            case '\\':
-                if ('0' <= s[1] && s[1] <= '9' &&
-                    '0' <= s[2] && s[2] <= '9' &&
-                    '0' <= s[3] && s[3] <= '9')
-		{
-                    /* \DDD seen */
-                    int val = ((s[1] - '0') * 100 +
-                           (s[2] - '0') * 10 +
-                           (s[3] - '0'));
-
-                    if (0 <= val && val <= 255) {
-                        /* this also handles \0 */
-                        s += 3;
-                        *p = val;
-                        length++;
-                    } else {
-                        warning("ASCII \\DDD overflow");
-                    }
-
-                } else {
-                    /* an espaced character, like \<space> ? 
-                    * remove the '\' keep the rest */
-                    *p = *++s;
-                    length++;
-                }
-                break;
-            case '\"':
-                /* non quoted " Is either first or the last character in
-                 * the string */
-
-                *p = *++s; /* skip it */
-                length++; 
-                if ( *s == '\0' ) {
-                    /* ok, it was the last one */
-                    *p  = '\0'; return length;
-                }
-                break;
-            default:
-                *p = *s;
-                length++;
-                break;
-        }
-    }
-    *p = '\0';
-    return length;
+	/*
+	 * s follows the string, p lags behind and rebuilds the new
+	 * string
+	 */
+	char *s;
+	char *p;
+	
+	for (s = p = text; *s; ++s, ++p) {
+		assert(p <= s);
+		if (s[0] != '\\') {
+			/* Ordinary character.  */
+			*p = *s;
+		} else if (isdigit(s[1]) && isdigit(s[2]) && isdigit(s[3])) {
+			/* \DDD escape.  */
+			int val = (hexdigit_to_int(s[1]) * 100 +
+				   hexdigit_to_int(s[2]) * 10 +
+				   hexdigit_to_int(s[3]));
+			if (0 <= val && val <= 255) {
+				s += 3;
+				*p = val;
+			} else {
+				zc_warning("text escape \\DDD overflow");
+				*p = *++s;
+			}
+		} else if (s[1] != '\0') {
+			/* \X where X is any character, keep X.  */
+			*p = *++s;
+		} else {
+			/* Trailing backslash, ignore it.  */
+			zc_warning("trailing backslash ignored");
+			--p;
+		}
+	}
+	*p = '\0';
+	return p - text;
 }
 
 static int
-parsestr(char *yytext, enum rr_spot *in_rr)
+parse_token(int token, char *yytext, enum lexer_state *lexer_state)
 {
-	int token;
-	char *t; char *ztext;
+	char *str = region_strdup(parser->rr_region, yytext);
+	size_t len = zoctet(str);
 
-	switch(*in_rr) {
-	case after_dname:
+	if (*lexer_state == EXPECT_OWNER) {
+		*lexer_state = PARSING_OWNER;
+	} else if (*lexer_state == PARSING_TTL_CLASS_TYPE) {
+		const char *t;
+		int token;
+		uint16_t rrclass;
+		
 		/* type */
-		token = zrrtype(yytext, &yylval.type);
+		token = rrtype_to_token(str, &yylval.type);
 		if (token != 0) {
-			*in_rr = reading_type;
+			*lexer_state = PARSING_RDATA;
 			return token;
 		}
 
 		/* class */
-		if (strcasecmp(yytext, "IN") == 0 ||
-		    strcasecmp(yytext,"CLASS1") == 0 ) {
-			yylval.klass = CLASS_IN;
-			LEXOUT(("IN "));
-			return T_IN;
-		} else if (strcasecmp(yytext, "CH") == 0) {
-			yylval.klass = CLASS_CHAOS;
-			return T_CH;
-		} else if (strcasecmp(yytext, "HS") == 0) {
-			yylval.klass = CLASS_HS;
-			return T_HS;
+		rrclass = rrclass_from_string(str);
+		if (rrclass != 0) {
+			yylval.klass = rrclass;
+			LEXOUT(("CLASS "));
+			return T_RRCLASS;
 		}
 
 		/* ttl */
-		strtottl(yytext, &t);
-		if ( *t == 0 ) {
-			/* was parseable */
-			yylval.data.str = yytext;
-			yylval.data.len = strlen(yytext); /*needed?*/
+		yylval.ttl = strtottl(str, &t);
+		if (*t == '\0') {
 			LEXOUT(("TTL "));
-			return TTL;
+			return T_TTL;
 		}
-		/* Fall through, default first, order matters.  */
-	default:
-		/*
-		 * Check to see if someone used @ in the rdata if so
-		 * return the origin str, and RD_ORIGIN token.
-		 */
-		if (strcasecmp(yytext, "@") == 0) {
-			ztext = (char *)dname_to_string(domain_dname(parser->origin));
-			yylval.data.len = strlen(ztext);
-			yylval.data.str = ztext;
-			LEXOUT(("RDATA_ORI "));
-			return RD_ORIGIN;
-		}
-		ztext = region_strdup(parser->rr_region, yytext);
-		yylval.data.len = zoctet(ztext);
-		yylval.data.str = ztext;
-		LEXOUT(("STR "));
-		return STR;
-	case outside:
-		/* should match ^ */
-		ztext = region_strdup(parser->rr_region, yytext);
-		yylval.data.len = zoctet(ztext);
-		yylval.data.str = ztext;
-		*in_rr = expecting_dname;
-		LEXOUT(("STR "));
-		return STR;
 	}
+
+	yylval.data.str = str;
+	yylval.data.len = len;
+	
+	LEXOUT(("%d ", token));
+	return token;
 }
