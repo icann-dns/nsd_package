@@ -4,12 +4,14 @@
  * 
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved
  *
- * See LICENSE for the license
+ * See LICENSE for the license.
+ *
  */
 
 #include <config.h>
 
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <strings.h>
 
@@ -17,220 +19,249 @@
 #include "dname.h"
 #include "zparser.h"
 
+#define YY_NO_UNPUT
+
 #if 0
 #define LEXOUT(s)  printf s /* used ONLY when debugging */
 #else
 #define LEXOUT(s)
 #endif
 
-static int parsestr(char * yytext, enum rr_spot *in_rr);
+enum lexer_state {
+	EXPECT_OWNER,
+	PARSING_OWNER,
+	PARSING_TTL_CLASS_TYPE,
+	PARSING_RDATA
+};
+
+static int parse_token(int token, char *yytext, enum lexer_state *lexer_state);
 
 static YY_BUFFER_STATE include_stack[MAXINCLUDES];
 static zparser_type zparser_stack[MAXINCLUDES];
 static int include_stack_ptr = 0;
 
+/*
+ * Saves the file specific variables on the include stack.
+ */
+static void
+push_parser_state(FILE *input)
+{
+	zparser_stack[include_stack_ptr].filename = parser->filename;
+	zparser_stack[include_stack_ptr].line = parser->line;
+	zparser_stack[include_stack_ptr].origin = parser->origin;
+	include_stack[include_stack_ptr] = YY_CURRENT_BUFFER;
+	yy_switch_to_buffer(yy_create_buffer(input, YY_BUF_SIZE));
+	++include_stack_ptr;
+}
+
+/*
+ * Restores the file specific variables from the include stack.
+ */
+static void
+pop_parser_state(void)
+{
+	--include_stack_ptr;
+	parser->filename = zparser_stack[include_stack_ptr].filename;
+	parser->line = zparser_stack[include_stack_ptr].line;
+	parser->origin = zparser_stack[include_stack_ptr].origin;
+	yy_delete_buffer(YY_CURRENT_BUFFER);
+	yy_switch_to_buffer(include_stack[include_stack_ptr]);
+}
+	
 %}
 
 SPACE   [ \t]
 LETTER  [a-zA-Z]
 NEWLINE \n
-ZONESTR [a-zA-Z0-9+/=:_!\-\*#%&^\[\]?@]
+ZONESTR [^ \t\n();.\"\$]
 DOLLAR  \$
 COMMENT ;
 DOT     \.
-SLASH   \\
-BIT	[^\]]|\\.
-ANY     [^\"]|\\.
-Q       \"
+BIT	[^\]\n]|\\.
+ANY     [^\"\n]|\\.
 
-%START	incl
+%x	incl bitlabel quotedstring
 
 %%
-    static int paren_open = 0;
-    static enum rr_spot in_rr = outside;
-{SPACE}*{COMMENT}.*     /* ignore */
-^@                      {
-                            in_rr = expecting_dname;
-                            return ORIGIN;
-                        }
-^{DOLLAR}TTL            return DIR_TTL;
-^{DOLLAR}ORIGIN         return DIR_ORIG;
-^{DOLLAR}INCLUDE        BEGIN(incl);
+	static int paren_open = 0;
+	static enum lexer_state lexer_state = EXPECT_OWNER;
+{SPACE}*{COMMENT}.*	/* ignore */
+^{DOLLAR}TTL            { lexer_state = PARSING_RDATA; return DOLLAR_TTL; }
+^{DOLLAR}ORIGIN         { lexer_state = PARSING_RDATA; return DOLLAR_ORIGIN; }
 
-			/* see
-			* http://dinosaur.compilertools.net/flex/flex_12.html#SEC12
-			*/
-<incl>[^\n]+ 		{ 	
-				/* Need to fix this so that $INCLUDE * file origin works */
-    				/* got the include file name
-			     	 * open the new filename and continue parsing 
-			     	 */
-
-				char *include_origin;
-				
-				/* eat leading white space */
-				while ( isspace(*yytext) ) 
-					yytext++;
-
-				include_origin = strrchr(yytext, 32); /* search for a space */
-				
-				if ( include_origin != NULL ) {
-					/* split the original yytext */
-					*include_origin = '\0';
-					include_origin++;
-				}
-				
-
-				if ( include_stack_ptr >= MAXINCLUDES ) {
-				    error("Includes nested too deeply (>10)");
-            			    exit(1);
-            			}
-
-				/* push zdefault on the stack (only the
-				 * important values
-				 */
-				zparser_stack[include_stack_ptr].filename = 
-					parser->filename;
-				zparser_stack[include_stack_ptr].line	   = 
-					parser->line;
-
-				/* put the given origin on the stack
-				 * if no origin was present push the current
-				 * origin on it. This way the popping of the
-				 * origin always works ok */
-
-				if ( include_origin != NULL ) {
-					zparser_stack[include_stack_ptr].origin = 
-						domain_table_insert(
-							parser->db->domains,
-							dname_parse(parser->region,
-								    include_origin,
-								    NULL));
-					/* start using this origin */
-					parser->origin = 
-						domain_table_insert(
-							parser->db->domains,
-							dname_parse(parser->region,
-								    include_origin,
-								    NULL));
-				} else {
-					zparser_stack[include_stack_ptr].origin = 
-						parser->origin;
-				}
-
-			        include_stack[include_stack_ptr++] = 
-					YY_CURRENT_BUFFER;
-
-		        	yyin = fopen( yytext, "r" );
-        			if ( ! yyin ) {
-					error("Cannot open $INCLUDE file: %s", yytext);
-				    	exit(1);
-				}
-
-				/* reset for the current file */
-				parser->filename = region_strdup(parser->region, yytext);
-				parser->line = 1;
-        			yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-
-			        BEGIN(INITIAL);
-        		}	
-<<EOF>>			{	/* end of file is reached - check if we were including */
-				if (include_stack_ptr == 0) {
-					yyterminate();
-        			} else {
-					--include_stack_ptr;
-					
-					/* pop (once you pop, you can not stop) */
-					parser->filename =
-						zparser_stack[include_stack_ptr].filename;
-					parser->line = 
-						zparser_stack[include_stack_ptr].line;
-					/* pop the origin */
-					parser->origin =
-						zparser_stack[include_stack_ptr].origin;
-					
-            				yy_delete_buffer( YY_CURRENT_BUFFER );
-            				yy_switch_to_buffer( include_stack[include_stack_ptr] );
-            			}
-        		}
-^{DOLLAR}{LETTER}+      { warning("Unknown $directive: %s", yytext); }
-^{DOT}                  {
-                            /* a ^. means the root zone... also set in_rr */
-                            in_rr = expecting_dname;
-			    LEXOUT((". "));
-                            return '.';
-                        }
-{DOT}                   { LEXOUT((". ")); return '.'; }
-{SLASH}#                { LEXOUT(("\\# "));return URR; }
-^{SPACE}+               {
-                            if ( paren_open == 0 ) { 
-                                in_rr = after_dname;
-                                return PREV;
-                            }
-                        }
-{NEWLINE}               {
-                            parser->line++;
-                            if ( paren_open == 0 ) { 
-                                in_rr = outside;
-				LEXOUT(("NL \n"));
-                                return NL;
-                            } else {
-				    LEXOUT(("SP "));
-				    return SP;
-			    }
-                        }
-{SPACE}*\({SPACE}*      {
-                            if ( paren_open == 1 ) {
-				error("Nested parentheses");
-                                yyterminate();
-                            }
-                            LEXOUT(("SP( "));
-                            paren_open = 1;
-                            return SP;
-                        }
-{SPACE}*\){SPACE}*      {
-                            if ( paren_open == 0 ) {
-				error("Unterminated parentheses");
-                                yyterminate();
-                            }
-                            LEXOUT(("SP) "));
-                            paren_open = 0;
-                            return SP;
-                        }
-{SPACE}+                {
-                            if ( paren_open == 0 ) {
-                                if (in_rr == expecting_dname)
-                                    in_rr = after_dname;
-                            }
-                            LEXOUT(("SP "));
-                            return SP;
-                        }
-\\\[{BIT}*\]	{
-			/* bitlabels */
-			yytext[strlen(yytext) - 1] = '\0';
-			yylval.data.len = strlen(yytext + 2);
-			yylval.data.str = region_strdup(parser->rr_region, yytext + 2);
-			if (in_rr == expecting_dname || in_rr == outside) 
-				in_rr = after_dname;
-			return BITLAB;
+	/*
+	 * Handle $INCLUDE directives.  See
+	 * http://dinosaur.compilertools.net/flex/flex_12.html#SEC12.
+	 */
+^{DOLLAR}INCLUDE        {
+	BEGIN(incl);
+}
+<incl>\n 		|
+<incl><<EOF>>		{
+	int error_occurred = parser->error_occurred;
+	BEGIN(INITIAL);
+	zc_error("missing file name in $INCLUDE directive");
+	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
+	++parser->line;
+	parser->error_occurred = error_occurred;
+}
+<incl>.+ 		{ 	
+	char *tmp;
+	domain_type *origin = parser->origin;
+	int error_occurred = parser->error_occurred;
+	
+	BEGIN(INITIAL);
+	if (include_stack_ptr >= MAXINCLUDES ) {
+		zc_error("includes nested too deeply, skipped (>%d)",
+			 MAXINCLUDES);
+	} else {
+		/* Remove trailing comment.  */
+		tmp = strrchr(yytext, ';');
+		if (tmp) {
+			*tmp = '\0';
 		}
+		strip_string(yytext);
+		
+		/* Parse origin for include file.  */
+		tmp = strrchr(yytext, ' ');
+		if (!tmp) {
+			tmp = strrchr(yytext, '\t');
+		}
+		if (tmp) {
+			const dname_type *dname;
+			
+			/* split the original yytext */
+			*tmp = '\0';
+			strip_string(yytext);
+			
+			dname = dname_parse(parser->region, tmp + 1);
+			if (!dname) {
+				zc_error("incorrect include origin '%s'",
+					 tmp + 1);
+			} else {
+				origin = domain_table_insert(
+					parser->db->domains, dname);
+			}
+		}
+		
+		if (strlen(yytext) == 0) {
+			zc_error("missing file name in $INCLUDE directive");
+		} else if (!(yyin = fopen(yytext, "r"))) {
+			zc_error("cannot open include file '%s': %s",
+				 yytext, strerror(errno));
+		} else {
+			/* Initialize parser for include file.  */
+			char *filename = region_strdup(parser->region, yytext);
+			push_parser_state(yyin); /* Destroys yytext.  */
+			parser->filename = filename;
+			parser->line = 1;
+			parser->origin = origin;
+			lexer_state = EXPECT_OWNER;
+		}
+	}
 
-{Q}({ANY})*{Q}   {
-                            /* this matches quoted strings */
-			    /* Strip leading and ending quotes.  */
-			    yytext[strlen(yytext) - 1] = '\0';
-                            return parsestr(yytext + 1, &in_rr);
-                        }
-({ZONESTR}|\\.)({ZONESTR}|\\.)* {
-                            /* any allowed word */
-			    return parsestr(yytext, &in_rr);
-                        }
-.                       {
-                            /* we should NEVER reach this
-                             * bail out with an error */
-			    error("Unknown character seen - is this a zonefile?");
-                            /*exit(1); [XXX] we should exit... */
-                        }
+	parser->error_occurred = error_occurred;
+}
+<INITIAL><<EOF>>	{
+	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
+	if (include_stack_ptr == 0) {
+		yyterminate();
+	} else {
+		fclose(yyin);
+		pop_parser_state();
+	}
+}
+^{DOLLAR}{LETTER}+	{ zc_warning("Unknown directive: %s", yytext); }
+{DOT}	{
+	LEXOUT((". "));
+	return parse_token('.', yytext, &lexer_state);
+}
+@	{
+	LEXOUT(("@ "));
+	return parse_token('@', yytext, &lexer_state);
+}
+\\#	{
+	LEXOUT(("\\# "));
+	return parse_token(URR, yytext, &lexer_state);
+}
+{NEWLINE}	{
+	++parser->line;
+	if (!paren_open) { 
+		lexer_state = EXPECT_OWNER;
+		LEXOUT(("NL\n"));
+		return NL;
+	} else {
+		LEXOUT(("SP "));
+		return SP;
+	}
+}
+\(	{
+	if (paren_open) {
+		zc_error("nested parentheses");
+		yyterminate();
+	}
+	LEXOUT(("( "));
+	paren_open = 1;
+	return SP;
+}
+\)	{
+	if (!paren_open) {
+		zc_error("closing parentheses without opening parentheses");
+		yyterminate();
+	}
+	LEXOUT((") "));
+	paren_open = 0;
+	return SP;
+}
+{SPACE}+	{
+	if (!paren_open && lexer_state == EXPECT_OWNER) {
+		lexer_state = PARSING_TTL_CLASS_TYPE;
+		LEXOUT(("PREV "));
+		return PREV;
+	}
+	if (lexer_state == PARSING_OWNER) {
+		lexer_state = PARSING_TTL_CLASS_TYPE;
+	}
+	LEXOUT(("SP "));
+	return SP;
+}
+
+	/* Bitlabels.  Strip leading and ending brackets.  */
+\\\[			{ BEGIN(bitlabel); }
+<bitlabel><<EOF>>	{
+	zc_error("EOF inside bitlabel");
+	BEGIN(INITIAL);
+}
+<bitlabel>{BIT}*	{ yymore(); }
+<bitlabel>\n		{ ++parser->line; yymore(); }
+<bitlabel>\]		{
+	BEGIN(INITIAL);
+	yytext[yyleng - 1] = '\0';
+	return parse_token(BITLAB, yytext, &lexer_state);
+}
+
+	/* Quoted strings.  Strip leading and ending quotes.  */
+\"			{ BEGIN(quotedstring); }
+<quotedstring><<EOF>> 	{
+	zc_error("EOF inside quoted string");
+	BEGIN(INITIAL);
+}
+<quotedstring>{ANY}*	{ yymore(); }
+<quotedstring>\n 	{ ++parser->line; yymore(); }
+<quotedstring>\" {
+	BEGIN(INITIAL);
+	yytext[yyleng - 1] = '\0';
+	return parse_token(STR, yytext, &lexer_state);
+}
+
+({ZONESTR}|\\.|\\\n)+ {
+	/* Any allowed word.  */
+	return parse_token(STR, yytext, &lexer_state);
+}
+. {
+	zc_error("unknown character '%c' (\\%03d) seen - is this a zonefile?",
+		 (int) yytext[0], (int) yytext[0]);
+}
 %%
 
 /*
@@ -239,9 +270,9 @@ Q       \"
  * returned and the TYPE parameter is set to the RR type value.
  */
 static int
-zrrtype (const char *word, uint16_t *type) 
+rrtype_to_token(const char *word, uint16_t *type) 
 {
-	uint16_t t = lookup_type_by_name(word);
+	uint16_t t = rrtype_from_string(word);
 	if (t != 0) {
 		rrtype_descriptor_type *entry = rrtype_descriptor_by_type(t);
 		*type = t;
@@ -251,136 +282,89 @@ zrrtype (const char *word, uint16_t *type)
 	return 0;
 }
 
-/* do some preparsing of the stuff */
-static int
-zoctet(char *word) 
+
+/*
+ * Remove \DDD constructs from the input. See RFC 1035, section 5.1.
+ */
+static size_t
+zoctet(char *text) 
 {
-    /* remove \DDD constructs from the input. See RFC 1035, section 5.1 */
-    /* s follows the string, p lags behind and rebuilds the new string */
-    char * s; char * p;
-    unsigned int length = 0;
-
-    for (s = p = word; *s != '\0'; s++,p++ ) {
-        switch ( *s ) {
-            case '.':
-		/* [XXX] is empty label handled correctly? */
-                if (s[1] == '.') {
-                    warning("Empty label");
-                    break;
-                }
-                *p = *s;
-                length++; 
-                break;
-            case '\\':
-                if ('0' <= s[1] && s[1] <= '9' &&
-                    '0' <= s[2] && s[2] <= '9' &&
-                    '0' <= s[3] && s[3] <= '9')
-		{
-                    /* \DDD seen */
-                    int val = ((s[1] - '0') * 100 +
-                           (s[2] - '0') * 10 +
-                           (s[3] - '0'));
-
-                    if (0 <= val && val <= 255) {
-                        /* this also handles \0 */
-                        s += 3;
-                        *p = val;
-                        length++;
-                    } else {
-                        warning("ASCII \\DDD overflow");
-                    }
-
-                } else {
-                    /* an espaced character, like \<space> ? 
-                    * remove the '\' keep the rest */
-                    *p = *++s;
-                    length++;
-                }
-                break;
-            case '\"':
-                /* non quoted " Is either first or the last character in
-                 * the string */
-
-                *p = *++s; /* skip it */
-                length++; 
-                if ( *s == '\0' ) {
-                    /* ok, it was the last one */
-                    *p  = '\0'; return length;
-                }
-                break;
-            default:
-                *p = *s;
-                length++;
-                break;
-        }
-    }
-    *p = '\0';
-    return length;
+	/*
+	 * s follows the string, p lags behind and rebuilds the new
+	 * string
+	 */
+	char *s;
+	char *p;
+	
+	for (s = p = text; *s; ++s, ++p) {
+		assert(p <= s);
+		if (s[0] != '\\') {
+			/* Ordinary character.  */
+			*p = *s;
+		} else if (isdigit(s[1]) && isdigit(s[2]) && isdigit(s[3])) {
+			/* \DDD escape.  */
+			int val = (hexdigit_to_int(s[1]) * 100 +
+				   hexdigit_to_int(s[2]) * 10 +
+				   hexdigit_to_int(s[3]));
+			if (0 <= val && val <= 255) {
+				s += 3;
+				*p = val;
+			} else {
+				zc_warning("text escape \\DDD overflow");
+				*p = *++s;
+			}
+		} else if (s[1] != '\0') {
+			/* \X where X is any character, keep X.  */
+			*p = *++s;
+		} else {
+			/* Trailing backslash, ignore it.  */
+			zc_warning("trailing backslash ignored");
+			--p;
+		}
+	}
+	*p = '\0';
+	return p - text;
 }
 
 static int
-parsestr(char *yytext, enum rr_spot *in_rr)
+parse_token(int token, char *yytext, enum lexer_state *lexer_state)
 {
-	int token;
-	char *t; char *ztext;
+	char *str = region_strdup(parser->rr_region, yytext);
+	size_t len = zoctet(str);
 
-	switch(*in_rr) {
-	case after_dname:
+	if (*lexer_state == EXPECT_OWNER) {
+		*lexer_state = PARSING_OWNER;
+	} else if (*lexer_state == PARSING_TTL_CLASS_TYPE) {
+		const char *t;
+		int token;
+		uint16_t rrclass;
+		
 		/* type */
-		token = zrrtype(yytext, &yylval.type);
+		token = rrtype_to_token(str, &yylval.type);
 		if (token != 0) {
-			*in_rr = reading_type;
+			*lexer_state = PARSING_RDATA;
 			return token;
 		}
 
 		/* class */
-		if (strcasecmp(yytext, "IN") == 0 ||
-		    strcasecmp(yytext,"CLASS1") == 0 ) {
-			yylval.klass = CLASS_IN;
-			LEXOUT(("IN "));
-			return T_IN;
-		} else if (strcasecmp(yytext, "CH") == 0) {
-			yylval.klass = CLASS_CHAOS;
-			return T_CH;
-		} else if (strcasecmp(yytext, "HS") == 0) {
-			yylval.klass = CLASS_HS;
-			return T_HS;
+		rrclass = rrclass_from_string(str);
+		if (rrclass != 0) {
+			yylval.klass = rrclass;
+			LEXOUT(("CLASS "));
+			return T_RRCLASS;
 		}
 
 		/* ttl */
-		strtottl(yytext, &t);
-		if ( *t == 0 ) {
-			/* was parseable */
-			yylval.data.str = yytext;
-			yylval.data.len = strlen(yytext); /*needed?*/
+		yylval.ttl = strtottl(str, &t);
+		if (*t == '\0') {
 			LEXOUT(("TTL "));
-			return TTL;
+			return T_TTL;
 		}
-		/* Fall through, default first, order matters.  */
-	default:
-		/*
-		 * Check to see if someone used @ in the rdata if so
-		 * return the origin str, and RD_ORIGIN token.
-		 */
-		if (strcasecmp(yytext, "@") == 0) {
-			ztext = (char *)dname_to_string(domain_dname(parser->origin));
-			yylval.data.len = strlen(ztext);
-			yylval.data.str = ztext;
-			LEXOUT(("RDATA_ORI "));
-			return RD_ORIGIN;
-		}
-		ztext = region_strdup(parser->rr_region, yytext);
-		yylval.data.len = zoctet(ztext);
-		yylval.data.str = ztext;
-		LEXOUT(("STR "));
-		return STR;
-	case outside:
-		/* should match ^ */
-		ztext = region_strdup(parser->rr_region, yytext);
-		yylval.data.len = zoctet(ztext);
-		yylval.data.str = ztext;
-		*in_rr = expecting_dname;
-		LEXOUT(("STR "));
-		return STR;
 	}
+
+	yylval.data.str = str;
+	yylval.data.len = len;
+	
+	LEXOUT(("%d ", token));
+	return token;
 }

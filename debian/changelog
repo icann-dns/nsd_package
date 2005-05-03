@@ -1,3 +1,23 @@
+nsd (2.3.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Enable stripping of nsd-xfer again (Closes: #302776)
+
+ -- Ondřej Surý <ondrej@sury.org>  Tue,  3 May 2005 10:11:02 +0200
+
+nsd (2.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ondřej Surý <ondrej@sury.org>  Wed, 23 Feb 2005 09:06:36 +0100
+
+nsd (2.2.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Includes it's own nsd-xfer program.
+
+ -- Ondřej Surý <ondrej@sury.org>  Tue, 18 Jan 2005 15:49:28 +0100
+
 nsd (2.1.5-1) unstable; urgency=low
 
   * New upstream release.

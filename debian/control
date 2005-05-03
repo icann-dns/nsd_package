@@ -2,7 +2,7 @@ Source: nsd
 Section: net
 Priority: optional
 Maintainer: Ondřej Surý <ondrej@debian.org>
-Build-Depends: debhelper (>> 4.0.0), libwrap0-dev | libwrap-dev, cdbs, bison, flex, groff, sharutils
+Build-Depends: debhelper (>> 4.0.0), libwrap0-dev | libwrap-dev, cdbs, bison, flex, groff, sharutils, libssl-dev (>= 0.9.7)
 Standards-Version: 3.6.1
 
 Package: nsd

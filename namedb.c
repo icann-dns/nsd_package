@@ -1,39 +1,9 @@
 /*
  * namedb.c -- common namedb operations.
  *
- * Erik Rozendaal, <erik@nlnetlabs.nl>
+ * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights
- * reserved.
- *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
@@ -47,10 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dns.h"
-#include "dname.h"
 #include "namedb.h"
-#include "util.h"
 
 
 static domain_type *
@@ -69,14 +36,15 @@ allocate_domain_info(domain_table_type *table,
 	result->node.key = dname_partial_copy(
 		table->region, dname, domain_dname(parent)->label_count + 1);
 	result->parent = parent;
-	result->wildcard_child_closest_match = NULL;
+	result->wildcard_child_closest_match = result;
 	result->rrsets = NULL;
 	result->number = 0;
 #ifdef PLUGINS
 	result->plugin_data = NULL;
 #endif
 	result->is_existing = 0;
-	
+	result->is_apex = 0;
+
 	return result;
 }
 
@@ -89,11 +57,12 @@ domain_table_create(region_type *region)
 
 	assert(region);
 	
-	origin = dname_make(region, (uint8_t *) "");
+	origin = dname_make(region, (uint8_t *) "", 0);
 
 	root = (domain_type *) region_alloc(region, sizeof(domain_type));
 	root->node.key = origin;
 	root->parent = NULL;
+	root->wildcard_child_closest_match = root;
 	root->rrsets = NULL;
 	root->number = 0;
 #ifdef PLUGINS
@@ -106,12 +75,10 @@ domain_table_create(region_type *region)
 	result->region = region;
 	result->names_to_domains = heap_create(
 		region, (int (*)(const void *, const void *)) dname_compare);
+	heap_insert(result->names_to_domains, (rbnode_t *) root);
+
 	result->root = root;
 
-	root->wildcard_child_closest_match
-		= (domain_type *) heap_insert(result->names_to_domains, (rbnode_t *) root);
-	assert(root->wildcard_child_closest_match);
-	
 	return result;
 }
 
@@ -183,14 +150,10 @@ domain_table_insert(domain_table_type *table,
 	
 		/* Insert new node(s).  */
 		do {
-			rbnode_t *node;
-			
 			result = allocate_domain_info(table,
 						      dname,
 						      closest_encloser);
-			node = heap_insert(table->names_to_domains, (rbnode_t *) result);
-			assert(node);
-			result->wildcard_child_closest_match = (domain_type *) node;
+			heap_insert(table->names_to_domains, (rbnode_t *) result);
 
 			/*
 			 * If the newly added domain name is larger
@@ -200,11 +163,13 @@ domain_table_insert(domain_table_type *table,
 			 * the parent's wildcard_child_closest_match
 			 * field.
 			 */
-			if (label_compare(dname_name(domain_dname(result)), (const uint8_t *) "\001*") <= 0
-			    && dname_compare(domain_dname(result), domain_dname(closest_encloser)) > 0)
+			if (label_compare(dname_name(domain_dname(result)),
+					  (const uint8_t *) "\001*") <= 0
+			    && dname_compare(domain_dname(result),
+					     domain_dname(closest_encloser->wildcard_child_closest_match)) > 0)
 			{
 				closest_encloser->wildcard_child_closest_match
-					= (domain_type *) node;
+					= result;
 			}
 			closest_encloser = result;
 		} while (domain_dname(closest_encloser)->label_count < dname->label_count);
@@ -218,13 +183,13 @@ domain_table_iterate(domain_table_type *table,
 		    domain_table_iterator_type iterator,
 		    void *user_data)
 {
-	const dname_type *dname;
-	domain_type *node;
+	const void *dname;
+	void *node;
 
 	assert(table);
 
 	HEAP_WALK(table->names_to_domains, dname, node) {
-		iterator(node, user_data);
+		iterator((domain_type *) node, user_data);
 	}
 }
 
@@ -247,7 +212,7 @@ domain_find_rrset(domain_type *domain, zone_type *zone, uint16_t type)
 	rrset_type *result = domain->rrsets;
 
 	while (result) {
-		if (result->zone == zone && result->type == type) {
+		if (result->zone == zone && rrset_rrtype(result) == type) {
 			return result;
 		}
 		result = result->next;
@@ -275,7 +240,7 @@ domain_find_zone(domain_type *domain)
 	rrset_type *rrset;
 	while (domain) {
 		for (rrset = domain->rrsets; rrset; rrset = rrset->next) {
-			if (rrset->type == TYPE_SOA) {
+			if (rrset_rrtype(rrset) == TYPE_SOA) {
 				return rrset->zone;
 			}
 		}
@@ -292,7 +257,7 @@ domain_find_parent_zone(zone_type *zone)
 	assert(zone);
 
 	for (rrset = zone->apex->rrsets; rrset; rrset = rrset->next) {
-		if (rrset->zone != zone && rrset->type == TYPE_NS) {
+		if (rrset->zone != zone && rrset_rrtype(rrset) == TYPE_NS) {
 			return rrset->zone;
 		}
 	}
@@ -331,9 +296,13 @@ domain_wildcard_child(domain_type *domain)
 	assert(domain->wildcard_child_closest_match);
 
 	wildcard_child = domain->wildcard_child_closest_match;
-	return (label_is_wildcard(dname_name(domain_dname(wildcard_child)))
-		? wildcard_child
-		: NULL);
+	if (wildcard_child != domain
+	    && label_is_wildcard(dname_name(domain_dname(wildcard_child))))
+	{
+		return wildcard_child;
+	} else {
+		return NULL;
+	}
 }
 
 int
@@ -343,18 +312,13 @@ zone_is_secure(zone_type *zone)
 }
 
 uint16_t
-rrset_rrsig_type_covered(rrset_type *rrset, uint16_t rr)
+rr_rrsig_type_covered(rr_type *rr)
 {
-	rdata_atom_type atom;
+	assert(rr->type == TYPE_RRSIG);
+	assert(rr->rdata_count > 0);
+	assert(rdata_atom_size(rr->rdatas[0]) == sizeof(uint16_t));
 	
-	assert(rrset->type == TYPE_RRSIG);
-	assert(rr < rrset->rrslen);
-	assert(rrset->rrs[rr]->rdata_count > 0);
-	
-	atom = rrset->rrs[rr]->rdata[0];
-	assert(rdata_atom_size(atom) == sizeof(uint16_t));
-	
-	return ntohs(* (uint16_t *) rdata_atom_data(atom));
+	return ntohs(* (uint16_t *) rdata_atom_data(rr->rdatas[0]));
 }
 
 zone_type *
@@ -369,102 +333,3 @@ namedb_find_zone(namedb_type *db, domain_type *domain)
 
 	return zone;
 }
-
-#ifdef TEST
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#define BUFSZ 1000
-
-int
-main(void)
-{
-	static const char *dnames[] = {
-		"com",
-		"aaa.com",
-		"hhh.com",
-		"zzz.com",
-		"ns1.aaa.com",
-		"ns2.aaa.com",
-		"foo.bar.com",
-		"a.b.c.d.e.bar.com",
-		"*.aaa.com"
-	};
-	region_type *region = region_create(xalloc, free);
-	dname_table_type *table = dname_table_create(region);
-	size_t key = dname_info_create_key(table);
-	const dname_type *dname;
-	size_t i;
-	dname_info_type *closest_match;
-	dname_info_type *closest_encloser;
-	int exact;
-	
-	for (i = 0; i < sizeof(dnames) / sizeof(char *); ++i) {
-		dname_info_type *temp;
-		dname = dname_parse(region, dnames[i], NULL);
-		temp = dname_table_insert(table, dname);
-		dname_info_put_ptr(temp, key, (void *) dnames[i]);
-	}
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "foo.bar.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(exact);
-	assert(dname_info_get_ptr(closest_match, key) == dnames[6]);
-	assert(dname_info_get_ptr(closest_encloser, key) == dnames[6]);
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "a.b.hhh.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(!exact);
-	assert(dname_info_get_ptr(closest_match, key) == dnames[2]);
-	assert(dname_info_get_ptr(closest_encloser, key) == dnames[2]);
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "ns3.aaa.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(!exact);
-	assert(dname_info_get_ptr(closest_match, key) == dnames[5]);
-	assert(dname_info_get_ptr(closest_encloser, key) == dnames[1]);
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "a.ns1.aaa.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(!exact);
-	assert(dname_info_get_ptr(closest_match, key) == dnames[4]);
-	assert(dname_info_get_ptr(closest_encloser, key) == dnames[4]);
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "x.y.z.d.e.bar.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(!exact);
-/* 	assert(dname_compare(closest_match->dname, */
-/* 			     dname_parse(region, "c.d.e.bar.com", NULL)) == 0); */
-/* 	assert(dname_compare(closest_encloser->dname, */
-/* 			     dname_parse(region, "d.e.bar.com", NULL)) == 0); */
-	
-	exact = dname_table_search(
-		table,
-		dname_parse(region, "a.aaa.com", NULL),
-		&closest_match, &closest_encloser);
-	assert(!exact);
-	assert(dname_info_get_ptr(closest_match, key) == dnames[8]);
-	assert(dname_info_get_ptr(closest_encloser, key) == dnames[1]);
-	assert(closest_encloser->wildcard_child);
-	assert(dname_info_get_ptr(closest_encloser->wildcard_child, key)
-	       == dnames[8]);
-
-	dname = dname_parse(region, "a.b.c.d", NULL);
-	assert(dname_compare(dname_parse(region, "d", NULL),
-			     dname_partial_copy(region, dname, 2)) == 0);
-	
-	exit(0);
-}
-
-#endif /* TEST */
