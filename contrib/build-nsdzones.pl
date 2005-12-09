@@ -244,7 +244,7 @@ sub do_nsd {
 sub do_misc() {
 	my ( $opt, %opts ) = (@_);
 	my $retval = 0;
-	my $ldate = '$Date: 2003/02/26 11:09:15 $';
+	my $ldate = '$Date: 2003-02-26 12:09:15 +0100 (Wed, 26 Feb 2003) $';
 	my $lauthor = '$Author: alexis $';
 	if( $opt eq "warranty" ){
 		$retval = 1;

@@ -1,3 +1,31 @@
+nsd (2.3.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Pass pidfile to nsd to allow chrooting.
+  * Prepare config files to allow easier chrooting.
+  * Move uid of nsd setuid user to nsd_user and add it to flags automatically.
+
+ -- Ondřej Surý <ondrej@sury.org>  Fri,  9 Dec 2005 09:45:19 +0100
+
+nsd (2.3.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Chown database file to nsd_user before reload and start.
+
+ -- Ondřej Surý <ondrej@sury.org>  Mon,  5 Dec 2005 14:39:56 +0100
+
+nsd (2.3.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ondřej Surý <ondrej@sury.org>  Fri,  2 Dec 2005 10:19:07 +0100
+
+nsd (2.3.0-2) unstable; urgency=low
+
+  * Recompile with openssl 0.9.8
+
+ -- Ondřej Surý <ondrej@sury.org>  Mon, 10 Oct 2005 13:32:19 +0200
+
 nsd (2.3.0-1) unstable; urgency=low
 
   * New upstream release.

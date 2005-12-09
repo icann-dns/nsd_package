@@ -38,10 +38,6 @@
 #include "util.h"
 #include "zparser.h"
 
-#ifndef TIMEGM
-time_t timegm(struct tm *tm);
-#endif /* !TIMEGM */
-
 const dname_type *error_dname;
 domain_type *error_domain;
 
@@ -58,6 +54,7 @@ static long int totalerrors = 0;
 static long int totalrrs = 0;
 
 extern uint8_t nsecbits[NSEC_WINDOW_COUNT][NSEC_WINDOW_BITS_SIZE];
+extern uint16_t nsec_highest_rcode;
 
 
 /*
@@ -133,7 +130,7 @@ zparser_conv_time(region_type *region, const char *time)
 	if (!strptime(time, "%Y%m%d%H%M%S", &tm)) {
 		zc_error_prev_line("date and time is expected");
 	} else {
-		uint32_t l = htonl(timegm(&tm));
+		uint32_t l = htonl(mktime_from_utc(&tm));
 		r = alloc_rdata_init(region, &l, sizeof(l));
 	}
 	return r;
@@ -424,18 +421,21 @@ zparser_conv_nsec(region_type *region,
 	size_t i,j;
 	uint16_t window_count = 0;
 	uint16_t total_size = 0;
+	uint16_t window_max = 0;
 
 	/* The used windows.  */
 	int used[NSEC_WINDOW_COUNT];
 	/* The last byte used in each the window.  */
 	int size[NSEC_WINDOW_COUNT];
 
+	window_max = 1 + (nsec_highest_rcode / 256);
+
 	/* used[i] is the i-th window included in the nsec 
 	 * size[used[0]] is the size of window 0
 	 */
 
 	/* walk through the 256 windows */
-	for (i = 0; i < NSEC_WINDOW_COUNT; ++i) {
+	for (i = 0; i < window_max; ++i) {
 		int empty_window = 1;
 		/* check each of the 32 bytes */
 		for (j = 0; j < NSEC_WINDOW_BITS_SIZE; ++j) {
@@ -875,10 +875,16 @@ void
 parse_unknown_rdata(uint16_t type, uint16_t *wireformat)
 {
 	buffer_type packet;
-	uint16_t size = *wireformat;
+	uint16_t size;
 	ssize_t rdata_count;
 	ssize_t i;
 	rdata_atom_type *rdatas;
+
+	if (wireformat) {
+		size = *wireformat;
+	} else {
+		return;
+	}
 
 	buffer_create_from(&packet, wireformat + 1, *wireformat);
 	rdata_count = rdata_wireformat_to_rdata_atoms(parser->region,
@@ -1156,7 +1162,7 @@ zone_read(const char *name, const char *zonefile)
 
 	dname = dname_parse(parser->region, name);
 	if (!dname) {
-		zc_error_prev_line("incorrect zone name '%s'", name);
+		zc_error("incorrect zone name '%s'", name);
 		return;
 	}
 	
@@ -1171,7 +1177,7 @@ zone_read(const char *name, const char *zonefile)
 	/* Open the zone file */
 	if (!zone_open(zonefile, 3600, CLASS_IN, dname)) {
 		/* cannot happen with stdin - so no fix needed for zonefile */
-		fprintf(stderr, " ERR: Cannot open \'%s\': %s\n", zonefile, strerror(errno));
+		zc_error("cannot open '%s': %s\n", zonefile, strerror(errno));
 		return;
 	}
 
@@ -1182,6 +1188,7 @@ zone_read(const char *name, const char *zonefile)
 	
 	fflush(stdout);
 	totalerrors += parser->errors;
+	parser->filename = NULL;
 }
 
 static void 
