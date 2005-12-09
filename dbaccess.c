@@ -134,6 +134,7 @@ read_rrset(namedb_type *db,
 	domain_type *owner;
 	uint16_t type;
 	uint16_t klass;
+	uint32_t soa_minimum;
 	
 	owner = read_domain(db, domain_count, domains);
 	if (!owner)
@@ -188,6 +189,25 @@ read_rrset(namedb_type *db,
 	if (rrset_rrtype(rrset) == TYPE_SOA) {
 		assert(owner == rrset->zone->apex);
 		rrset->zone->soa_rrset = rrset;
+		
+		/* BUG #103 add another soa with a tweaked ttl */
+		rrset->zone->soa_nx_rrset = region_alloc(db->region, sizeof(rrset_type));
+		rrset->zone->soa_nx_rrset->rrs = 
+			region_alloc(db->region, rrset->rr_count * sizeof(rr_type));
+
+		memcpy(rrset->zone->soa_nx_rrset->rrs, rrset->rrs, sizeof(rr_type));
+		rrset->zone->soa_nx_rrset->rr_count = 1;
+
+		/* also add a link to the zone */
+		rrset->zone->soa_nx_rrset->zone = rrset->zone;
+
+		/* check the ttl and MINIMUM value and set accordinly */
+		memcpy(&soa_minimum, rdata_atom_data(rrset->rrs->rdatas[6]),
+				rdata_atom_size(rrset->rrs->rdatas[6]));
+		if (rrset->rrs->ttl > ntohl(soa_minimum)) {
+			rrset->zone->soa_nx_rrset->rrs[0].ttl = ntohl(soa_minimum); 
+		} 
+
 	} else if (owner == rrset->zone->apex
 		   && rrset_rrtype(rrset) == TYPE_NS)
 	{
@@ -311,6 +331,7 @@ namedb_open (const char *filename)
 		db->zones = zones[i];
 		zones[i]->apex = domain_table_insert(db->domains, dname);
 		zones[i]->soa_rrset = NULL;
+		zones[i]->soa_nx_rrset = NULL;
 		zones[i]->ns_rrset = NULL;
 		zones[i]->number = i + 1;
 		zones[i]->is_secure = 0;

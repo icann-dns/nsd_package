@@ -1,29 +1,38 @@
 # Rebuild zone file at startup
 rebuild=true
 
+#Chroot - You have to prepare chroot before changing this value
+chroot=""
+
 # Pathname to the directory containing zone file. De facto NSD ``home''
-configdir="/etc/nsd"
+configdir="${chroot}/etc/nsd"
 
 # The directory where NSD binaries reside
-sbindir="/usr/sbin"
+sbindir="${chroot}/usr/sbin"
 
-# Flags to pass to nsd on startup
-flags="-u nsd"
+# User to run daemon as
+nsd_user="nsd"
+
+# Flags to pass nsd at startup
+flags=""
 
 # Pathname of the database
-dbfile="/var/lib/nsd/nsd.db"
+dbfile="${chroot}/var/lib/nsd/nsd.db"
 
 # List of the configured zones
-zonesfile="/etc/nsd/nsd.zones"
+zonesfile="${chroot}/etc/nsd/nsd.zones"
 
 # The directory containing NSD keys
-keysdir="/etc/nsd/keys"
+keysdir="${chroot}/etc/nsd/keys"
+
+# Pidfile
+pidfile="${chroot}/var/run/nsd.pid"
 
 # Pathname of nsd-notify binary
 notify="/usr/sbin/nsd-notify"
 
-# Pathname of named-xfer(8) binary from BIND8 distribution
-namedxfer="/usr/sbin/nsd-xfer"
+# Pathname of nsd-xfer(8) binary
+nsdxfer="/usr/sbin/nsd-xfer"
 
 # Verbosity of "nsdc update". Set ZONEC_VERBOSE to -v, -vv or to a
 # null string ZONEC_VERBOSE=-v

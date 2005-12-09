@@ -16,6 +16,9 @@ test -x ${NSDC} || exit 0
 
 COUNTER=0
 
+[ -n "${chroot}" ] && flags="${flags} -t ${chroot}"
+[ -n "${nsd_user}" ] && flags="${flags} -u ${nsd_user}"
+
 [ ! -d /proc/sys/net/ipv6/ ] && flags="${flags} -4"
 
 set -e
@@ -23,8 +26,9 @@ set -e
 case "$1" in
   start)
 	if ${rebuild} && [ "${zonesfile}" -nt "${dbfile}" ]; then ${NSDC} rebuild; fi
+        [ -n "${nsd_user}" ] && chown "${nsd_user}:" "${dbfile}"
 	echo -n "Starting $DESC: $NAME..."
-	start-stop-daemon --start --quiet --pidfile ${pidfile} --exec ${DAEMON} -- -f ${dbfile} ${flags} 2>/dev/null
+	start-stop-daemon --start --quiet --pidfile ${pidfile} --exec ${DAEMON} -- -f ${dbfile} -P ${pidfile} ${flags} 2>/dev/null
 	while [ ! -s ${pidfile} ]; do
 		echo -n ".";
 		sleep 1
@@ -42,12 +46,13 @@ case "$1" in
 	;;
   stop)
 	echo -n "Stopping $DESC: $NAME"
-	start-stop-daemon --stop --oknodo --pidfile /var/run/nsd.pid --exec ${DAEMON}
+	start-stop-daemon --stop --oknodo --pidfile ${pidfile} --exec ${DAEMON}
 	echo "."
 	;;
   reload|force-reload)
 	echo -n "Reloading $DESC: $NAME"
-	start-stop-daemon --stop --quiet --signal HUP --pidfile /var/run/nsd.pid --exec $DAEMON
+        [ -n "${nsd_user}" ] && chown "${nsd_user}:" "${dbfile}"
+	start-stop-daemon --stop --signal HUP --pidfile ${pidfile} --exec $DAEMON
 	${NSDC} notify
 	echo "."
 	;;
