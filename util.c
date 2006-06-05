@@ -1,7 +1,7 @@
 /*
  * util.c -- set of various support routines.
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved.
  *
  * See LICENSE for the license.
  *
@@ -475,4 +475,29 @@ mktime_from_utc(const struct tm *tm)
     seconds = minutes * 60 + tm->tm_sec;
 
     return seconds;
+}
+
+const char*
+rcode2str(int rc)
+{
+        switch(rc)
+        {
+        case RCODE_OK:
+                return "NO ERROR";
+        case RCODE_FORMAT:
+                return "FORMAT ERROR";
+        case RCODE_SERVFAIL:
+                return "SERV FAIL";
+        case RCODE_NXDOMAIN:
+                return "NAME ERROR";
+        case RCODE_IMPL:
+                return "NOT IMPL";
+        case RCODE_REFUSE:
+                return "REFUSED";
+        case RCODE_NOTAUTH:
+                return "NOT AUTHORIZED";
+        default:
+                return "UNKNOWN ERROR";
+        }
+        return NULL; /* ENOREACH */
 }

@@ -7,7 +7,7 @@ Standards-Version: 3.6.1
 
 Package: nsd
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: adduser, ${shlibs:Depends}, ${misc:Depends}
 Conflicts: aolserver, mico
 Description: authoritative name domain server
  NSD is an fast, authoritative only, high performance, simple

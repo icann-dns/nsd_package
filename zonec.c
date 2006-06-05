@@ -1,7 +1,7 @@
 /*
  * zonec.c -- zone compiler.
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved.
  *
  * See LICENSE for the license.
  *
@@ -225,23 +225,7 @@ zparser_conv_short(region_type *region, const char *text)
 	uint16_t value;
 	char *end;
    
-	value = htons((uint16_t) strtol(text, &end, 0));
-	if (*end != 0) {
-		zc_error_prev_line("integer value is expected");
-	} else {
-		r = alloc_rdata_init(region, &value, sizeof(value));
-	}
-	return r;
-}
-
-uint16_t *
-zparser_conv_long(region_type *region, const char *text)
-{
-	uint16_t *r = NULL;
-	uint32_t value;
-	char *end;
-   
-	value = htonl((uint32_t) strtol(text, &end, 0));
+	value = htons((uint16_t) strtol(text, &end, 10));
 	if (*end != 0) {
 		zc_error_prev_line("integer value is expected");
 	} else {
@@ -257,7 +241,7 @@ zparser_conv_byte(region_type *region, const char *text)
 	uint8_t value;
 	char *end;
    
-	value = (uint8_t) strtol(text, &end, 0);
+	value = (uint8_t) strtol(text, &end, 10);
 	if (*end != '\0') {
 		zc_error_prev_line("integer value is expected");
 	} else {
@@ -277,7 +261,7 @@ zparser_conv_algorithm(region_type *region, const char *text)
 		id = (uint8_t) alg->id;
 	} else {
 		char *end;
-		id = (uint8_t) strtol(text, &end, 0);
+		id = (uint8_t) strtol(text, &end, 10);
 		if (*end != '\0') {
 			zc_error_prev_line("algorithm is expected");
 			return NULL;
@@ -299,7 +283,7 @@ zparser_conv_certificate_type(region_type *region, const char *text)
 		id = htons((uint16_t) type->id);
 	} else {
 		char *end;
-		id = htons((uint16_t) strtol(text, &end, 0));
+		id = htons((uint16_t) strtol(text, &end, 10));
 		if (end != 0) {
 			zc_error_prev_line("certificate type is expected");
 			return NULL;
@@ -669,7 +653,7 @@ zparser_conv_loc(region_type *region, char *str)
 	}
 
 	/* Meters of altitude... */
-	(void) strtol(str, &str, 10);
+	(void)strtol(str, &str, 10);
 	switch(*str) {
 	case ' ':
 	case '\0':
@@ -1238,7 +1222,7 @@ main (int argc, char **argv)
 			}
 		}
 	}
-#endif
+#endif /* NDEBUG */
 	
 	global_region = region_create(xalloc, free);
 	rr_region = region_create(xalloc, free);
@@ -1331,12 +1315,14 @@ main (int argc, char **argv)
 			/* Zone name... */
 			if ((zonename = strtok(NULL, sep)) == NULL) {
 				fprintf(stderr, "zonec: syntax error in %s line %d: expected zone name\n", *argv, line);
+				++totalerrors;
 				break;
 			}
 
 			/* File name... */
 			if ((zonefile = strtok(NULL, sep)) == NULL) {
 				fprintf(stderr, "zonec: syntax error in %s line %d: expected file name\n", *argv, line);
+				++totalerrors;
 				break;
 			}
 
