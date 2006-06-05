@@ -1,7 +1,7 @@
 /*
  * query.c -- nsd(8) the resolver.
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved.
  *
  * See LICENSE for the license.
  *
@@ -270,7 +270,7 @@ process_query_section(query_type *query)
  * unsupported EDNS record, and to 1 otherwise.  Updates QUERY->MAXLEN
  * if the EDNS record specifies a maximum supported response length.
  *
- * Return 0 on failure, 1 on success.
+ * Return NSD_RC_FORMAT on failure, NSD_RC_OK on success.
  */
 static nsd_rc_type
 process_edns(struct query *q)
@@ -890,8 +890,13 @@ query_process(query_type *q, nsd_type *nsd)
 	nsd_rc_type rc;
 	query_state_type query_state;
 	uint16_t arcount;
-	
+
 	/* Sanity checks */
+	if (buffer_limit(q->packet) < QHEADERSZ) {
+		/* packet too small to contain DNS header. 
+		Now packet investigation macros will work without problems. */
+		return QUERY_DISCARDED;
+	}
 	if (QR(q->packet)) {
 		/* Not a query? Drop it on the floor. */
 		return QUERY_DISCARDED;
@@ -984,12 +989,32 @@ query_add_optional(query_type *q, nsd_type *nsd)
 		break;
 	case EDNS_OK:
 		buffer_write(q->packet, edns->ok, OPT_LEN);
+		/* if nsid data should be written */
+#ifdef NSID
+		if (nsd->nsid_len > 0 && q->edns.nsid == 1 &&
+				!query_overflow_nsid(q, nsd->nsid_len)) { 
+
+			/* rdata length */
+			buffer_write(q->packet, edns->rdata_nsid, OPT_RDATA);
+			/* nsid opt header */
+			buffer_write(q->packet, edns->nsid, OPT_HDR);
+			/* nsid payload */
+			buffer_write(q->packet, nsd->nsid, nsd->nsid_len);
+		}  else {
+			/* fill with NULLs */
+			buffer_write(q->packet, edns->rdata_none, OPT_RDATA);
+		}
+#else
+		buffer_write(q->packet, edns->rdata_none, OPT_RDATA);
+#endif /* NSID */
+
 		ARCOUNT_SET(q->packet, ARCOUNT(q->packet) + 1);
 
 		STATUP(nsd, edns);
 		break;
 	case EDNS_ERROR:
 		buffer_write(q->packet, edns->error, OPT_LEN);
+		buffer_write(q->packet, edns->rdata_none, OPT_RDATA);
 		ARCOUNT_SET(q->packet, ARCOUNT(q->packet) + 1);
 
 		STATUP(nsd, ednserr);

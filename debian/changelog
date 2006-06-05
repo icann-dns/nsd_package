@@ -1,3 +1,11 @@
+nsd (2.3.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * makefile-destdir.patch:
+    - Removed, merged upstream.
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon,  5 Jun 2006 09:15:36 +0200
+
 nsd (2.3.3-1) unstable; urgency=low
 
   * New upstream release.

@@ -1,7 +1,7 @@
 /*
  * nsd-xfer.c -- nsd-xfer(8).
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved.
  *
  * See LICENSE for the license.
  *
@@ -456,7 +456,7 @@ print_rr(FILE *out,
 	if (result) {
 		buffer_printf(output, "\n");
 		buffer_flip(output);
-		fwrite(buffer_current(output), buffer_remaining(output), 1,
+		(void)fwrite(buffer_current(output), buffer_remaining(output), 1,
 		       out);
 /* 		fflush(out); */
 	}
@@ -695,7 +695,8 @@ check_serial(axfr_state_type *state)
 	}
 
 	if (RCODE(state->q->packet) != RCODE_OK) {
-		error("error response %d", (int) RCODE(state->q->packet));
+		error("error response %d (%s)", (int) RCODE(state->q->packet),
+				rcode2str((int) RCODE(state->q->packet)));
 		return -1;
 	}
 
@@ -800,8 +801,8 @@ handle_axfr_response(FILE *out, axfr_state_type *axfr)
 		}
 
 		if (RCODE(axfr->q->packet) != RCODE_OK) {
-			error("error response %d",
-			      (int) RCODE(axfr->q->packet));
+			error("error response %d (%s)", (int) RCODE(axfr->q->packet),
+					rcode2str((int) RCODE(axfr->q->packet)));
 			return 0;
 		}
 
