@@ -1,3 +1,11 @@
+nsd (2.3.6-1) unstable; urgency=low
+
+  * New upstream version.
+  * Add dependency on adduser (Closes: #350408)
+  * Changes in IPv6 binding (I hope it closes: #279277)
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 12 Oct 2006 11:35:09 +0200
+
 nsd (2.3.5-1) unstable; urgency=low
 
   * New upstream release.

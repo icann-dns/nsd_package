@@ -1,5 +1,27 @@
 NSD RELEASE NOTES
 
+2.3.6
+=============
+FEATURES:
+	- nsd-notify will retry max 15 times 5 second retries.
+	- patch from Stephane to allow xfer in parallel added to contrib.
+
+BUG FIXES:
+	- Bug #105: nsdc lacks locking, fixed locking for root user.
+        - Bug #134: nsd: make -N <large number> work again
+        - Bug #135: Typo in locking code for nsdc, fixed.
+	- uninitialised variable (found in nsd3 debugging) fixed.
+	- unaligned memory access (on Solaris SPARC, from nsd3 debugging),
+	  in zonec LOC parsing, fixed.
+	- removed unused named8_stats ptr.
+	- Bug #138: nsd aborts trying to bind all interfaces if ip6 is not 
+	  enabled, instead it will fallback to ip4.
+	- Bug #139: resync stats to whole period.
+	- Bug #140: NSD did not clear CD bit on authoritative answers.
+	- Bug #141: NSD did not clear flags on a formerror reply.
+	- tsig null ptr when size set, fixed.
+	- Bug #144: LOC RRtype defaults not according to RFC1876.
+
 2.3.5
 =============
 BUG FIXES:
