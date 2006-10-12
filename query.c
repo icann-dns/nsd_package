@@ -132,6 +132,10 @@ query_error (struct query *q, nsd_rc_type rcode)
 static query_state_type
 query_formerr (struct query *query)
 {
+	int opcode = OPCODE(query->packet);
+	FLAGS_SET(query->packet, FLAGS(query->packet) & 0x0100U);
+		/* Preserve the RD flag. Clear the rest. */
+	OPCODE_SET(query->packet, opcode);
 	return query_error(query, NSD_RC_FORMAT);
 }
 
@@ -217,7 +221,7 @@ query_addtxt(struct query  *q,
  * is stored in QUERY->name, the class in QUERY->klass, and the type
  * in QUERY->type.
  */
-static nsd_rc_type
+static int
 process_query_section(query_type *query)
 {
 	uint8_t qnamebuf[MAXDOMAINLEN];
@@ -238,7 +242,7 @@ process_query_section(query_type *query)
 		    (src + *src + 1 > buffer_end(query->packet)) || 
 		    (src + *src + 1 > query_name + MAXDOMAINLEN))
 		{
-			return NSD_RC_FORMAT;
+			return 0;
 		}
 		memcpy(dst, src, *src + 1);
 		dst += *src + 1;
@@ -251,7 +255,7 @@ process_query_section(query_type *query)
 	if (len > MAXDOMAINLEN ||
 	    (src + 2*sizeof(uint16_t) > buffer_end(query->packet)))
 	{
-		return NSD_RC_FORMAT;
+		return 0;
 	}
 	buffer_set_position(query->packet, src - buffer_begin(query->packet));
 
@@ -260,7 +264,7 @@ process_query_section(query_type *query)
 	query->qclass = buffer_read_u16(query->packet);
 	query->opcode = OPCODE(query->packet);
 
-	return NSD_RC_OK;
+	return 1;
 }
 
 
@@ -870,11 +874,8 @@ query_prepare_response(query_type *q)
 	
 	/* Update the flags.  */
 	flags = FLAGS(q->packet);
-#ifdef DNSSEC
-	flags &= 0x0110U;	/* Preserve the RD and CD flags.  */
-#else
 	flags &= 0x0100U;	/* Preserve the RD flag.  */
-#endif
+				/* CD flag must be cleared for auth answers */
 	flags |= 0x8000U;	/* Set the QR flag.  */
 	FLAGS_SET(q->packet, flags);
 }
@@ -902,9 +903,8 @@ query_process(query_type *q, nsd_type *nsd)
 		return QUERY_DISCARDED;
 	}
 
-	rc = process_query_section(q);
-	if (rc != NSD_RC_OK) {
-		return query_error(q, rc);
+	if(!process_query_section(q)) {
+		return query_formerr(q);
 	}
 
 	/* Update statistics.  */
