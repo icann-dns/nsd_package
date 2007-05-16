@@ -13,7 +13,7 @@ then
 	mkdir -p /var/lib/nsd/
 	chown nsd.nsd /var/lib/nsd
 	. /etc/default/nsd
-	if ${rebuild} && [ "${zonesfile}" -nt "${dbfile}" ]; then
+	if [ ! -e "${dbfile}" ] || [ "${zonesfile}" -nt "${dbfile}" ]; then
 	  /sbin/start-stop-daemon --start -c nsd:nsd --exec /usr/sbin/nsdc -- rebuild
 	fi
 fi

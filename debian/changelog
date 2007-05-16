@@ -1,10 +1,19 @@
+nsd (2.3.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fix bashism in postinst, so dbfile gets created (Closes: #417892)
+  * Enabled root server functionality (shoot yourself in foot if you want).
+  * Remove config.log and config.status in clean target (Closes: #424600)
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 16 May 2007 18:56:32 +0200
+
 nsd (2.3.6-1) unstable; urgency=low
 
   * New upstream version.
   * Add dependency on adduser (Closes: #350408)
   * Changes in IPv6 binding (I hope it closes: #279277)
 
- -- Ondřej Surý <ondrej@debian.org>  Thu, 12 Oct 2006 11:35:09 +0200
+ -- Ondřej Surý <ondrej@yuna.office.nic.cz>  Thu, 12 Oct 2006 11:19:18 +0200
 
 nsd (2.3.5-1) unstable; urgency=low
 
