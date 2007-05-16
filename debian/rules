@@ -11,10 +11,10 @@ DEB_MAKE_CLEAN_TARGET := clean
 DEB_CONFIGURE_EXTRA_FLAGS := \
 	--with-configfile=/etc/default/nsd --with-pidfile=/var/run/nsd.pid \
 	--with-configdir=/etc/nsd/ --sysconfdir=/etc --localstatedir=/var \
-	--enable-ipv6 --with-dbfile=/var/lib/nsd/nsd.db
+	--enable-ipv6 --with-dbfile=/var/lib/nsd/nsd.db --enable-root-server
 
 clean::
-	rm -f config.h Makefile config.sub
+	rm -f config.h Makefile config.sub config.log config.status
 
 install/nsd::
 	rm $(CURDIR)/debian/nsd/etc/default/nsd.sample
