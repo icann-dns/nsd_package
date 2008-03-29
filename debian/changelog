@@ -1,3 +1,10 @@
+nsd (2.3.7-1.1) unstable; urgency=low
+
+  * Non-maintainer upload to solve release goal.
+  * Add LSB dependency header to init.d scripts (Closes: #465060).
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 29 Mar 2008 11:21:55 +0100
+
 nsd (2.3.7-1) unstable; urgency=low
 
   * New upstream release.
