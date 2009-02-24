@@ -32,8 +32,9 @@ set -e
 
 case "$1" in
   start)
-	if ${rebuild} && [ "${zonesfile}" -nt "${dbfile}" ]; then ${NSDC} rebuild; fi
-        [ -n "${nsd_user}" ] && chown "${nsd_user}:" "${dbfile}"
+	if ${rebuild} && [ \( "${zonesfile}" -nt "${dbfile}" \) -a -n "${nsd_user}" ]; then
+		/sbin/start-stop-daemon --start -c nsd:nsd --exec /usr/sbin/nsdc -- rebuild
+	fi
 	echo -n "Starting $DESC: $NAME..."
 	start-stop-daemon --start --quiet --pidfile ${pidfile} --exec ${DAEMON} -- -f ${dbfile} -P ${pidfile} ${flags} 2>/dev/null
 	while [ ! -s ${pidfile} ]; do
