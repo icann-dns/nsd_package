@@ -1,3 +1,11 @@
+nsd (2.3.7-2) unstable; urgency=low
+
+  * Don't chown database file to nsd_user before reload and start.
+  * Build database file as nsd_user instead. (Closes: #513717)
+  * Acknowledge NMU.
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 24 Feb 2009 15:06:01 +0100
+
 nsd (2.3.7-1.1) unstable; urgency=low
 
   * Non-maintainer upload to solve release goal.
