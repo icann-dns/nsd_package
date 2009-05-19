@@ -1,3 +1,10 @@
+nsd (2.3.7-3) unstable; urgency=high
+
+  * Fix off-by-one error (Closes: #529420)
+    - debian/patches/nsd-2.3.7-vuln.patch
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 19 May 2009 11:37:44 +0200
+
 nsd (2.3.7-2) unstable; urgency=low
 
   * Don't chown database file to nsd_user before reload and start.
