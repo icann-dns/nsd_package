@@ -1,3 +1,9 @@
+nsd (2.3.7-1.1+lenny1build0.8.10.1) intrepid-security; urgency=low
+
+  * fake sync from Debian
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 06 Oct 2009 16:36:11 -0500
+
 nsd (2.3.7-1.1+lenny1) stable-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
