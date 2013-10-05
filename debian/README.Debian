@@ -1,0 +1,12 @@
+nsd 4.x for Debian
+==================
+
+  Beware that using nsd commands have often to be performed as user
+‘nsd’ and not ‘root’, so that the files it touches or create have the
+correct permissions.
+
+  The Debian /etc/init.d/nsd script hence contains wrappers around nsdc
+performing the tasks under the proper user, avoiding the need to bother
+with switching users.
+
+ -- Ondřej Surý <ondrej@debian.org>, Sun,  6 Oct 2013 00:12:52 +0200

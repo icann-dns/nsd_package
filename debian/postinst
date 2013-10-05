@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+set_perms() {
+    if ! dpkg-statoverride --list "$4" >/dev/null; then
+        dpkg-statoverride --update --add "$@"
+    fi
+}
+
+if test "$1" = "configure"; then
+    if ! getent passwd nsd > /dev/null; then
+        adduser --quiet --system --group --no-create-home nsd
+    fi
+
+    set_perms nsd nsd 0755 /var/lib/nsd
+    set_perms nsd nsd 0640 /etc/nsd/nsd.conf
+    set_perms nsd nsd 0750 /etc/nsd
+
+    if ! grep -q '^hostmaster: ' /etc/aliases; then
+        echo hostmaster: root >> /etc/aliases
+        if [ -x "`which newaliases`" ]; then
+            newaliases >/dev/null
+        fi
+    fi
+
+    # nsd.db format has changed in 3.2.9
+    if dpkg --compare-versions "$2" lt 4.0.0~; then
+        invoke-rc.d nsd rebuild
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

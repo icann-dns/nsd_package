@@ -1,0 +1,18 @@
+Author: Ondřej Surý <ondrej@sury.org>
+Description: Conditionally define MAXHOSTNAMELEN to allow hurd build
+Forwarded: no
+Last-Update: 2011-05-15
+
+--- nsd4.orig/nsd.c
++++ nsd4/nsd.c
+@@ -45,6 +45,10 @@
+ #include "tsig.h"
+ #include "remote.h"
+ 
++#ifndef MAXHOSTNAMELEN
++#define MAXHOSTNAMELEN 256
++#endif
++
+ /* The server handler... */
+ static struct nsd nsd;
+ static char hostname[MAXHOSTNAMELEN];

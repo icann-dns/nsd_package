@@ -1,0 +1,378 @@
+nsd (4.0.0~b5-1) experimental; urgency=low
+
+  * New upstream version 4.0.0~b5
+  * Remove obsolete patches and update the ones still relevant
+
+ -- Ondřej Surý <ondrej@debian.org>  Sun, 06 Oct 2013 00:26:57 +0200
+
+nsd3 (3.2.16-1) unstable; urgency=low
+
+  * New upstream version 3.2.16
+
+ -- Ondřej Surý <ondrej@debian.org>  Fri, 27 Sep 2013 08:44:02 +0200
+
+nsd3 (3.2.15-1) unstable; urgency=low
+
+  * New upstream version 3.2.15 (Closes: #711490)
+  * Remove RRL patch as it is already included in new upstream version
+  * Update patches for 3.2.15 release
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 27 Jun 2013 15:55:53 +0200
+
+nsd3 (3.2.12-3) unstable; urgency=low
+
+  * Cleanup autoreconf -fi stuff in dh_auto_clean target
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 19 Feb 2013 13:11:59 +0100
+
+nsd3 (3.2.12-2) unstable; urgency=low
+
+  * Add Response Rate Limiting patch (Courtesy of Matthijs Mekking of NLnet Labs)
+  * Regenerate configure due to RRL patch and ./configure with --enable-ratelimit
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 06 Feb 2013 14:09:36 +0100
+
+nsd3 (3.2.12-1) unstable; urgency=low
+
+  * Imported Upstream version 3.2.12
+   - Fix for VU#624931 CVE-2012-2978: NSD denial of service 
+     vulnerability from non-standard DNS packet from any host
+     on the internet as discovered by Marek Vavrusa and Lubos
+     Slovak from CZ.NIC Labs
+     http://www.nlnetlabs.nl/downloads/CVE-2012-2978.txt
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 19 Jul 2012 15:06:15 +0200
+
+nsd3 (3.2.11-1) unstable; urgency=low
+
+  * Imported Upstream version 3.2.11
+    - Fallback to AXFR if IXFR is unknown at the primary. NSD considers
+      IXFR unknown at the primary if there is a negative response for the
+      IXFR RRtype. This does not override the value for
+      'allow-axfr-fallback'.
+    - Allow for reading in new DNSKEY algorithm mnemonics (RFC5155,
+      RFC5702, RFC5933, and RFC6605 (ECDSA)).
+    - Zone statistics, enable with --enable-zone-stats. This stores the
+      BIND8 stats per zone in a configurable statistics file. This option
+      does not scale and should therefore not be enabled when serving
+      many zones.
+    - Support for TLSA RRtype (DANE).
+    - Fix for qtype ANY for a wildcard domain in NSEC signed zone: Don't
+      add the wildcard domain NSEC into the answer section. Instead,
+      put the wildcard expanded NSEC into the answer section and keep the
+      wildcard domain NSEC in the authority section.
+    - Fix for accept spinning reported by OpenBSD.
+    - Fix restart failed due to bad ixfr packet because of zone removed
+      from nsd.conf.
+    - Bugfix #453: typo in nsdc man page.
+    - NSD uses the query name for dname compression again (Fix #235
+      had as side effect that this didn't happen anymore and is hereby
+      undone).
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 19 Jul 2012 13:04:56 +0200
+
+nsd3 (3.2.10-1) unstable; urgency=low
+
+  [ Jeroen Schot ]
+  * Imported Upstream version 3.2.10
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 15 Feb 2012 21:23:02 +0100
+
+nsd3 (3.2.9-3) unstable; urgency=low
+
+  [ Jeroen Schot ]
+  * Sync long description of nsd with nsd3
+  * Drop 0007-Fix-spelling-errors-in-manpage.patch, applied upstream
+  * Move transitional nsd package to oldlibs/extra
+  * Add minimal DEP3 headers to patches
+  * Use Breaks instead of Conflicts with old nsd
+  * Switch from hardening-wrapper to (hardened) dpkg-buildflags
+
+  [ Ondřej Surý ]
+  * Use nsd3 version and not php5 version in postinst :)
+  * Don't break the build when buildflags.mk is not found
+
+  [ Jeroen Schot ]
+  * Call 'nsdc rebuild' via init script to handle new and unconfigured
+    installations without nsd.conf
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 31 Jan 2012 16:03:31 +0100
+
+nsd3 (3.2.9-2) unstable; urgency=medium
+
+  * Rebuild nsd.db database if upgrading from pre-3.2.9 version
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 31 Jan 2012 12:38:36 +0100
+
+nsd3 (3.2.9-1) unstable; urgency=low
+
+  [ Ondřej Surý ]
+  * Update Vcs-* links
+  * Bump standards to 3.9.2
+
+  [ Jeroen Schot ]
+  * Install real upstream changelog (instead of README)
+  * Drop unneeded quilt stuff, handled by dpkg-source
+  * Add hostmaster alias to /etc/aliases in postinst (Closes: #625810)
+  * Fix spelling errors in nsd.conf.5.in.
+
+  [ Ondřej Surý ]
+  * Imported Upstream version 3.2.9
+  * Update verbose patch
+  * Add NSEC3 wildcard Bind 9 compatibility patch (See upstream bug 390)
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 28 Nov 2011 19:37:06 +0100
+
+nsd3 (3.2.8-3) unstable; urgency=low
+
+  [ Jeroen Schot ]
+  * Install upstream changelog
+  * Replace '#!/bin/sh -e' with separate 'set -e'
+  * Add newline to lintian-override file
+
+  [ Ondřej Surý ]
+  * Conditionally define MAXHOSTNAMELEN to allow hurd build
+
+ -- Ondřej Surý <ondrej@debian.org>  Sun, 15 May 2011 16:43:06 +0200
+
+nsd3 (3.2.8-2) unstable; urgency=low
+
+  * Fix statoverride file breakage (Closes: #621071)
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 07 Apr 2011 16:14:29 +0200
+
+nsd3 (3.2.8-1) unstable; urgency=low
+
+  * Imported Upstream version 3.2.8 (Closes: #619495)
+  * Add reload option to nsd3.init (Closes: #616404)
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 16 Mar 2011 11:58:03 +0100
+
+nsd3 (3.2.7-1) unstable; urgency=low
+
+  * Imported Upstream version 3.2.7
+  * Refreshed patch for new release
+  * Remove 0006-fix_manpages.patch; merged upstream
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 24 Jan 2011 14:26:57 +0100
+
+nsd3 (3.2.6-3) unstable; urgency=low
+
+  * Don't run init script if config file is missing (Closes: #603383)
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 02 Dec 2010 16:00:19 +0100
+
+nsd3 (3.2.6-2) unstable; urgency=high
+
+  * Install files into the package (urgency high, because it's unusable)
+
+ -- Ondřej Surý <ondrej@debian.org>  Fri, 13 Aug 2010 16:12:34 +0200
+
+nsd3 (3.2.6-1) unstable; urgency=low
+
+  * New upstream version
+  * Add transitional nsd package to obsolete nsd 2.x
+  * Add debian/NEWS file with instructions for nsd 2.x users
+  * Update copyright file to include files in contrib/
+  * Fix errors in manpages
+  * debian/control changes:
+    + Bump standards version to 3.9.1
+    + Update VCS links in debian/control
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 04 Aug 2010 17:06:27 +0200
+
+nsd3 (3.2.5-1) unstable; urgency=low
+
+  * New upstream version 3.2.5
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 15 Apr 2010 11:43:30 +0200
+
+nsd3 (3.2.5~rc1-1) unstable; urgency=low
+
+  * New upstream RC version
+  * Merge 3.2.4-1.1 NMU changes
+  * Enable experimental mmap support
+  * Enable hardened build
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 07 Apr 2010 16:36:56 +0200
+
+nsd3 (3.2.4-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix "Installation fails because of missing /etc/nsd3/nsd.conf"; apply
+    patch from martin f krafft (closes: #570160).
+  * Fix lintian errors: add $remote_fs to required-start and -stop in the init
+    script. (The other lintian error about /var/run/nsd3/ looks bogus as this
+    directory is re-created in the init script anyway.)
+
+ -- gregor herrmann <gregoa@debian.org>  Mon, 08 Mar 2010 22:30:10 +0100
+
+nsd3 (3.2.4-1) unstable; urgency=low
+
+  * New upstream version 3.2.4
+  * New maintainer
+  * Convert to 3.0 (quilt) source package
+  * Convert to new debhelper (>= 7)
+  * Refreshed debian/patches/0005-Force-dbdir-to-be-var-lib-nsd3-by-
+    patching-configure.patch
+  * Fix small typo s/diffile/difffile/ in configure call
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 25 Jan 2010 15:18:26 +0100
+
+nsd3 (3.2.3-5) unstable; urgency=low
+
+  * init: remove spurious and bogus -- argument to nsdc.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Tue, 10 Nov 2009 21:45:02 +0100
+
+nsd3 (3.2.3-4) unstable; urgency=low
+
+  * add debian/gbp.conf to be able to use git-dch.
+  * Rename README.packaging, and s/tokyocabinet/nsd3/ in it
+  * postinst: do not remove user-provided statoverrides.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Mon, 09 Nov 2009 21:12:27 +0100
+
+nsd3 (3.2.3-3) unstable; urgency=low
+
+  * Simplify init script wrt nsdc calls.
+  * Ignore chrooted, as it seems that db paths must be absolute relative to
+    the host environment and not the chroot, IOW the db rebuilds from init
+    work.
+  * Fix permission issue wrt nsd.conf that should be nsd:nsd 640.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 08 Nov 2009 19:27:49 +0100
+
+nsd3 (3.2.3-2) unstable; urgency=low
+
+  * Rework how directories are chowned nsd:root:
+    - use dpkg-statoverride for /usr/lib/nsd3 and /etc/nsd3.
+    - use chown (no -R) for /var/run/nsd3 (Closes: #554893).
+  * Do not rebuild db from postinst, init.d will do it.
+  * Move packaging to collab-maint.
+  * Move standards version to 3.8.3.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 08 Nov 2009 18:03:20 +0100
+
+nsd3 (3.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Pass SHELL=/bin/bash to make so that nsdc.sh gets the proper shebang
+    (Closes: #535878).
+  * Disable largefile as it breaks architectures not allowing unaligned
+    8-bytes access, and it's likely to be a problem for nsd3
+    (Closes: #539979).
+  * Make init.d read more values from the actual configuration using
+    nsd-checkconf -o, and do less stuff if people are using chrooted stuff,
+    because we probably aren't doing it right (Closes: #543580).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 30 Aug 2009 00:21:05 +0200
+
+nsd3 (3.2.2-1) unstable; urgency=low
+
+  * New upstream release (Closes: #529418).
+  * Fix bashism in nsdc.sh (Closes: #530152).
+  * Add 0005-Force-dbdir-to-be-var-lib-nsd3-by-patching-configure.patch
+    to fix the use of /var/db.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sat, 30 May 2009 11:47:17 +0200
+
+nsd3 (3.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use Martin F. Krafft patch to rebuild databases if none exists at startup
+    time (Closes: #523898).
+  * patches/0004-be-sure-nsdc-drops-privilegies-properly-for-anything.patch:
+    drops privileges in nsdc when doing anything else than start/stop
+    (Closes: #500806).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Mon, 13 Apr 2009 17:53:26 +0200
+
+nsd3 (3.2.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * update patches/0003-Be-silent-if-there-is-nothing-to-patch.patch to silent
+    nsdc patch even more (Closes: #479222).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Thu, 15 Jan 2009 14:23:42 +0100
+
+nsd3 (3.1.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add patches/0003-Be-silent-if-there-is-nothing-to-patch.patch to make
+    patch cron silent if there is nothing to patch (Closes: #479222).
+  * Remove reload action fro the init script (Closes: #491883).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Fri, 15 Aug 2008 16:02:57 +0200
+
+nsd3 (3.0.7-3) unstable; urgency=low
+
+  * Remove useless docs (Closes: 463527).
+  * Don't compress pdf files either.
+  * Bump Standards-Version to 3.7.3, no changes required.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 10 Feb 2008 17:41:53 +0100
+
+nsd3 (3.0.7-2~bpo40+1) etch-backports; urgency=low
+
+  * Rebuild for Etch backports.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Wed, 02 Jan 2008 16:23:45 +0100
+
+nsd3 (3.0.7-2) unstable; urgency=low
+
+  * debian/control: fix Description typos, thanks to Thijs Kinkhorst
+    (Closes: #458645).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Wed, 02 Jan 2008 16:20:25 +0100
+
+nsd3 (3.0.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+      + XS-Vcs-* -> Vcs-*.
+      + Have a real Homepage field.
+  * rework how packaging is done:
+      + use pristine-tar to store the tarballs.
+      + have a debian/patches/ directory.
+  * drop Fix-manpages.patch: obsolete.
+  * make debian/copyright machine-parseable.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sat, 24 Nov 2007 18:43:02 +0100
+
+nsd3 (3.0.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Mon, 08 Oct 2007 15:51:00 +0200
+
+nsd3 (3.0.5-3) unstable; urgency=high
+
+  * (debian/cron.d): add MAILTO=hostmaster so that the proper user gets the
+    mail.
+  * Set urgency to high as it's the sole change, and that for now it fills
+    /var/mail/nsd3 for no good reason.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Tue, 21 Aug 2007 09:58:43 +0200
+
+nsd3 (3.0.5-2) unstable; urgency=high
+
+  * (debian/cron.d):
+    + fix sillyness in the way nsdc is called, set urgency to high as it's an
+      RC bug.
+    + set cron date to 4:17 to avoid load surge.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Fri, 03 Aug 2007 18:01:26 +0200
+
+nsd3 (3.0.5-1~bpo.1) etch-backports; urgency=low
+
+  * Backport for backports.org.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 22 Jul 2007 11:11:06 +0200
+
+nsd3 (3.0.5-1) unstable; urgency=low
+
+  * Initial release (Closes: 430335).
+  * Pull upstream bugfixes from the NSD_3_0 branch.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sun, 24 Jun 2007 15:59:09 +0200

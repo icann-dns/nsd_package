@@ -1,0 +1,2 @@
+0005-Force-dbdir-to-be-var-lib-nsd-by-patching-configure.patch
+0006-define_MAXHOSTNAMELEN_for_hurd_build.patch
