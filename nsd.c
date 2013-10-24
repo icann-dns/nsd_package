@@ -72,7 +72,7 @@ usage (void)
 		"  -a ip-address[@port] Listen to the specified incoming IP address (and port)\n"
 		"                       May be specified multiple times).\n"
 		"  -c configfile        Read specified configfile instead of %s.\n"
-		"  -d                   Enable debug mode (do not fork as a daemon process).\n"
+		"  -d                   do not fork as a daemon process.\n"
 #ifndef NDEBUG
 		"  -F facilities        Specify the debug facilities.\n"
 #endif /* NDEBUG */
@@ -346,8 +346,8 @@ bind8_stats (struct nsd *nsd)
 	time(&now);
 
 	/* NSTATS */
-	t = msg = buf + snprintf(buf, MAXSYSLOGMSGLEN, "NSTATS %lu %lu",
-				 (unsigned long) now, (unsigned long) nsd->st.boot);
+	t = msg = buf + snprintf(buf, MAXSYSLOGMSGLEN, "NSTATS %lld %lu",
+				 (long long) now, (unsigned long) nsd->st.boot);
 	for (i = 0; i <= 255; i++) {
 		/* How much space left? */
 		if ((len = buf + MAXSYSLOGMSGLEN - t) < 32) {
@@ -372,12 +372,12 @@ bind8_stats (struct nsd *nsd)
 	    || nsd->st.rcode[RCODE_FORMAT] || nsd->st.nona || nsd->st.rcode[RCODE_NXDOMAIN]
 	    || nsd->st.opcode[OPCODE_UPDATE]) {
 
-		log_msg(LOG_INFO, "XSTATS %lu %lu"
+		log_msg(LOG_INFO, "XSTATS %lld %lu"
 			" RR=%lu RNXD=%lu RFwdR=%lu RDupR=%lu RFail=%lu RFErr=%lu RErr=%lu RAXFR=%lu"
 			" RLame=%lu ROpts=%lu SSysQ=%lu SAns=%lu SFwdQ=%lu SDupQ=%lu SErr=%lu RQ=%lu"
 			" RIQ=%lu RFwdQ=%lu RDupQ=%lu RTCP=%lu SFwdR=%lu SFail=%lu SFErr=%lu SNaAns=%lu"
 			" SNXD=%lu RUQ=%lu RURQ=%lu RUXFR=%lu RUUpd=%lu",
-			(unsigned long) now, (unsigned long) nsd->st.boot,
+			(long long) now, (unsigned long) nsd->st.boot,
 			nsd->st.dropped, (unsigned long)0, (unsigned long)0, (unsigned long)0, (unsigned long)0,
 			(unsigned long)0, (unsigned long)0, nsd->st.raxfr, (unsigned long)0, (unsigned long)0,
 			(unsigned long)0, nsd->st.qudp + nsd->st.qudp6 - nsd->st.dropped, (unsigned long)0,
@@ -1016,8 +1016,10 @@ main(int argc, char *argv[])
 
 		/* strip chroot from pathnames if they're absolute */
 		nsd.options->zonesdir += l;
-		if (nsd.log_filename[0] == '/')
-			nsd.log_filename += l;
+		if (nsd.log_filename){
+			if (nsd.log_filename[0] == '/')
+				nsd.log_filename += l;
+		}
 		if (nsd.pidfile[0] == '/')
 			nsd.pidfile += l;
 		if (nsd.dbfile[0] == '/')

@@ -81,6 +81,10 @@
 /** number of seconds timeout on incoming remote control handshake */
 #define REMOTE_CONTROL_TCP_TIMEOUT 120
 
+/** repattern to master or slave */
+#define REPAT_SLAVE  1
+#define REPAT_MASTER 2
+
 /** if you want zero to be inhibited in stats output.
  * it omits zeroes for types that have no acronym and unused-rcodes */
 const int inhibit_zero = 1;
@@ -304,7 +308,6 @@ void daemon_remote_close(struct daemon_remote* rc)
 	p = rc->busy_list;
 	while(p) {
 		np = p->next;
-		close(h->c.ev_fd);
 		if(p->event_added)
 			event_del(&p->c);
 		if(p->ssl)
@@ -438,7 +441,8 @@ add_open(struct daemon_remote* rc, const char* ip, int nr, int noproto_is_err)
 	return 1;
 }
 
-int daemon_remote_open_ports(struct daemon_remote* rc, nsd_options_t* cfg)
+int
+daemon_remote_open_ports(struct daemon_remote* rc, nsd_options_t* cfg)
 {
 	assert(cfg->control_enable && cfg->control_port);
 	if(cfg->control_interface) {
@@ -461,7 +465,8 @@ int daemon_remote_open_ports(struct daemon_remote* rc, nsd_options_t* cfg)
 	return 1;
 }
 
-void daemon_remote_attach(struct daemon_remote* rc, struct xfrd_state* xfrd)
+void
+daemon_remote_attach(struct daemon_remote* rc, struct xfrd_state* xfrd)
 {
 	int fd;
 	struct acceptlist* p;
@@ -649,7 +654,8 @@ ssl_print_vmsg(SSL* ssl, const char* format, va_list args)
 }
 
 /** printf style printing to the ssl connection */
-static int ssl_printf(SSL* ssl, const char* format, ...)
+static int
+ssl_printf(SSL* ssl, const char* format, ...)
 {
 	va_list args;
 	int ret;
@@ -699,13 +705,15 @@ skipwhite(char* str)
 }
 
 /** send the OK to the control client */
-static void send_ok(SSL* ssl)
+static void
+send_ok(SSL* ssl)
 {
 	(void)ssl_printf(ssl, "ok\n");
 }
 
 /** get zone argument (if any) or NULL, false on error */
-static int get_zone_arg(SSL* ssl, xfrd_state_t* xfrd, char* arg,
+static int
+get_zone_arg(SSL* ssl, xfrd_state_t* xfrd, char* arg,
 	zone_options_t** zo)
 {
 	const dname_type* dname;
@@ -1196,7 +1204,8 @@ parse_implicit_name(xfrd_state_t* xfrd,const char* pname)
 }
 
 /** remove cfgzone and add task so that reload does too */
-static void remove_cfgzone(xfrd_state_t* xfrd, const char* pname)
+static void
+remove_cfgzone(xfrd_state_t* xfrd, const char* pname)
 {
 	/* dname and find the zone for the implicit pattern */
 	zone_options_t* zopt = NULL;
@@ -1233,7 +1242,8 @@ static void remove_cfgzone(xfrd_state_t* xfrd, const char* pname)
 }
 
 /** add cfgzone and add task so that reload does too */
-static void add_cfgzone(xfrd_state_t* xfrd, const char* pname)
+static void
+add_cfgzone(xfrd_state_t* xfrd, const char* pname)
 {
 	/* add to our zonelist */
 	zone_options_t* zopt = zone_options_create(xfrd->nsd->options->region);
@@ -1263,7 +1273,8 @@ static void add_cfgzone(xfrd_state_t* xfrd, const char* pname)
 }
 
 /** remove pattern and add task so that reload does too */
-static void remove_pat(xfrd_state_t* xfrd, const char* name)
+static void
+remove_pat(xfrd_state_t* xfrd, const char* name)
 {
 	/* add task before deletion, because name-string could be deleted */
 	task_new_del_pattern(xfrd->nsd->task[xfrd->nsd->mytask],
@@ -1273,7 +1284,8 @@ static void remove_pat(xfrd_state_t* xfrd, const char* name)
 }
 
 /** add pattern and add task so that reload does too */
-static void add_pat(xfrd_state_t* xfrd, pattern_options_t* p)
+static void
+add_pat(xfrd_state_t* xfrd, pattern_options_t* p)
 {
 	pattern_options_add_modify(xfrd->nsd->options, p);
 	task_new_add_pattern(xfrd->nsd->task[xfrd->nsd->mytask],
@@ -1353,7 +1365,8 @@ repat_interrupt_notify_start(xfrd_state_t* xfrd)
 }
 
 /** check if patterns have changed */
-static void repat_patterns(xfrd_state_t* xfrd, nsd_options_t* newopt)
+static void
+repat_patterns(xfrd_state_t* xfrd, nsd_options_t* newopt)
 {
 	/* zones that use changed patterns must have:
 	 * - their AXFR/IXFR interrupted: try again, acl may have changed.
@@ -1363,6 +1376,7 @@ static void repat_patterns(xfrd_state_t* xfrd, nsd_options_t* newopt)
 	 */
 	nsd_options_t* oldopt = xfrd->nsd->options;
 	pattern_options_t* p;
+	int search_zones = 0;
 
 	repat_interrupt_zones(xfrd, newopt);
 	/* find deleted patterns */
@@ -1392,14 +1406,66 @@ static void repat_patterns(xfrd_state_t* xfrd, nsd_options_t* newopt)
 				add_cfgzone(xfrd, p->pname);
 			}
 		} else if(!pattern_options_equal(p, origp)) {
+			uint8_t newstate = 0;
+			if (p->request_xfr && !origp->request_xfr) {
+				newstate = REPAT_SLAVE;
+			} else if (!p->request_xfr && origp->request_xfr) {
+				newstate = REPAT_MASTER;
+			}
 			add_pat(xfrd, p);
+			if (p->implicit && newstate) {
+				const dname_type* dname =
+					parse_implicit_name(xfrd, p->pname);
+				if (dname) {
+					if (newstate == REPAT_SLAVE) {
+						zone_options_t* zopt =
+							zone_options_find(
+							oldopt, dname);
+						if (zopt) {
+							xfrd_init_slave_zone(
+								xfrd, zopt);
+						}
+					} else if (newstate == REPAT_MASTER) {
+						xfrd_del_slave_zone(xfrd,
+							dname);
+					}
+					region_recycle(xfrd->region,
+						(void*)dname,
+						dname_total_size(dname));
+				}
+			} else if(!p->implicit && newstate) {
+				/* search all zones with this pattern */
+				search_zones = 1;
+				origp->xfrd_flags = newstate;
+			}
+		}
+	}
+	if (search_zones) {
+		zone_options_t* zone_opt;
+		/* search in oldopt because 1) it contains zonelist zones,
+		 * and 2) you need oldopt(existing) to call xfrd_init */
+		RBTREE_FOR(zone_opt, zone_options_t*, oldopt->zone_options) {
+			pattern_options_t* oldp = zone_opt->pattern;
+			if (!oldp->implicit) {
+				if (oldp->xfrd_flags == REPAT_SLAVE) {
+					/* xfrd needs stable reference so get
+					 * it from the oldopt(modified) tree */
+					xfrd_init_slave_zone(xfrd, zone_opt);
+				} else if (oldp->xfrd_flags == REPAT_MASTER) {
+					xfrd_del_slave_zone(xfrd,
+						(const dname_type*)
+						zone_opt->node.key);
+				}
+				oldp->xfrd_flags = 0;
+			}
 		}
 	}
 	repat_interrupt_notify_start(xfrd);
 }
 
 /** true if options are different that can be set via repat. */
-static int repat_options_changed(xfrd_state_t* xfrd, nsd_options_t* newopt)
+static int
+repat_options_changed(xfrd_state_t* xfrd, nsd_options_t* newopt)
 {
 #ifdef RATELIMIT
 	if(xfrd->nsd->options->rrl_ratelimit != newopt->rrl_ratelimit)
@@ -1415,7 +1481,8 @@ static int repat_options_changed(xfrd_state_t* xfrd, nsd_options_t* newopt)
 }
 
 /** check if global options have changed */
-static void repat_options(xfrd_state_t* xfrd, nsd_options_t* newopt)
+static void
+repat_options(xfrd_state_t* xfrd, nsd_options_t* newopt)
 {
 	if(repat_options_changed(xfrd, newopt)) {
 		/* update our options */
@@ -1432,7 +1499,8 @@ static void repat_options(xfrd_state_t* xfrd, nsd_options_t* newopt)
 
 /** print errors over ssl, gets pointer-to-pointer to ssl, so it can set
  * the pointer to NULL on failure and stop printing */
-static void print_ssl_cfg_err(void* arg, const char* str)
+static void
+print_ssl_cfg_err(void* arg, const char* str)
 {
 	SSL** ssl = (SSL**)arg;
 	if(!*ssl) return;
@@ -1848,7 +1916,8 @@ clear_stats(xfrd_state_t* xfrd)
 	xfrd->nsd->st.db_mem = dbm;
 }
 
-void daemon_remote_process_stats(struct daemon_remote* rc)
+void
+daemon_remote_process_stats(struct daemon_remote* rc)
 {
 	struct rc_state* s;
 	struct timeval now;

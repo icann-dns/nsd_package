@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+if test "$1" = "purge"; then
+    spool=/var/lib/nsd
+    rm -f $spool/nsd.db $spool/ixfr.db $spool/xfrd.state
+    rmdir $spool 2>/dev/null || true
+
+    dpkg-statoverride --remove $spool >/dev/null 2>/dev/null || true
+
+    deluser --quiet nsd >/dev/null || true
+fi
+
+exit 0

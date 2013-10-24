@@ -1,0 +1,32 @@
+--- nsd.orig/nsd-control-setup.sh.in
++++ nsd/nsd-control-setup.sh.in
+@@ -155,6 +155,6 @@ chmod o-rw $SVR_BASE.pem $SVR_BASE.key $
+ rm -f request.cfg
+ rm -f $CTL_BASE"_trust.pem" $SVR_BASE"_trust.pem" $SVR_BASE"_trust.srl"
+ 
+-echo "Setup success. Certificates created. Enable in nsd.conf file to use"
++echo "Setup success. Certificates created."
+ 
+ exit 0
+--- nsd.orig/options.c
++++ nsd/options.c
+@@ -79,7 +79,7 @@ nsd_options_create(region_type* region)
+ #endif
+ 	opt->zonefiles_check = 1;
+ 	opt->xfrd_reload_timeout = 1;
+-	opt->control_enable = 0;
++	opt->control_enable = 1;
+ 	opt->control_interface = NULL;
+ 	opt->control_port = NSD_CONTROL_PORT;
+ 	opt->server_key_file = CONFIGDIR"/nsd_server.key";
+--- nsd.orig/nsd-control.8.in
++++ nsd/nsd-control.8.in
+@@ -139,8 +139,6 @@ these in the default run directory, or w
+ If you change the access control permissions on the key files you can decide
+ who can use nsd\-control, by default owner and group but not all users.
+ The script preserves private keys present in the directory.
+-After running the script as root, turn on \fBcontrol\-enable\fR in 
+-\fInsd.conf\fR.
+ .SH "STATISTIC COUNTERS"
+ The \fIstats\fR command shows a number of statistic counters.
+ .TP

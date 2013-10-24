@@ -33,6 +33,11 @@ override_dh_auto_install:
 	dh_auto_install -- DESTDIR=$(CURDIR)/debian/nsd
 	rmdir $(CURDIR)/debian/nsd/run/nsd
 	rmdir $(CURDIR)/debian/nsd/run
+	mv $(CURDIR)/debian/nsd/etc/nsd/nsd.conf.sample $(CURDIR)/debian/nsd/usr/share/doc/nsd/examples/nsd.conf
+	install -m 640 debian/nsd.conf $(CURDIR)/debian/nsd/etc/nsd/
 
 override_dh_installchangelogs:
 	dh_installchangelogs doc/ChangeLog
+
+override_dh_compress:
+	dh_compress -X/usr/share/doc/nsd/examples/nsd.conf
