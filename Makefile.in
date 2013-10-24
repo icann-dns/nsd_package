@@ -157,8 +157,7 @@ udb-inspect:	udb-inspect.o $(COMMON_OBJ) $(LIBOBJS)
 	$(LINK) -o $@ udb-inspect.o $(COMMON_OBJ) $(LIBOBJS) $(LIBS)
 
 clean:
-	rm -f *.o *.so y.* *.core *.gmon tags TAGS
-	rm -f $(TARGETS) $(MANUALS) cutest udb-inspect nsd-mem
+	rm -f *.o $(TARGETS) $(MANUALS) cutest udb-inspect nsd-mem
 
 realclean: clean
 	rm -f Makefile config.h config.log config.status
@@ -269,17 +268,19 @@ udb-inspect.o:	$(srcdir)/tpkg/cutest/udb-inspect.c
 	$(COMPILE) -c $(srcdir)/tpkg/cutest/udb-inspect.c
 
 zlexer.c:	$(srcdir)/zlexer.lex
-	rm -f $@
-	echo '#include "config.h"' > $@
-	$(LEX) -i -t $(srcdir)/zlexer.lex >> $@
+	if test "$(LEX)" != ":"; then rm -f $@ ;\
+		echo '#include "config.h"' > $@ ;\
+		$(LEX) -i -t $(srcdir)/zlexer.lex >> $@ ;\
+	fi
 
 zparser.c zparser.h: $(srcdir)/zparser.y
 	$(YACC) -d -o zparser.c $(srcdir)/zparser.y
 
 configlexer.c:	$(srcdir)/configlexer.lex
-	rm -f $@
-	echo '#include "configyyrename.h"' > $@
-	$(LEX) -i -t $(srcdir)/configlexer.lex >> $@
+	if test "$(LEX)" != ":"; then rm -f $@ ;\
+		echo '#include "configyyrename.h"' > $@ ;\
+		$(LEX) -i -t $(srcdir)/configlexer.lex >> $@ ;\
+	fi
 
 configparser.c configparser.h:	$(srcdir)/configparser.y
 	$(YACC) -d -o configparser.c $(srcdir)/configparser.y

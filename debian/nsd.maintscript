@@ -1,0 +1,1 @@
+mv_conffile /etc/nsd3/nsd.conf /etc/nsd/nsd.conf 4.0.0~rc2~ nsd3 -- "$@" 0

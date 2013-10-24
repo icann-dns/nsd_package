@@ -1,5 +1,78 @@
+24 October 2013: Wouter
+	- Fixup zone change code.
+	- tag 4.0.0rc3.
+
+21 October 2013: Matthijs
+	- Initialize xfrd zone when changing zone from master to slave
+	  and delete xfrd zone when changing zone from slave to master.
+
+14 October 2013: Wouter
+	- tag 4.0.0rc2.
+
+14 October 2013: Matthijs
+	- Additional log messages with reason why RR to be deleted cannot be
+	  found.
+
+14 October 2013: Wouter
+	- Fix for zone transfer that has different-cased RRSIG signer names
+	  or NSEC next-owner names.
+
+9 October 2013: Wouter
+	- tsig errors on incoming tsig print key name and source IP of query.
+
+8 October 2013: Wouter
+	- Update documentation for nsd -d option.
+
+7 October 2013: Wouter
+	- Fix mini_event ev_once flag to be prettier (review comments Yuri).
+	- tag 4.0.0rc1 recreated.
+
+4 October 2013: Wouter
+	- Fix bug where if you do not have flex, and then install flex, it
+	  would not make without a re-untar of the source.
+
+3 October 2013: Wouter
+	- Review changes from Matthijs.
+	- doc/README updated, 'nsdc' is now removed.
+
+1 October 2013: Wouter
+	- Review commits from Matthijs.
+	- doc/UPGRADING updated, review Yuri.
+
+30 September 2013: Wouter
+	- tag 4.0.0rc1
+	- updated doc/RELNOTES
+
+19 September 2013: Wouter
+	- configure --disable-recvmmsg for compat with older Linux kernels,
+	  by default it autodetects support in the kernel on the buildmachine.
+
+20 Aug 2013: Wouter
+	- Fix time at 2038, uint32s changed to time_t, support 64bit time_t.
+
+19 Aug 2013: Wouter
+	- Fix use of 32bit time, for 2038, thanks to Theo de Raadt for patch.
+
+13 Aug 2013: Wouter
+	- Bugfix#518 Incorrect RRL prefix length option names in nsd.conf
+	  man page from Ville Mattila.
+
+9 Aug 2013: Wouter
+	- Fix that xfrd, and nsd-control, does not stop responding when reload
+	  errors out.  The pid is sent like it should by server_main.
+	- Fix that EOF in quoted string error does not cause reload to exit.
+	- Fixup errors from the stack code checker.
+
+6 Aug 2013: Wouter
+	- Removed use of random when arc4random is available.  Thus, random
+	  and srandom are then not linked with the executable.
+
+16 Jul 2013: Wouter
+	- Fix segfault with no logfile and chroot.
+
 15 Jul 2013: Wouter
 	- beta 5 tag.
+	- trunk has beta6 named in configure.
 
 9 Jul 2013: Wouter
 	- unlink xfr file if transfer is stopped, timeouted or interrupted.

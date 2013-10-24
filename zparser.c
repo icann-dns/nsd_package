@@ -3379,7 +3379,7 @@ yyreduce:
 #ifdef DRAFT_RRTYPES
 	    zadd_rdata_wireformat(zparser_conv_eui(parser->region, (yyvsp[(1) - (2)].data).str, 48));
 #else
-	    zc_error_prev_line("EUI48 not supported, enable with --enable-eui-rrtypes.");
+	    zc_error_prev_line("EUI48 not supported, enable with --enable-draft-rrtypes.");
 #endif
     }
     break;
@@ -3391,7 +3391,7 @@ yyreduce:
 #ifdef DRAFT_RRTYPES
 	    zadd_rdata_wireformat(zparser_conv_eui(parser->region, (yyvsp[(1) - (2)].data).str, 64));
 #else
-	    zc_error_prev_line("EUI64 not supported, enable with --enable-eui-rrtypes.");
+	    zc_error_prev_line("EUI64 not supported, enable with --enable-draft-rrtypes.");
 #endif
     }
     break;

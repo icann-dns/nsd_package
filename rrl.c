@@ -279,7 +279,7 @@ static void examine_query(query_type* query, uint32_t* hash, uint64_t* source,
 	uint16_t c, c2;
 	/* size with 16 bytes to spare */
 	uint8_t buf[MAXDOMAINLEN + sizeof(*source) + sizeof(c) + 16];
-	const uint8_t* dname = NULL; size_t dname_len;
+	const uint8_t* dname = NULL; size_t dname_len = 0;
 	uint32_t r = 0x267fcd16;
 
 	*source = rrl_get_source(query, &c2);
@@ -426,6 +426,7 @@ int rrl_process_query(query_type* query)
 {
 	uint64_t source;
 	uint32_t hash;
+	/* we can use circular arithmatic here, so int32 works after 2038 */
 	int32_t now = (int32_t)time(NULL);
 	uint32_t lm = rrl_ratelimit;
 	uint16_t flags;
@@ -444,8 +445,12 @@ int rrl_process_query(query_type* query)
 
 query_state_type rrl_slip(query_type* query)
 {
-	/* discard half the packets, randomly */
+	/* discard number the packets, randomly */
+#ifdef HAVE_ARC4RANDOM
+	if((rrl_slip_ratio > 0) && ((rrl_slip_ratio == 1) || ((arc4random() % rrl_slip_ratio) == 0))) {
+#else
 	if((rrl_slip_ratio > 0) && ((rrl_slip_ratio == 1) || ((random() % rrl_slip_ratio) == 0))) {
+#endif
 		/* set TC on the rest */
 		TC_SET(query->packet);
 		ANCOUNT_SET(query->packet, 0);
