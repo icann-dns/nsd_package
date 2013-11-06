@@ -32,6 +32,7 @@ Description: authoritative domain name server
 Package: nsd3
 Architecture: all
 Section: oldlibs
+Priority: extra
 Depends: nsd (>= 4.0.0~rc2~), ${misc:Depends}
 Description: authoritative domain name server [transitional package]
  NSD is a fast, authoritative only, high performance, simple

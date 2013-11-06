@@ -25,7 +25,7 @@ NSDC=/usr/sbin/nsd-control
 # Exit if the package is not installed
 [ -x $DAEMON ] || exit 0
 
-PIDFILE=$(dirname $(nsd-checkconf -o pidfile $CONFFILE))
+PIDFILE=$(nsd-checkconf -o pidfile $CONFFILE)
 
 # Define LSB log_* functions.
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
