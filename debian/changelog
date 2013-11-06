@@ -1,3 +1,11 @@
+nsd (4.0.0-2) unstable; urgency=high
+
+  * Drop the cronjob as it is no longer needed
+  * Bump the urgency to high, so people don't install 4.0.0~rc3 from
+    testing for too long
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 06 Nov 2013 23:41:55 +0100
+
 nsd (4.0.0-1) unstable; urgency=low
 
   * New upstream version 4.0.0
