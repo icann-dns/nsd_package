@@ -1,3 +1,11 @@
+nsd (4.0.0-1) unstable; urgency=low
+
+  * New upstream version 4.0.0
+  * $PIDFILE in init script should be file and not a directory
+  * lintian: transitional package should be oldlibs extra
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 06 Nov 2013 17:55:49 +0100
+
 nsd (4.0.0~rc3-1) unstable; urgency=low
 
   * New upstream version 4.0.0~rc3
