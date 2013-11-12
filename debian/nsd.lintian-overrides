@@ -1,1 +1,2 @@
 nsd: extra-license-file usr/share/doc/nsd/contrib/bind2nsd/COPYING
+nsd: no-debconf-config

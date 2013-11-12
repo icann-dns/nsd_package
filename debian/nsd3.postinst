@@ -1,0 +1,28 @@
+#!/bin/sh -e
+
+#DEBHELPER#
+
+DOCDIR=/usr/share/doc/nsd3
+DOCLINK=nsd
+
+if [ -d $DOCDIR ] && [ ! -L $DOCDIR ]; then
+    rmdir $DOCDIR
+    ln -s $DOCLINK $DOCDIR
+fi
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+if test -d "/etc/nsd3"; then
+    # cleanup a backup cruft
+    for ext in '~' '%' .bak;  do
+	rm -f /etc/nsd/nsd.conf$ext
+    done
+    # try to remove config directory
+    rmdir "/etc/nsd3" >/dev/null 2>/dev/null || true
+
+    if test -d "/etc/nsd3"; then
+	db_input high nsd3/old_confdir_exists || true
+	db_go
+    fi
+fi

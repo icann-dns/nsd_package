@@ -1,3 +1,20 @@
+nsd (4.0.0-3) unstable; urgency=low
+
+  * Add updated and fixed systemd service file (Closes: #729166)
+  * Move /etc/nsd3/nsd.conf to /etc/nsd/nsd.conf manually since
+    dpkg-maintscript-helper checks for ownership of moved config file
+    (Closes: #729120)
+  * Remove the old nsd.conf.example configfile on upgrade to nsd3 (4.0.0)
+    and also remove /etc/init.d/nsd3 and /etc/cron.d/nsd3
+  * Cleanup nsd3 statoverrides in nsd.postinst
+  * Don't remove system user in postrm
+  * Link nsd-control-setup manpage to nsd-control
+  * Add a hack^Hsolution to prevent nsd user removal when nsd3 was
+    removed, but not purged, nsd installed and nsd3 purged after that
+    (very rare case, but can happen)
+
+ -- Ondřej Surý <ondrej@debian.org>  Tue, 12 Nov 2013 17:33:38 +0100
+
 nsd (4.0.0-2) unstable; urgency=high
 
   * Drop the cronjob as it is no longer needed
