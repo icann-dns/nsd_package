@@ -9,8 +9,6 @@ if test "$1" = "purge"; then
     rmdir $spool 2>/dev/null || true
 
     dpkg-statoverride --remove $spool >/dev/null 2>/dev/null || true
-
-    deluser --quiet nsd >/dev/null || true
 fi
 
 exit 0

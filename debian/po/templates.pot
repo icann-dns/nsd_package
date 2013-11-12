@@ -1,0 +1,41 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-11-12 16:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../templates:1001
+msgid "Configuration directory for NSD has been changed"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../templates:1001
+msgid "WARNING: Your old NSD 3 configuration directory is not empty."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../templates:1001
+msgid ""
+"Please note that configuration directory has changed from /etc/nsd3 to /etc/"
+"nsd in NSD 4.  The new nsd (>= 4.0.0-1) package will automatically move your "
+"configuration file from /etc/nsd3/nsd.conf to /etc/nsd/nsd.conf, but it will "
+"not migrate everything under /etc/nsd3, so you need to check and move your "
+"configuration snippets and zone files by hand."
+msgstr ""

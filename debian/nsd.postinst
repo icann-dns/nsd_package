@@ -1,26 +1,50 @@
 #!/bin/sh
 set -e
 
+#DEBHELPER#
+
 if test "$1" = "configure"; then
+    # Move /etc/nsd3/nsd.conf to /etc/nsd/nsd.conf on first install of NSD 4
+    OLDCONFFILE=/etc/nsd3/nsd.conf
+    NEWCONFFILE=/etc/nsd/nsd.conf
+    if [ -z "$2" ] && [ -f "$OLDCONFFILE" ]; then
+	echo "Preserving user changes to $NEWCONFFILE (renamed from $OLDCONFFILE)..."
+        mv -f "$NEWCONFFILE" "$NEWCONFFILE.dpkg-new"
+        mv -f "$OLDCONFFILE" "$NEWCONFFILE"
+    fi
+
+    # Create nsd user and group
     if ! getent passwd nsd > /dev/null; then
         adduser --quiet --system --group --no-create-home --home /var/lib/nsd nsd
     fi
 
+    # Make /var/lib/nsd writeable by nsd:nsd user
     if ! dpkg-statoverride --list /var/lib/nsd >/dev/null; then
         dpkg-statoverride --update --add nsd nsd 0755 /var/lib/nsd >/dev/null 2>/dev/null || true
     fi
 
-    if dpkg --compare-versions 4.0.0-1~ gt "$2"; then
+    # Cleanup some cruft from prior NSD 4 packaging (it can go away before release)
+    if [ -n "$2" ] && dpkg --compare-versions 4.0.0-1~ gt "$2"; then
 	dpkg-statoverride --remove /etc/nsd/nsd.conf >/dev/null 2>/dev/null || true
 	dpkg-statoverride --remove /etc/nsd >/dev/null 2>/dev/null || true
     fi
 
-    # generate the control certificates if needed
+    # Remove the old statoverrides from nsd3 package
+    for f in /var/lib/nsd3 /etc/nsd3/nsd.conf /etc/nsd3; do
+	if dpkg-statoverride --list "$f" >/dev/null; then
+	    dpkg-statoverride --remove "$f" >/dev/null 2>/dev/null || true
+	fi
+    done
+
+    # Generate the control certificates if needed
     if ! [ -f /etc/nsd/nsd_control.key ]; then
 	nsd-control-setup >/dev/null 2>&1 || true
     fi
-fi
 
-#DEBHELPER#
+    # This is a remedy for purging already removed nsd3 after nsd installation
+    if [ -f /var/lib/dpkg/info/nsd3.postrm ] && grep -q deluser /var/lib/dpkg/info/nsd3.postrm; then
+	sed -i -e '/deluser --quiet nsd/ d' /var/lib/dpkg/info/nsd3.postrm
+    fi
+fi
 
 exit 0

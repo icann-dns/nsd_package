@@ -2,14 +2,14 @@
 Description=Name Server Daemon
 After=network.target
 
-[Service] 
+[Service]
 Type=simple
 Restart=always
 Environment=CONFFILE=/etc/nsd/nsd.conf
-ExecStartPre=mkdir -p "$(dirname "$(/usr/sbin/nsd-checkconf -o pidfile $CONFFILE)")"
-ExecStartPre=chown "$(/usr/sbin/nsd-checkconf -o username $CONFFILE)" "$(dirname "$(/usr/sbin/nsd-checkconf -o pidfile $CONFFILE)")"
-ExecStartPre=mkdir -p "$(dirname "$(/usr/sbin/nsd-checkconf -o database $CONFFILE)")"
-ExecStartPre=chown "$(/usr/sbin/nsd-checkconf -o username $CONFFILE)" "$(dirname "$(/usr/sbin/nsd-checkconf -o database $CONFFILE)")"
+ExecStartPre=/bin/sh -c '/bin/mkdir -p "$(dirname "$(/usr/sbin/nsd-checkconf -o pidfile $CONFFILE)")"'
+ExecStartPre=/bin/sh -c '/bin/chown "$(/usr/sbin/nsd-checkconf -o username $CONFFILE)" "$(dirname "$(/usr/sbin/nsd-checkconf -o pidfile $CONFFILE)")"'
+ExecStartPre=/bin/sh -c '/bin/mkdir -p "$(dirname "$(/usr/sbin/nsd-checkconf -o database $CONFFILE)")"'
+ExecStartPre=/bin/sh -c '/bin/chown "$(/usr/sbin/nsd-checkconf -o username $CONFFILE)" "$(dirname "$(/usr/sbin/nsd-checkconf -o database $CONFFILE)")"'
 ExecStart=/usr/sbin/nsd -d -c $CONFFILE
 ExecReload=/usr/sbin/nsd-control reload
 

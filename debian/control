@@ -9,7 +9,8 @@ Build-Depends: debhelper (>= 9),
                flex,
                libssl-dev,
 	       libevent-dev,
-	       openssl
+	       openssl,
+	       po-debconf
 Standards-Version: 3.9.4
 Vcs-Browser: http://git.debian.org/?p=pkg-nlnetlabs/nsd.git
 Vcs-Git: git://git.debian.org/pkg-nlnetlabs/nsd.git
@@ -18,9 +19,8 @@ Homepage: http://www.nlnetlabs.nl/nsd/
 Package: nsd
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.0-10), adduser
-Replaces: nsd3 (<= 4.0.0~rc2~)
-Breaks: nsd3 (<= 4.0.0~rc2~)
-Provides: authoritative-name-server
+Replaces: nsd3 (<= 4.0.0-1~)
+Breaks: nsd3 (<= 4.0.0-1~)
 Description: authoritative domain name server
  NSD is a fast, authoritative only, high performance, simple
  and open source name server.
@@ -33,7 +33,7 @@ Package: nsd3
 Architecture: all
 Section: oldlibs
 Priority: extra
-Depends: nsd (>= 4.0.0~rc2~), ${misc:Depends}
+Depends: nsd (>= 4.0.0-1~), ${misc:Depends}, debconf
 Description: authoritative domain name server [transitional package]
  NSD is a fast, authoritative only, high performance, simple
  and open source name server.
