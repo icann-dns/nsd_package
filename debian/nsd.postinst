@@ -42,8 +42,9 @@ if test "$1" = "configure"; then
     fi
 
     # This is a remedy for purging already removed nsd3 after nsd installation
-    if [ -f /var/lib/dpkg/info/nsd3.postrm ] && grep -q deluser /var/lib/dpkg/info/nsd3.postrm; then
-	sed -i -e '/deluser --quiet nsd/ d' /var/lib/dpkg/info/nsd3.postrm
+    nsd3_postrm=$(dpkg-query --control-path nsd3 postrm)
+    if [ -f "$nsd3_postrm" ] && grep -q deluser "$nsd3_postrm"; then
+	sed -i -e "/deluser --quiet nsd/ d" "$nsd3_postrm"
     fi
 fi
 
