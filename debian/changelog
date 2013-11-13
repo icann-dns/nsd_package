@@ -1,3 +1,11 @@
+nsd (4.0.0-4) unstable; urgency=high
+
+  * Use 'dpkg-query --control-path nsd3 postrm' instead of hard-coded path
+  * Set urgency to high since we need to push fix for nsd.conf migration
+    to testing (forgot to do so in last upload).
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 13 Nov 2013 13:30:53 +0100
+
 nsd (4.0.0-3) unstable; urgency=low
 
   * Add updated and fixed systemd service file (Closes: #729166)
