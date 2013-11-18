@@ -1,3 +1,9 @@
+nsd (4.0.0-5) unstable; urgency=high
+
+  * Don't fail when nsd3 is not installed (Closes: #729612)
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 18 Nov 2013 14:19:30 +0100
+
 nsd (4.0.0-4) unstable; urgency=high
 
   * Use 'dpkg-query --control-path nsd3 postrm' instead of hard-coded path
