@@ -1,5 +1,66 @@
+21 January 2014: Wouter
+	- tag 4.0.1rc2
+
+20 January 2014: Wouter
+	- Fix #546:  output format errors in nsd_munin_ (Thanks Tom Hendrikx).
+
+17 January 2014: Wouter
+	- Fix type CAA.
+	- Fix type EUI48.
+	- nsid can be set with "ascii_somestring" in ascii.
+	- Fix printout of high-chars in TXT on NetBSD.
+
+16 January 2014: Wouter
+	- Unit test for WKS failure.
+
+15 January 2014: Wouter
+	- tag 4.0.1rc1
+
+13 January 2014: Wouter
+	- Check if configure in srcdir collides with outofdir build.
+
+10 January 2014: Wouter
+	- Fix that chroot is removed from zonefile names (for absolute names).
+
+9 January 2014: Wouter
+	- Fix that bad IXFR updates do not result in double SOA records,
+	  and that an AXFR is started (attempted) when the zone state seems
+	  to be inconsistent with the master's zone state.
+
+8 January 2014: Matthijs
+	- Bugfix #542: Match RRSIG TTL with SOA TTL in negative response.
+
+7 January 2014: Wouter
+	- Fix xfrd when zone transfer TCP contains zero length packets.
+	- Fix for NSEC3 zones where parent zone is co-hosted, also NSEC3,
+	  because AXFRs overwrote nsec3 administration in the child zone.
+
+2 January 2014: Wouter
+	- Log ip address for sendto and sendmmsg failures.
+
+4 December 2013: Matthijs
+	- Support for CAA RRtype (RFC 6844).
+
+26 November 2013: Wouter
+	- Fix segfaults after read of zones with rr type WKS from zonefile.
+	- Seed PRNG for openssl at start of daemon, fixes SSL connection issue.
+
+25 November 2013: Wouter
+	- (same as in 3.2.16): fix wildcard cname to nxdomain repeated rrset.
+
+11 November 2013: Wouter
+	- Fix bug#534: IXFR query loop over UDP for zones that are unchanged.
+
+11 November 2013: Matthijs
+	- EUI48 and EUI64 is now RFC 7043
+
+5 November 2013: Wouter
+	- Accept interface: as an alternative for ip-address: for
+	  consistency with unbound.conf syntax.
+
 29 October 2013: Wouter
 	- tag for 4.0.0 release.
+	- trunk has 4.0.1 in development, for bug fixes.
 
 24 October 2013: Wouter
 	- Fixup zone change code.
@@ -71,7 +132,7 @@
 	  and srandom are then not linked with the executable.
 
 16 Jul 2013: Wouter
-	- Fix segfault with no logfile and chroot.
+	- Fix segfault with no logfile and chroot (Thanks Patrik Lundin).
 
 15 Jul 2013: Wouter
 	- beta 5 tag.

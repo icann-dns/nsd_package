@@ -116,17 +116,18 @@ extern int yydebug;
      T_LP = 325,
      T_EUI48 = 326,
      T_EUI64 = 327,
-     DOLLAR_TTL = 328,
-     DOLLAR_ORIGIN = 329,
-     NL = 330,
-     SP = 331,
-     STR = 332,
-     PREV = 333,
-     BITLAB = 334,
-     T_TTL = 335,
-     T_RRCLASS = 336,
-     URR = 337,
-     T_UTYPE = 338
+     T_CAA = 328,
+     DOLLAR_TTL = 329,
+     DOLLAR_ORIGIN = 330,
+     NL = 331,
+     SP = 332,
+     STR = 333,
+     PREV = 334,
+     BITLAB = 335,
+     T_TTL = 336,
+     T_RRCLASS = 337,
+     URR = 338,
+     T_UTYPE = 339
    };
 #endif
 /* Tokens.  */
@@ -200,17 +201,18 @@ extern int yydebug;
 #define T_LP 325
 #define T_EUI48 326
 #define T_EUI64 327
-#define DOLLAR_TTL 328
-#define DOLLAR_ORIGIN 329
-#define NL 330
-#define SP 331
-#define STR 332
-#define PREV 333
-#define BITLAB 334
-#define T_TTL 335
-#define T_RRCLASS 336
-#define URR 337
-#define T_UTYPE 338
+#define T_CAA 328
+#define DOLLAR_TTL 329
+#define DOLLAR_ORIGIN 330
+#define NL 331
+#define SP 332
+#define STR 333
+#define PREV 334
+#define BITLAB 335
+#define T_TTL 336
+#define T_RRCLASS 337
+#define URR 338
+#define T_UTYPE 339
 
 
 
@@ -230,7 +232,7 @@ typedef union YYSTYPE
 
 
 /* Line 2049 of yacc.c  */
-#line 234 "zparser.h"
+#line 236 "zparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
