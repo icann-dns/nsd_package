@@ -1,3 +1,10 @@
+nsd (4.0.1-1) unstable; urgency=low
+
+  * New upstream version 4.0.1
+  * Disable recvmmsg by default (Closes: #737540)
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 03 Feb 2014 17:07:05 +0100
+
 nsd (4.0.0-5) unstable; urgency=high
 
   * Don't fail when nsd3 is not installed (Closes: #729612)

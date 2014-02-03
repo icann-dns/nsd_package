@@ -14,16 +14,17 @@ DPKG_EXPORT_BUILDFLAGS = 1
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-	       --with-configdir=/etc/nsd                     \
-	       --with-nsd_conf_file=/etc/nsd/nsd.conf        \
-	       --with-pidfile=/run/nsd/nsd.pid               \
-	       --with-dbfile=/var/lib/nsd/nsd.db             \
-	       --with-zonesdir=/etc/nsd                      \
-	       --with-difffile=/var/lib/nsd/ixfr.db          \
-	       --with-xfrdfile=/var/lib/nsd/xfrd.state       \
-	       --disable-largefile                           \
-	       --enable-root-server                          \
-	       --enable-mmap				     \
+	       --with-configdir=/etc/nsd		\
+	       --with-nsd_conf_file=/etc/nsd/nsd.conf	\
+	       --with-pidfile=/run/nsd/nsd.pid		\
+	       --with-dbfile=/var/lib/nsd/nsd.db	\
+	       --with-zonesdir=/etc/nsd			\
+	       --with-difffile=/var/lib/nsd/ixfr.db	\
+	       --with-xfrdfile=/var/lib/nsd/xfrd.state	\
+	       --disable-largefile			\
+	       --disable-recvmmsg			\
+	       --enable-root-server			\
+	       --enable-mmap				\
 	       --enable-ratelimit
 
 override_dh_auto_clean:
