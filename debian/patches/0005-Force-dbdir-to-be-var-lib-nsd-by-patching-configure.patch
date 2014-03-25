@@ -11,9 +11,9 @@ Signed-off-by: Pierre Habouzit <madcoder@debian.org>
  configure.ac |    2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
---- nsd4.orig/configure.ac
-+++ nsd4/configure.ac
-@@ -60,7 +60,7 @@ AC_SUBST(logfile)
+--- nsd.orig/configure.ac
++++ nsd/configure.ac
+@@ -63,7 +63,7 @@ AC_SUBST(logfile)
  #
  # Database directory
  #
