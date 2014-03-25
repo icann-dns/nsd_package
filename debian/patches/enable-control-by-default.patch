@@ -21,7 +21,7 @@
  	opt->server_key_file = CONFIGDIR"/nsd_server.key";
 --- nsd.orig/nsd-control.8.in
 +++ nsd/nsd-control.8.in
-@@ -139,8 +139,6 @@ these in the default run directory, or w
+@@ -145,8 +145,6 @@ these in the default run directory, or w
  If you change the access control permissions on the key files you can decide
  who can use nsd\-control, by default owner and group but not all users.
  The script preserves private keys present in the directory.
