@@ -21,6 +21,7 @@ override_dh_auto_configure:
 	       --with-zonesdir=/etc/nsd			\
 	       --with-difffile=/var/lib/nsd/ixfr.db	\
 	       --with-xfrdfile=/var/lib/nsd/xfrd.state	\
+	       --with-max-ips=1024			\
 	       --disable-largefile			\
 	       --disable-recvmmsg			\
 	       --enable-root-server			\

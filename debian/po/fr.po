@@ -1,0 +1,46 @@
+# Translation of nsd debconf template to French
+# Copyright (C) 2013
+# This file is distributed under the same license as the nsd package.
+# Steve Petruzzello <dlist@bluewin.ch>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-14 12:00+0100\n"
+"Last-Translator: Steve Petruzzello <dlist@bluewin.ch>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Déplacement du répertoire de configuration de NSD"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr ""
+"Le répertoire de configuration de NSD 4 a été déplacé de /etc/nsd3 à /etc/"
+"nsd."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"L'ancien fichier de configuration (/etc/nsd3/nsd.conf) sera déplacé vers /"
+"etc/nsd/nsd.conf. Toutefois, les autres fichiers de configuration présents "
+"dans /etc/nsd3 ne seront pas déplacés ; vous devrez donc vérifier et "
+"déplacer vos bribes de configuration et vos fichiers de zone vous-même."

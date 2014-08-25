@@ -1,0 +1,47 @@
+# Translation of nsd debconf templates to Polish.
+# Copyright (C) 2013
+# This file is distributed under the same license as the nsd package.
+#
+# Michał Kułach <michal.kulach@gmail.com>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-26 21:17+0100\n"
+"Last-Translator: Michał Kułach <michal.kulach@gmail.com>\n"
+"Language-Team: Polish <debian-l10n-polish@lists.debian.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 1.4\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Katalog konfiguracyjny NSD uległ zmianie"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr "NSD 4 zmieniło katalog konfiguracyjny z /etc/nsd3 na /etc/nsd."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"Stary plik konfiguracyjny (/etc/nsd3/nsd.conf) zostanie przeniesiony do /etc/"
+"nsd/nsd.conf, jednak lokalizacja pozostałych plików z /etc/nsd3 nie będzie "
+"zmieniana, dlatego należy sprawdzić i przenieść własne fragmenty "
+"konfiguracji i pliki stref."
