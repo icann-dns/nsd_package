@@ -1,0 +1,46 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the nsd package.
+#
+# Yuri Kozlov <yuray@komyakino.ru>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd 4.0.0-4\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-15 17:28+0400\n"
+"Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 1.4\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Изменился каталог настроек NSD"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr "В NSD 4 изменён каталог настроек с /etc/nsd3 на /etc/nsd."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"Старый файл настроек (/etc/nsd3/nsd.conf) будет перемещён в /etc/nsd/nsd."
+"conf. Однако, остальные файлы настроек в /etc/nsd3 не будут перемещены, "
+"поэтому вам нужно проверить и переместить свои части и файлы зоны "
+"самостоятельно."

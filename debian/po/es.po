@@ -1,0 +1,70 @@
+# nsd translation to Spanish
+# Copyright (C) 2013 Software in the Public Interest, SPI Inc.
+# This file is distributed under the same license as the nsd package.
+#
+# Changes:
+# - Initial translation
+#      Matías Bellone <matiasbellone+debian@gmail.com> , 2013
+#
+#  Traductores, si no conoce el formato PO, merece la pena leer la 
+#  documentación de gettext, especialmente las secciones dedicadas a este
+#  formato, por ejemplo ejecutando:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+# Equipo de traducción al español, por favor lean antes de traducir
+# los siguientes documentos:
+#
+# - El proyecto de traducción de Debian al español
+#   http://www.debian.org/intl/spanish/
+#   especialmente las notas y normas de traducción en
+#   http://www.debian.org/intl/spanish/notas
+#
+# - La guía de traducción de po's de debconf:
+#   /usr/share/doc/po-debconf/README-trans
+#   o http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+# Si tiene dudas o consultas sobre esta traducción consulte con el último
+# traductor (campo Last-Translator) y ponga en copia a la lista de
+# traducción de Debian al español (<debian-l10n-spanish@lists.debian.org>)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-13 13:08-0300\n"
+"Last-Translator: Matías Bellone <matiasbellone+debian@gmail.com>\n"
+"Language-Team: Debian L10N Spanish <debian-l10n-spanish@lists.debian.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Cambio del directorio de configuración de NSD"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr ""
+"NSD 4 ha cambiado el directorio de configuración de «/etc/nsd3» a «/etc/nsd»."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"Se moverá el archivo de configuración anterior («/etc/nsd3/nsd.conf») a «/"
+"etc/nsd/nsd.conf». Sin embargo, no se moverán los demás archivos de "
+"configuración que se encuentran en «/etc/nsd3» por lo que deberá revisar y "
+"mover por su cuenta los archivos de configuración y de zonas."

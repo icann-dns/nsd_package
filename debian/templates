@@ -1,10 +1,19 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
 Template: nsd3/old_confdir_exists
 Type: note
-_Description: Configuration directory for NSD has been changed
- WARNING: Your old NSD 3 configuration directory is not empty.
+_Description: Configuration directory for NSD changed
+ NSD 4 has changed the configuration directory from /etc/nsd3 to
+ /etc/nsd.
  .
- Please note that configuration directory has changed from /etc/nsd3 to
- /etc/nsd in NSD 4.  The new nsd (>= 4.0.0-1) package will automatically
- move your configuration file from /etc/nsd3/nsd.conf to /etc/nsd/nsd.conf,
- but it will not migrate everything under /etc/nsd3, so you need to check
- and move your configuration snippets and zone files by hand.
+ The old configuration file (/etc/nsd3/nsd.conf) will be moved to
+ /etc/nsd/nsd.conf. However, other configuration files in
+ /etc/nsd3 will not be moved, so you need to check
+ and move your configuration snippets and zone files yourself.

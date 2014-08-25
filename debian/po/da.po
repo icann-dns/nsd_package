@@ -1,0 +1,44 @@
+# Danish translation nsd.
+# Copyright (c) 2013 nsd & nedenstående oversættere.
+# This file is distributed under the same license as the nsd package.
+# Joe Hansen <joedalton2@yahoo.dk>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-14 17:30+01:00\n"
+"Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
+"Language-Team: Danish <debian-l10n-danish@lists.debian.org>\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Konfigurationsmappen for NSD ændrede sig"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr "NSD 4 har ændret konfigurationsmappen fra /etc/nsd3 til /etc/nsd."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"Den gamle konfigurationsfil (/etc/nsd3/nsd.conf) vil blive flyttet til /etc/"
+"nsd/nsd.conf. Andre konfigurationsfiler i /etc/nsd3 vil ikke blive flyttet, "
+"så du skal selv kontrollere og flytte dine konfigurationskodestumper og "
+"zonefiler."

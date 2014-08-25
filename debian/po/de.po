@@ -1,0 +1,46 @@
+# German debconf translation of nsd.
+# This file is distributed under the same license as the nsd package.
+# Copyright (C) 2001-2011, NLnet Labs.
+# Copyright (C) of this file 2013 Chris Leick <c.leick@vollbio.de>.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nsd 4.0.0-4\n"
+"Report-Msgid-Bugs-To: nsd@packages.debian.org\n"
+"POT-Creation-Date: 2013-12-13 06:20+0100\n"
+"PO-Revision-Date: 2013-12-22 23:43+0100\n"
+"Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid "Configuration directory for NSD changed"
+msgstr "Geändertes Konfigurationsverzeichnis für NSD"
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"NSD 4 has changed the configuration directory from /etc/nsd3 to /etc/nsd."
+msgstr ""
+"Das NSD-4-Konfigurationsverzeichnis hat sich von /etc/nsd3 in /etc/nsd "
+"geändert."
+
+#. Type: note
+#. Description
+#: ../templates:2001
+msgid ""
+"The old configuration file (/etc/nsd3/nsd.conf) will be moved to /etc/nsd/"
+"nsd.conf. However, other configuration files in /etc/nsd3 will not be moved, "
+"so you need to check and move your configuration snippets and zone files "
+"yourself."
+msgstr ""
+"Die alte Konfigurationsdatei (/etc/nsd3/nsd.conf) wird nach /etc/nsd/nsd."
+"conf verschoben, andere Konfigurationsdateien in /etc/nsd3 jedoch nicht. "
+"Daher müssen Sie Ihre Konfigurationsschnipsel und Zonendateien selbst "
+"überprüfen und verschieben."
