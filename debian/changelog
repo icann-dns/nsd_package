@@ -1,3 +1,9 @@
+nsd (4.1.0-1) unstable; urgency=medium
+
+  * New upstream version 4.1.0
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 04 Sep 2014 16:12:28 +0200
+
 nsd (4.0.3-2) unstable; urgency=low
 
   * Raise maximum number of listening IP addresses to 1024

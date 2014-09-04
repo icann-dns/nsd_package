@@ -1,8 +1,59 @@
 NSD RELEASE NOTES
 
-4.0.3 (upcoming)
+4.1.0
 ================
 FEATURES:
+	- database: "" starts without mmap of database.  Less memory is used,
+	  zones are read from text zonefile.
+	- optimised zonefile parse code and zonefile write code.
+	- zonefiles-write option in nsd.conf, enabled when database is "".
+	  The server writes changed zonefiles to disk every hour.
+	- xfrdfile: "" disables xfrd.state.  If enabled, zones that are
+	  same as before are not checked for a serial update at server start.
+	- include: "foo/nsd.d/*.conf" works, wildcard glob on includes.
+	- nsd shuts down during init process if given signal.
+	- log-time-ascii option, default yes, with readable timestamp in log.
+	- nsd-control addzone reports if zone already exists.
+	- Fix #564: add nsd-checkzone tool to check zonefile correctness.
+	- Increased default --with-max-ips from 8 to 16, this increases the
+	  number of interfaces you can specify in nsd.conf to listen to.
+BUG FIXES:
+	- Fixed shutdown message sporadically not printed on exit
+	  (Thanks Anand Buddhdev).
+	- Documented zonefile %s syntax in nsd.conf man page.
+	- Fix manpage to put colon after zonefiles check and write.
+	- Change from 'Zone" to "zone" with ".. serial .. is updated" log
+	  message.
+	- Changed maxbackoff for no-content secondary zones from 4h to 24h.
+	- Fix print filename of encompassing config file on read failure.
+	- Fix delete or rename of a lot of zones and make it take a
+	  non-enormous time.
+	- Speed up deletion of zone contents a lot, (56s to 1s), speeds up
+	  delete, rename and AXFR for zones.
+	- Fix #571: unused variable and incompatible pointer warnings when
+	  compiled on a system without INET6.
+	- Fix write_socket return value check in server.c (Thanks Brad Smith,
+	  Mark Kettenis).
+	- Fix that xfrd reaps children also if the signal is lost.
+	- Fix #577: makefile incorrectly installed manpages from srcdir.
+	- Fix #587: Default value for statistics is 0.
+	- Fix #553: Improve TXT parsing.
+	- Fix #590: rrl log does not print wildcard as a star but escaped.
+	- Fix #591: rrl log messages at verbosity level 1.
+	- fix strptime implicit declaration error on OpenBSD.
+	- Fix -O3 compile flag to -O2 to avoid miscompilations.
+	- Allow user to override the -g -O2 CFLAGS in ./configure.
+	- Fix endian.h include for OpenBSD.
+	- Fix #600: document that provide-xfr provides AXFR and not IXFR.
+	- Fix rising-load-average or memory-leaks in OSes (Linux since 2.6),
+	  that keep track of all past process parents, or leak memory
+	  for them.  Fix makes it so there is no very deep string of
+	  process parents.
+	- Remove .LP after .SH in man pages.
+
+
+4.0.3
+================
 BUG FIXES:
 	- Fix nsd.db unclean close check.  Previous databases are considered
 	  unclean by the code and are created anew.
@@ -12,6 +63,7 @@ BUG FIXES:
 	- fix to not delete tmpdir too early in shutdown process.
 	- disabled udb checking functionality that made it very slow,
 	  this was enabled when enable-checking was turned on.
+
 
 4.0.2
 ================
