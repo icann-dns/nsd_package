@@ -14,5 +14,5 @@ Last-Update: 2011-05-15
 +#endif
 +
  /* The server handler... */
- static struct nsd nsd;
+ struct nsd nsd;
  static char hostname[MAXHOSTNAMELEN];

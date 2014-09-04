@@ -117,7 +117,10 @@ extern int yydebug;
      VAR_RRL_IPV6_PREFIX_LENGTH = 326,
      VAR_RRL_WHITELIST_RATELIMIT = 327,
      VAR_RRL_WHITELIST = 328,
-     VAR_ZONEFILES_CHECK = 329
+     VAR_ZONEFILES_CHECK = 329,
+     VAR_ZONEFILES_WRITE = 330,
+     VAR_LOG_TIME_ASCII = 331,
+     VAR_ROUND_ROBIN = 332
    };
 #endif
 /* Tokens.  */
@@ -193,6 +196,9 @@ extern int yydebug;
 #define VAR_RRL_WHITELIST_RATELIMIT 327
 #define VAR_RRL_WHITELIST 328
 #define VAR_ZONEFILES_CHECK 329
+#define VAR_ZONEFILES_WRITE 330
+#define VAR_LOG_TIME_ASCII 331
+#define VAR_ROUND_ROBIN 332
 
 
 
@@ -206,7 +212,7 @@ typedef union YYSTYPE
 
 
 /* Line 2049 of yacc.c  */
-#line 210 "configparser.h"
+#line 216 "configparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
