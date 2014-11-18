@@ -39,10 +39,7 @@ override_dh_auto_install:
 	install -m 640 debian/nsd.conf $(CURDIR)/debian/nsd/etc/nsd/
 
 override_dh_installchangelogs:
-	dh_installchangelogs -pnsd doc/ChangeLog
+	dh_installchangelogs doc/ChangeLog
 
 override_dh_compress:
 	dh_compress -X/usr/share/doc/nsd/examples/nsd.conf
-
-override_dh_installdocs:
-	dh_installdocs --link-doc=nsd

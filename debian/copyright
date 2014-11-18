@@ -3,7 +3,7 @@ Upstream-Name: NSD
 Source: http://www.nlnetlabs.nl/nsd/
 
 Files: debian/*
-Copyright: 
+Copyright:
   2006-2007, Pierre Habouzit <madcoder@debian.org>.
   2009-2012, Ondřej Surý <ondrej@debian.org>.
   2011-2012, Jeroen Schot <schot@a-eskwadraat.nl>.
@@ -15,34 +15,34 @@ License: public-domain
  This file is in the public domain.
 
 Files: compat/fake-rfc2553.c compat/fake-rfc2553.h
-Copyright: 
+Copyright:
   2000-2003, Damien Miller.  All rights reserved.
   1999, WIDE Project.  All rights reserved.
 License: BSD-2-clause
 
 Files: compat/inet_aton.c
-Copyright: 
+Copyright:
   1983, 1990, 1993, The Regents of the University of California.
   All rights reserved.
 License: BSD-2-clause
 
 Files: compat/b64_ntop.c compat/b64_pton.c
-Copyright: 
+Copyright:
   1996, 1998, Internet Software Consortium.
 License: MIT
 
 Files: compat/strlcpy.c
-Copyright: 
+Copyright:
   1998, Todd C. Miller <Todd.Miller@courtesan.com>.
 License: MIT
 
 Files: contrib/bind2nsd/*
-Copyright: 
+Copyright:
   2007, Secure64 Software Corporation.
 License: BSD-2-clause
 
 Files: *
-Copyright: 
+Copyright:
   2001-2011, NLnet Labs.  All rights reserved.
 License: NSD-BSD-like
 
@@ -108,4 +108,3 @@ License: NSD-BSD-like
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-

@@ -2,15 +2,15 @@ Source: nsd
 Section: net
 Priority: optional
 Maintainer: Ondřej Surý <ondrej@debian.org>
-Build-Depends: debhelper (>= 9),
+Build-Depends: bison,
+               debhelper (>= 9),
+               dh-autoreconf,
                dpkg-dev (>= 1.16.1.1~),
-	       dh-autoreconf,
-               bison,
                flex,
+               libevent-dev,
                libssl-dev,
-	       libevent-dev,
-	       openssl,
-	       po-debconf
+               openssl,
+               po-debconf
 Standards-Version: 3.9.4
 Vcs-Browser: http://anonscm.debian.org/?p=pkg-nlnetlabs/nsd.git
 Vcs-Git: git://anonscm.debian.org/pkg-nlnetlabs/nsd.git
@@ -18,7 +18,10 @@ Homepage: http://www.nlnetlabs.nl/nsd/
 
 Package: nsd
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.0-10), adduser
+Depends: adduser,
+         lsb-base (>= 3.0-10),
+         ${misc:Depends},
+         ${shlibs:Depends}
 Replaces: nsd3 (<= 4.0.0-1~)
 Breaks: nsd3 (<= 4.0.0-1~)
 Description: authoritative domain name server
@@ -33,7 +36,10 @@ Package: nsd3
 Architecture: all
 Section: oldlibs
 Priority: extra
-Depends: nsd (>= 4.0.0-1~), ${misc:Depends}, debconf
+Pre-Depends: ${misc:Pre-Depends}
+Depends: debconf,
+         nsd (>= 4.0.0-1~),
+         ${misc:Depends}
 Description: authoritative domain name server - transitional package
  NSD is a fast, authoritative only, high performance, simple
  and open source name server.

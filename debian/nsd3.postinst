@@ -2,14 +2,6 @@
 
 #DEBHELPER#
 
-DOCDIR=/usr/share/doc/nsd3
-DOCLINK=nsd
-
-if [ -d $DOCDIR ] && [ ! -L $DOCDIR ]; then
-    rmdir $DOCDIR
-    ln -s $DOCLINK $DOCDIR
-fi
-
 # Source debconf library.
 . /usr/share/debconf/confmodule
 

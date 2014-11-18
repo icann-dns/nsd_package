@@ -1,3 +1,4 @@
-rm_conffile /etc/nsd3/nsd.conf.sample 4.0.0~ nsd3 -- "$@" 0
-rm_conffile /etc/cron.d/nsd3 4.0.0~ nsd3 -- "$@" 0
-rm_conffile /etc/init.d/nsd3 4.0.0~ nsd3 -- "$@" 0
+rm_conffile /etc/nsd3/nsd.conf.sample 4.0.0~
+rm_conffile /etc/cron.d/nsd3 4.0.0~
+rm_conffile /etc/init.d/nsd3 4.0.0~
+symlink_to_dir /usr/share/doc/nsd3 /usr/share/doc/nsd 4.1.0-1.1~

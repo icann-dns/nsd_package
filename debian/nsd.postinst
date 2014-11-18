@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-#DEBHELPER#
-
 if test "$1" = "configure"; then
     # Move /etc/nsd3/nsd.conf to /etc/nsd/nsd.conf on first install of NSD 4
     OLDCONFFILE=/etc/nsd3/nsd.conf
@@ -47,5 +45,7 @@ if test "$1" = "configure"; then
 	sed -i -e "/deluser --quiet nsd/ d" "$nsd3_postrm"
     fi
 fi
+
+#DEBHELPER#
 
 exit 0
