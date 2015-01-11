@@ -1,3 +1,10 @@
+nsd (4.0.1-1ubuntu0.1) trusty-proposed; urgency=low
+
+  * Fix "invalid user: nsd" install error by moving auto-generated
+    debhelper code to the end of the postinst script. (LP: #1311886)
+
+ -- Evan Broder <evan@ebroder.net>  Sun, 11 Jan 2015 17:55:51 +0100
+
 nsd (4.0.1-1) unstable; urgency=low
 
   * New upstream version 4.0.1
