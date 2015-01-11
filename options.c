@@ -79,7 +79,7 @@ nsd_options_create(region_type* region)
 #endif
 	opt->zonefiles_check = 1;
 	opt->xfrd_reload_timeout = 1;
-	opt->control_enable = 0;
+	opt->control_enable = 1;
 	opt->control_interface = NULL;
 	opt->control_port = NSD_CONTROL_PORT;
 	opt->server_key_file = CONFIGDIR"/nsd_server.key";
