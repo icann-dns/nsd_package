@@ -5,6 +5,7 @@ Maintainer: Ondřej Surý <ondrej@debian.org>
 Build-Depends: bison,
                debhelper (>= 9),
                dh-autoreconf,
+	       dh-systemd,
                dpkg-dev (>= 1.16.1.1~),
                flex,
                libevent-dev,
