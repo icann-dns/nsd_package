@@ -45,6 +45,10 @@
 #include "tsig.h"
 #include "remote.h"
 
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 256
+#endif
+
 /* The server handler... */
 struct nsd nsd;
 static char hostname[MAXHOSTNAMELEN];
