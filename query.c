@@ -454,6 +454,18 @@ answer_notify(struct nsd* nsd, struct query *query)
 				strerror(errno));
 			return query_error(query, NSD_RC_SERVFAIL);
 		}
+		if(verbosity >= 1) {
+			uint32_t serial = 0;
+			char address[128];
+			addr2str(&query->addr, address, sizeof(address));
+			if(packet_find_notify_serial(query->packet, &serial))
+			  VERBOSITY(1, (LOG_INFO, "notify for %s from %s serial %u",
+				dname_to_string(query->qname, NULL), address,
+				(unsigned)serial));
+			else
+			  VERBOSITY(1, (LOG_INFO, "notify for %s from %s",
+				dname_to_string(query->qname, NULL), address));
+		}
 
 		/* create notify reply - keep same query contents */
 		QR_SET(query->packet);         /* This is an answer.  */
@@ -466,20 +478,14 @@ answer_notify(struct nsd* nsd, struct query *query)
 		pos = buffer_position(query->packet);
 		buffer_clear(query->packet);
 		buffer_set_position(query->packet, pos);
-		if(verbosity >= 1) {
-			char address[128];
-			addr2str(&query->addr, address, sizeof(address));
-			VERBOSITY(2, (LOG_INFO, "notify for %s from %s",
-				dname_to_string(query->qname, NULL), address));
-		}
 		/* tsig is added in add_additional later (if needed) */
 		return QUERY_PROCESSED;
 	}
 
-	if (verbosity >= 1) {
+	if (verbosity >= 2) {
 		char address[128];
 		addr2str(&query->addr, address, sizeof(address));
-		VERBOSITY(1, (LOG_INFO, "notify for zone %s from client %s refused, %s%s",
+		VERBOSITY(2, (LOG_INFO, "notify for %s from %s refused, %s%s",
 			dname_to_string(query->qname, NULL),
 			address,
 			why?why->key_name:"no acl matches",
@@ -528,6 +534,8 @@ answer_chaos(struct nsd *nsd, query_type *q)
 			} else {
 				RCODE_SET(q->packet, RCODE_REFUSE);
 			}
+		} else {
+			RCODE_SET(q->packet, RCODE_REFUSE);
 		}
 		break;
 	default:
@@ -703,7 +711,7 @@ add_rrset(struct query   *query,
 static size_t
 query_synthesize_cname(struct query* q, struct answer* answer, const dname_type* from_name,
 	const dname_type* to_name, domain_type* src, domain_type* to_closest_encloser,
-	domain_type** to_closest_match)
+	domain_type** to_closest_match, uint32_t ttl)
 {
 	/* add temporary domains for from_name and to_name and all
 	   their (not allocated yet) parents */
@@ -765,7 +773,7 @@ query_synthesize_cname(struct query* q, struct answer* answer, const dname_type*
 	rrset->rrs = (rr_type*) region_alloc(q->region, sizeof(rr_type));
 	memset(rrset->rrs, 0, sizeof(rr_type));
 	rrset->rrs->owner = cname_domain;
-	rrset->rrs->ttl = 0;
+	rrset->rrs->ttl = ttl;
 	rrset->rrs->type = TYPE_CNAME;
 	rrset->rrs->klass = CLASS_IN;
 	rrset->rrs->rdata_count = 1;
@@ -1020,7 +1028,7 @@ answer_authoritative(struct nsd   *nsd,
 			exact = namedb_lookup(nsd->db, newname, &closest_match, &closest_encloser);
 			/* synthesize CNAME record */
 			newnum = query_synthesize_cname(q, answer, name, newname,
-				src, closest_encloser, &closest_match);
+				src, closest_encloser, &closest_match, rrset->rrs[0].ttl);
 			if(!newnum) {
 				/* could not synthesize the CNAME. */
 				/* return previous CNAMEs to make resolver recurse for us */
@@ -1230,6 +1238,9 @@ answer_query(struct nsd *nsd, struct query *q)
 
 	answer_lookup_zone(nsd, q, &answer, 0, exact, closest_match,
 		closest_encloser, q->qname);
+	ZTATUP2(nsd, q->zone, opcode, q->opcode);
+	ZTATUP2(nsd, q->zone, qtype, q->qtype);
+	ZTATUP2(nsd, q->zone, qclass, q->qclass);
 
 	offset = dname_label_offsets(q->qname)[domain_dname(closest_encloser)->label_count - 1] + QHEADERSZ;
 	query_add_compression_domain(q, closest_encloser, offset);
@@ -1433,6 +1444,7 @@ query_add_optional(query_type *q, nsd_type *nsd)
 		}
 		ARCOUNT_SET(q->packet, ARCOUNT(q->packet) + 1);
 		STATUP(nsd, edns);
+		ZTATUP(nsd, q->zone, edns);
 		break;
 	case EDNS_ERROR:
 		if (q->edns.dnssec_ok)	edns->error[7] = 0x80;
@@ -1441,6 +1453,7 @@ query_add_optional(query_type *q, nsd_type *nsd)
 		buffer_write(q->packet, edns->rdata_none, OPT_RDATA);
 		ARCOUNT_SET(q->packet, ARCOUNT(q->packet) + 1);
 		STATUP(nsd, ednserr);
+		ZTATUP(nsd, q->zone, ednserr);
 		break;
 	}
 

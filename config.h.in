@@ -203,6 +203,9 @@
 /* Define to 1 if you have the `pwrite' function. */
 #undef HAVE_PWRITE
 
+/* Define to 1 if you have the `reallocarray' function. */
+#undef HAVE_REALLOCARRAY
+
 /* Define if recvmmsg is implemented */
 #undef HAVE_RECVMMSG
 
@@ -484,6 +487,9 @@
 #endif
 
 
+/* Define this to enable per-zone statistics gathering. */
+#undef USE_ZONE_STATS
+
 /* Define to the NSD version to answer version.server query. */
 #undef VERSION
 
@@ -738,6 +744,9 @@ size_t strlcat(char *dst, const char *src, size_t siz);
 #endif
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz);
+#endif
+#ifndef HAVE_REALLOCARRAY
+void* reallocarray(void *ptr, size_t nmemb, size_t size);
 #endif
 #ifndef HAVE_GETADDRINFO
 #include "compat/fake-rfc2553.h"

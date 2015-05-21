@@ -10,7 +10,7 @@
  exit 0
 --- nsd.orig/options.c
 +++ nsd/options.c
-@@ -84,7 +84,7 @@ nsd_options_create(region_type* region)
+@@ -88,7 +88,7 @@ nsd_options_create(region_type* region)
  		opt->zonefiles_write = ZONEFILES_WRITE_INTERVAL;
  	else	opt->zonefiles_write = 0;
  	opt->xfrd_reload_timeout = 1;
@@ -21,7 +21,7 @@
  	opt->server_key_file = CONFIGDIR"/nsd_server.key";
 --- nsd.orig/nsd-control.8.in
 +++ nsd/nsd-control.8.in
-@@ -144,8 +144,6 @@ these in the default run directory, or w
+@@ -146,8 +146,6 @@ these in the default run directory, or w
  If you change the access control permissions on the key files you can decide
  who can use nsd\-control, by default owner and group but not all users.
  The script preserves private keys present in the directory.

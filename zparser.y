@@ -67,7 +67,7 @@ nsec3_add_params(const char* hash_algo_str, const char* flag_str,
 %token <type> T_OPT T_APL T_UINFO T_UID T_GID T_UNSPEC T_TKEY T_TSIG T_IXFR
 %token <type> T_AXFR T_MAILB T_MAILA T_DS T_DLV T_SSHFP T_RRSIG T_NSEC T_DNSKEY
 %token <type> T_SPF T_NSEC3 T_IPSECKEY T_DHCID T_NSEC3PARAM T_TLSA
-%token <type> T_NID T_L32 T_L64 T_LP T_EUI48 T_EUI64 T_CAA
+%token <type> T_NID T_L32 T_L64 T_LP T_EUI48 T_EUI64 T_CAA T_CDS T_CDNSKEY
 
 /* other tokens */
 %token	       DOLLAR_TTL DOLLAR_ORIGIN NL SP
@@ -97,21 +97,29 @@ line:	NL
     |	PREV NL		{}    /* Lines containing only whitespace.  */
     |	ttl_directive
 	{
+	    region_free_all(parser->rr_region);
+	    parser->current_rr.type = 0;
+	    parser->current_rr.rdata_count = 0;
+	    parser->current_rr.rdatas = parser->temporary_rdatas;
 	    parser->error_occurred = 0;
     }
     |	origin_directive
 	{
+	    region_free_all(parser->rr_region);
+	    parser->current_rr.type = 0;
+	    parser->current_rr.rdata_count = 0;
+	    parser->current_rr.rdatas = parser->temporary_rdatas;
 	    parser->error_occurred = 0;
     }
     |	rr
     {	/* rr should be fully parsed */
 	    if (!parser->error_occurred) {
 			    parser->current_rr.rdatas
-				    = (rdata_atom_type *) region_alloc_init(
+				    =(rdata_atom_type *)region_alloc_array_init(
 					    parser->region,
 					    parser->current_rr.rdatas,
-					    (parser->current_rr.rdata_count
-					     * sizeof(rdata_atom_type)));
+					    parser->current_rr.rdata_count,
+					    sizeof(rdata_atom_type));
 
 			    process_rr();
 	    }
@@ -148,7 +156,12 @@ ttl_directive:	DOLLAR_TTL sp STR trail
 origin_directive:	DOLLAR_ORIGIN sp abs_dname trail
     {
 	    /* if previous origin is unused, remove it, do not leak it */
-	    domain_table_deldomain(parser->db, parser->origin);
+	    if(parser->origin != error_domain && parser->origin != $3) {
+		/* protect $3 from deletion, because deldomain walks up */
+		$3->usage ++;
+	    	domain_table_deldomain(parser->db, parser->origin);
+		$3->usage --;
+	    }
 	    parser->origin = $3;
     }
     |	DOLLAR_ORIGIN sp rel_dname trail
@@ -612,6 +625,10 @@ type_and_rdata:
     |	T_EUI64 sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	T_CAA sp rdata_caa
     |	T_CAA sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
+    |	T_CDS sp rdata_ds
+    |	T_CDS sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
+    |	T_CDNSKEY sp rdata_dnskey
+    |	T_CDNSKEY sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	T_UTYPE sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	STR error NL
     {
@@ -1056,8 +1073,8 @@ zparser_create(region_type *region, region_type *rr_region, namedb_type *db)
 	result->prev_dname = NULL;
 	result->default_apex = NULL;
 
-	result->temporary_rdatas = (rdata_atom_type *) region_alloc(
-		result->region, MAXRDATALEN * sizeof(rdata_atom_type));
+	result->temporary_rdatas = (rdata_atom_type *) region_alloc_array(
+		result->region, MAXRDATALEN, sizeof(rdata_atom_type));
 
 	return result;
 }

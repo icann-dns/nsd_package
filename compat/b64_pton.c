@@ -144,18 +144,16 @@ static void
 b64_initialize_rmap ()
 {
 	int i;
-	char ch;
 
 	/* Null: end of string, stop parsing */
 	b64rmap[0] = b64rmap_end;
 
 	for (i = 1; i < 256; ++i) {
-		ch = (char)i;
 		/* Whitespaces */
-		if (isspace(ch))
+		if (isspace(i))
 			b64rmap[i] = b64rmap_space;
 		/* Padding: stop parsing */
-		else if (ch == Pad64)
+		else if (i == (unsigned char)Pad64)
 			b64rmap[i] = b64rmap_end;
 		/* Non-base64 char */
 		else
@@ -170,7 +168,7 @@ b64_initialize_rmap ()
 }
 
 static int
-b64_pton_do(char const *src, uint8_t *target, size_t targsize)
+b64_pton_do(unsigned char const *src, uint8_t *target, size_t targsize)
 {
 	int tarindex, state, ch;
 	uint8_t ofs;
@@ -287,7 +285,7 @@ b64_pton_do(char const *src, uint8_t *target, size_t targsize)
 
 
 static int
-b64_pton_len(char const *src)
+b64_pton_len(unsigned char const *src)
 {
 	int tarindex, state, ch;
 	uint8_t ofs;
@@ -386,7 +384,7 @@ b64_pton(char const *src, uint8_t *target, size_t targsize)
 		b64_initialize_rmap ();
 
 	if (target)
-		return b64_pton_do (src, target, targsize);
+		return b64_pton_do ((unsigned char*)src, target, targsize);
 	else
-		return b64_pton_len (src);
+		return b64_pton_len ((unsigned char*)src);
 }

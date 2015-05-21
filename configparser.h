@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.1.  */
+/* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison interface for Yacc-like parsers in C
    
@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_CONFIGPARSER_H
-# define YY_CONFIGPARSER_H
+#ifndef YY_YY_CONFIGPARSER_H_INCLUDED
+# define YY_YY_CONFIGPARSER_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -120,7 +120,8 @@ extern int yydebug;
      VAR_ZONEFILES_CHECK = 329,
      VAR_ZONEFILES_WRITE = 330,
      VAR_LOG_TIME_ASCII = 331,
-     VAR_ROUND_ROBIN = 332
+     VAR_ROUND_ROBIN = 332,
+     VAR_ZONESTATS = 333
    };
 #endif
 /* Tokens.  */
@@ -199,20 +200,21 @@ extern int yydebug;
 #define VAR_ZONEFILES_WRITE 330
 #define VAR_LOG_TIME_ASCII 331
 #define VAR_ROUND_ROBIN 332
+#define VAR_ZONESTATS 333
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2049 of yacc.c  */
+/* Line 2058 of yacc.c  */
 #line 42 "configparser.y"
 
 	char*	str;
 
 
-/* Line 2049 of yacc.c  */
-#line 216 "configparser.h"
+/* Line 2058 of yacc.c  */
+#line 218 "configparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -235,4 +237,4 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_CONFIGPARSER_H  */
+#endif /* !YY_YY_CONFIGPARSER_H_INCLUDED  */

@@ -1,5 +1,137 @@
+7 April 2015: Wouter
+	- Tag 4.1.2rc2.
+
+2 April 2015: Wouter
+	- Made log message more consistent, changed 'axfr refused' log message
+	  to be more consistent with other messages.  Also notify refused.
+	- verbosity 2 logs axfr refused and notify refused.
+	  verbosity 1 contains less log messages.
+
+31 March 2015: Wouter
+	- Tag 4.1.2rc1.
+
+24 March 2015: Wouter
+	- Fix #654: Fix contradiction in notify logging verbosity level.
+	- Incoming notifies have serial number logged (at verbosity 1).
+	- Fix #655: Fix contradiction in verbosity for zone transfers.
+
+17 March 2015: Wouter
+	- Use reallocarray for integer overflow protection, patch submitted
+	  by Loganaden Velvindron.
+	- Fix allocation integer overflow checks.
+
+13 March 2015: Wouter
+	- Fix buffer overflow in config parse of domain name,
+	  reported by John Van de Meulebrouck Brendgard.
+
+12 March 2015: Wouter
+	- Updated default keylength in nsd-control-setup to 3k.
+
+10 March 2015: Wouter
+	- Fix use after free after zonefile syntax error followed by ttl
+	  or origin directive, reported by John Van de Meulebrouck Brendgard.
+	- Fix syntax error followed by too many TXT elements parse crash
+	  reported by John Van de Meulebrouck Brendgard.
+
+9 March 2015: Wouter
+	- Fix origin directive from unused old value and subdomain parser
+	  failure, reported by John Van de Meulebrouck Brendgard.
+
+2 March 2015: Wouter
+	- Fix b64pton out of bounds error on invalid zonefile input
+	  reported by John Van de Meulebrouck Brendgard.
+
+20 February 2015: Wouter
+	- Fix segfault on double origin in zone reader (thanks John Van de
+	  Meulebrouck Brendgard).
+
+19 February 2015: Wouter
+	- Remove dead code domain_table_iterate.
+	- Fix segfault in zone reader on invalid input
+	  reported by John Van de Meulebrouck Brendgard.
+
+5 February 2015: Wouter
+	- Fix #642: Change 'zone read with no errors' to '.. with success'.
+	  Patch from Benedikt Heine.
+
+3 February 2015: Wouter
+	- Tag 4.1.1 release
+	- Trunk is 4.1.2 in development.
+	- Remove some duplicate header includes (from Brad Smith).
+	- Fix tcp waiting list for zone transfers where the bind and connect
+	  calls fail.
+
+29 January 2015: Wouter
+	- Fix zonesdir chroot error message.
+
+28 January 2015: Wouter
+	- correct some hyphen-used-as-minus-sign (from Andreas Schulze) in
+	  man pages.
+
+27 January 2015: Wouter
+	- Tag 4.1.1rc1
+
+21 January 2015: Wouter
+	- Synthesize CNAMEs with same TTL as DNAME.
+
+12 January 2015: Wouter
+	- Fix casts for ctype functions (from Todd Miller).
+	- nsd-checkconf -f prints out full name of pidfile (with dir).
+
+9 January 2015: Wouter
+	- Fix bug#637: fix that nsd.db grows limitlessly, an off by one
+	  on one megabyte free chunks, created during AXFRs of large zones,
+	  that caused the one megabyte chunk to be leaked.
+	- Fix udb-inspect for one megabyte chunks, counts and statistics.
+
+6 January 2015: Wouter
+	- Fix spinning NSD with lots of failing transfers, due to pointer
+	  comparison using void pointer subtraction (from Otto Moerbeek).
+
+5 January 2015: Wouter
+	- Patch nsd_munin_ from Philip Paeps to use type ABSOLUTE.
+
+4 Nov 2014: Wouter
+	- Document zonestat config, and nsd-checkconf access.
+
+3 Nov 2014: Wouter
+	- Fix that failure to add tcp to tcp base does not leak the socket.
+
+27 Oct 2014: Wouter
+	- Disabled use of SSLv3 in nsd-control.
+	- zonestats are cleared (or not, with stats_noreset).
+
+22 Oct 2014: Wouter
+	- Test for wildcard fix (from 3.2).
+
+16 Oct 2014: Wouter
+	- Fixes for wildcard addition and deletion, speedup for some cases.
+
+15 Oct 2014: Wouter
+	- Fix that queries for noname CH TXT are REFUSED instead of nodata.
+
+14 Oct 2014: Wouter
+	- per zone statistics with --enable-zone-stats, configure with
+	  zonestats: "zonestatidentifier", zones with the same id are added.
+
+10 Oct 2014: Wouter
+	- Fix #616: retry xfer for zones with no content after command.
+	- Fix char used as array index warnings on NetBSD.
+
+8 Oct 2014: Wouter
+	- Fix "xfrd_handle_ipc: bad mode" log errors when compiled 
+	  with --disable-bind8-stats.
+
+18 Sep 2014: Wouter
+	- Fix that expired zones stay expired after a server restart.
+
+15 Sep 2014: Wouter
+	- RFC 7344: CDS and CDNSKEY (read in).
+
 4 Sep 2014: Wouter
 	- Tag 4.1.0.
+	- trunk is 4.1.1 in development.
+	- fix manpage for nsd-checkzone to have version and date.
 
 29 Aug 2014: Wouter
 	- Fix install of the nsd-checkconf man page.
