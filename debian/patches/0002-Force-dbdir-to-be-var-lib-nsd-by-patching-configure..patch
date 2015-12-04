@@ -1,18 +1,18 @@
-From 1d048e09c6937edd7ffd155051848822ca8066a2 Mon Sep 17 00:00:00 2001
 From: Pierre Habouzit <madcoder@debian.org>
 Date: Sat, 30 May 2009 12:10:24 +0200
-Subject: [PATCH 5/5] Force dbdir to be /var/lib/nsd by patching configure.ac
+Subject: Force dbdir to be /var/lib/nsd by patching configure.ac
 
 since it's not configureable...
 
 Signed-off-by: Pierre Habouzit <madcoder@debian.org>
 ---
- configure    |    2 +-
- configure.ac |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- nsd.orig/configure.ac
-+++ nsd/configure.ac
+diff --git a/configure.ac b/configure.ac
+index 29fab96..2a2afcf 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -64,7 +64,7 @@ AC_SUBST(logfile)
  #
  # Database directory

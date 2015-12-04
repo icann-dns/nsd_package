@@ -85,12 +85,6 @@
 /* Define to 1 if you have the <event.h> header file. */
 #undef HAVE_EVENT_H
 
-/* Define to 1 if you have the `EVP_sha1' function. */
-#undef HAVE_EVP_SHA1
-
-/* Define to 1 if you have the `EVP_sha256' function. */
-#undef HAVE_EVP_SHA256
-
 /* Define to 1 if you have the `ev_default_loop' function. */
 #undef HAVE_EV_DEFAULT_LOOP
 
@@ -359,11 +353,11 @@
 /* Define this to enable IPv6 support. */
 #undef INET6
 
+/* If flex defines yy_current_buffer as a macro */
+#undef LEX_DEFINES_YY_CURRENT_BUFFER
+
 /* Define to the maximum message length to pass to syslog. */
 #undef MAXSYSLOGMSGLEN
-
-/* Define to the maximum ip-addresses to serve. */
-#undef MAX_INTERFACES
 
 /* Define if memcmp() does not compare unsigned bytes */
 #undef MEMCMP_IS_BROKEN
@@ -419,6 +413,9 @@
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
+
+/* enable reuseport option by default. */
+#undef REUSEPORT_BY_DEFAULT
 
 /* Define this to configure as a root server. */
 #undef ROOT_SERVER

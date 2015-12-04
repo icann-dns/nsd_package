@@ -1,0 +1,48 @@
+From: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
+Date: Fri, 4 Dec 2015 14:50:14 +0100
+Subject: enable-control-by-default
+
+---
+ nsd-control-setup.sh.in | 2 +-
+ nsd-control.8.in        | 2 --
+ options.c               | 2 +-
+ 3 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/nsd-control-setup.sh.in b/nsd-control-setup.sh.in
+index b39c11c..a126ae2 100755
+--- a/nsd-control-setup.sh.in
++++ b/nsd-control-setup.sh.in
+@@ -155,6 +155,6 @@ chmod o-rw $SVR_BASE.pem $SVR_BASE.key $CTL_BASE.pem $CTL_BASE.key
+ rm -f request.cfg
+ rm -f $CTL_BASE"_trust.pem" $SVR_BASE"_trust.pem" $SVR_BASE"_trust.srl"
+ 
+-echo "Setup success. Certificates created. Enable in nsd.conf file to use"
++echo "Setup success. Certificates created."
+ 
+ exit 0
+diff --git a/nsd-control.8.in b/nsd-control.8.in
+index b6af80c..15d462c 100644
+--- a/nsd-control.8.in
++++ b/nsd-control.8.in
+@@ -154,8 +154,6 @@ these in the default run directory, or with \-d in another directory.
+ If you change the access control permissions on the key files you can decide
+ who can use nsd\-control, by default owner and group but not all users.
+ The script preserves private keys present in the directory.
+-After running the script as root, turn on \fBcontrol\-enable\fR in 
+-\fInsd.conf\fR.
+ .SH "STATISTIC COUNTERS"
+ The \fIstats\fR command shows a number of statistic counters.
+ .TP
+diff --git a/options.c b/options.c
+index 902e294..0770fdd 100644
+--- a/options.c
++++ b/options.c
+@@ -94,7 +94,7 @@ nsd_options_create(region_type* region)
+ 		opt->zonefiles_write = ZONEFILES_WRITE_INTERVAL;
+ 	else	opt->zonefiles_write = 0;
+ 	opt->xfrd_reload_timeout = 1;
+-	opt->control_enable = 0;
++	opt->control_enable = 1;
+ 	opt->control_interface = NULL;
+ 	opt->control_port = NSD_CONTROL_PORT;
+ 	opt->server_key_file = CONFIGDIR"/nsd_server.key";

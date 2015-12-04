@@ -4,7 +4,7 @@ dnl
 
 sinclude(acx_nlnetlabs.m4)
 
-AC_INIT(NSD,4.1.2,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,4.1.6,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 CFLAGS="$CFLAGS"
@@ -168,6 +168,23 @@ AC_PROG_INSTALL
 AC_PROG_LEX
 AC_PROG_YACC
 
+if test "$LEX" != ":" -a "$LEX" != ""; then
+  # Check if lex defines yy_current_buffer, because 2.4.6 and older use it,
+  # but later could define it as a macro and then we should not redefine it.
+  AC_MSG_CHECKING(if lex defines yy_current_buffer)
+  cat <<EOF >conftest.lex
+%%
+EOF
+  $LEX -i -t conftest.lex >> conftest.c
+  if grep "^#define yy_current_buffer" conftest.c >/dev/null; then
+	  AC_DEFINE_UNQUOTED(LEX_DEFINES_YY_CURRENT_BUFFER, 1, [If flex defines yy_current_buffer as a macro])
+	AC_MSG_RESULT(yes)
+  else
+	AC_MSG_RESULT(no)
+  fi
+  rm -f conftest.lex conftest.c
+fi
+
 AC_DEFUN([AC_CHECK_FORMAT_ATTRIBUTE],
 [AC_REQUIRE([AC_PROG_CC])
 AC_MSG_CHECKING(whether the C compiler (${CC-cc}) accepts the "format" attribute)
@@ -265,6 +282,8 @@ if test "x$CFLAGS" = "x" ; then
 	# we do not use O3 because it causes miscompilations.
 	ACX_CHECK_COMPILER_FLAG(O2, [CFLAGS="$CFLAGS -O2"])
 	ACX_CHECK_FLTO
+	ACX_CHECK_PIE
+	ACX_CHECK_RELRO_NOW
 fi
 AC_C_CONST
 AC_C_INLINE
@@ -320,7 +339,6 @@ AC_DEFUN([CHECK_SSL], [
             AC_CHECK_LIB(crypto, HMAC_CTX_init,, [
                     AC_MSG_ERROR([OpenSSL found in $ssldir, but version 0.9.7 or higher is required])
                 ])
-		AC_CHECK_FUNCS([EVP_sha1 EVP_sha256])
         fi
         AC_SUBST(HAVE_SSL)
     fi
@@ -485,6 +503,12 @@ AC_SEARCH_LIBS(socket, [socket])
 AC_CHECK_STRPTIME_WORKS
 ACX_CHECK_NONBLOCKING_BROKEN
 ACX_MKDIR_ONE_ARG
+
+# see if reuseport is enabled by default (also a config option).
+# freebsd can compile the option, but it does not work, it works on Linux.
+if test "`uname`" = "Linux"; then
+	AC_DEFINE([REUSEPORT_BY_DEFAULT], 1, [enable reuseport option by default.])
+fi
 
 # set -I. and -Isrcdir
 if test -n "$CPPFLAGS"; then
@@ -685,15 +709,6 @@ AC_ARG_WITH([facility],
         AC_HELP_STRING([--with-facility=name], [Syslog default facility (LOG_DAEMON)]),
         [facility=$withval])
 AC_DEFINE_UNQUOTED([FACILITY], $facility, [Define to the default facility for syslog.])
-
-dnl
-dnl Determine the maximum number of ip-addresses that are allowed
-dnl
-max_ips=16
-AC_ARG_WITH([max_ips],
-	AC_HELP_STRING([--with-max-ips=number], [Limit on the number of ip-addresses that may be specified]),
-	[max_ips=$withval])
-AC_DEFINE_UNQUOTED([MAX_INTERFACES], $max_ips, [Define to the maximum ip-addresses to serve.])
 
 dnl
 dnl Determine the default tcp timeout
