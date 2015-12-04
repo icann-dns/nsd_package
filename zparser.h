@@ -110,26 +110,27 @@ extern int yydebug;
      T_DHCID = 319,
      T_NSEC3PARAM = 320,
      T_TLSA = 321,
-     T_NID = 322,
-     T_L32 = 323,
-     T_L64 = 324,
-     T_LP = 325,
-     T_EUI48 = 326,
-     T_EUI64 = 327,
-     T_CAA = 328,
-     T_CDS = 329,
-     T_CDNSKEY = 330,
-     DOLLAR_TTL = 331,
-     DOLLAR_ORIGIN = 332,
-     NL = 333,
-     SP = 334,
-     STR = 335,
-     PREV = 336,
-     BITLAB = 337,
-     T_TTL = 338,
-     T_RRCLASS = 339,
-     URR = 340,
-     T_UTYPE = 341
+     T_URI = 322,
+     T_NID = 323,
+     T_L32 = 324,
+     T_L64 = 325,
+     T_LP = 326,
+     T_EUI48 = 327,
+     T_EUI64 = 328,
+     T_CAA = 329,
+     T_CDS = 330,
+     T_CDNSKEY = 331,
+     DOLLAR_TTL = 332,
+     DOLLAR_ORIGIN = 333,
+     NL = 334,
+     SP = 335,
+     STR = 336,
+     PREV = 337,
+     BITLAB = 338,
+     T_TTL = 339,
+     T_RRCLASS = 340,
+     URR = 341,
+     T_UTYPE = 342
    };
 #endif
 /* Tokens.  */
@@ -197,26 +198,27 @@ extern int yydebug;
 #define T_DHCID 319
 #define T_NSEC3PARAM 320
 #define T_TLSA 321
-#define T_NID 322
-#define T_L32 323
-#define T_L64 324
-#define T_LP 325
-#define T_EUI48 326
-#define T_EUI64 327
-#define T_CAA 328
-#define T_CDS 329
-#define T_CDNSKEY 330
-#define DOLLAR_TTL 331
-#define DOLLAR_ORIGIN 332
-#define NL 333
-#define SP 334
-#define STR 335
-#define PREV 336
-#define BITLAB 337
-#define T_TTL 338
-#define T_RRCLASS 339
-#define URR 340
-#define T_UTYPE 341
+#define T_URI 322
+#define T_NID 323
+#define T_L32 324
+#define T_L64 325
+#define T_LP 326
+#define T_EUI48 327
+#define T_EUI64 328
+#define T_CAA 329
+#define T_CDS 330
+#define T_CDNSKEY 331
+#define DOLLAR_TTL 332
+#define DOLLAR_ORIGIN 333
+#define NL 334
+#define SP 335
+#define STR 336
+#define PREV 337
+#define BITLAB 338
+#define T_TTL 339
+#define T_RRCLASS 340
+#define URR 341
+#define T_UTYPE 342
 
 
 
@@ -236,7 +238,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 240 "zparser.h"
+#line 242 "zparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -1,7 +1,8 @@
 Source: nsd
 Section: net
 Priority: optional
-Maintainer: Ondřej Surý <ondrej@debian.org>
+Maintainer: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
+Uploaders: Ondřej Surý <ondrej@debian.org>
 Build-Depends: bison,
                debhelper (>= 9),
                dh-autoreconf,
@@ -13,8 +14,8 @@ Build-Depends: bison,
                openssl,
                po-debconf
 Standards-Version: 3.9.4
-Vcs-Browser: http://anonscm.debian.org/?p=pkg-nlnetlabs/nsd.git
-Vcs-Git: git://anonscm.debian.org/pkg-nlnetlabs/nsd.git
+Vcs-Browser: http://anonscm.debian.org/?p=pkg-dns/nsd.git
+Vcs-Git: git://anonscm.debian.org/pkg-dns/nsd.git
 Homepage: http://www.nlnetlabs.nl/nsd/
 
 Package: nsd

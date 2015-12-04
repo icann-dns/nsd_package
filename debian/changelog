@@ -1,3 +1,11 @@
+nsd (4.1.6-1) unstable; urgency=medium
+
+  * Imported Upstream version 4.1.6
+  * Rebase patches on top of 4.1.6 release
+  * Move nsd under pkg-dns umbrella
+
+ -- Ondřej Surý <ondrej@debian.org>  Fri, 04 Dec 2015 14:49:08 +0100
+
 nsd (4.1.2-1) unstable; urgency=medium
 
   * New upstream version 4.1.2

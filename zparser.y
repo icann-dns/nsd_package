@@ -66,7 +66,7 @@ nsec3_add_params(const char* hash_algo_str, const char* flag_str,
 %token <type> T_GPOS T_EID T_NIMLOC T_ATMA T_NAPTR T_KX T_A6 T_DNAME T_SINK
 %token <type> T_OPT T_APL T_UINFO T_UID T_GID T_UNSPEC T_TKEY T_TSIG T_IXFR
 %token <type> T_AXFR T_MAILB T_MAILA T_DS T_DLV T_SSHFP T_RRSIG T_NSEC T_DNSKEY
-%token <type> T_SPF T_NSEC3 T_IPSECKEY T_DHCID T_NSEC3PARAM T_TLSA
+%token <type> T_SPF T_NSEC3 T_IPSECKEY T_DHCID T_NSEC3PARAM T_TLSA T_URI
 %token <type> T_NID T_L32 T_L64 T_LP T_EUI48 T_EUI64 T_CAA T_CDS T_CDNSKEY
 
 /* other tokens */
@@ -219,6 +219,9 @@ dname:	abs_dname
     |	rel_dname
     {
 	    if ($1 == error_dname) {
+		    $$ = error_domain;
+	    } else if(parser->origin == error_domain) {
+		    zc_error("cannot concatenate origin to domain name, because origin failed to parse");
 		    $$ = error_domain;
 	    } else if ($1->name_size + domain_dname(parser->origin)->name_size - 1 > MAXDOMAINLEN) {
 		    zc_error("domain name exceeds %d character limit", MAXDOMAINLEN);
@@ -629,6 +632,8 @@ type_and_rdata:
     |	T_CDS sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	T_CDNSKEY sp rdata_dnskey
     |	T_CDNSKEY sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
+    |	T_URI sp rdata_uri
+    |	T_URI sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	T_UTYPE sp rdata_unknown { $$ = $1; parse_unknown_rdata($1, $3); }
     |	STR error NL
     {
@@ -962,9 +967,14 @@ rdata_ipsec_base: STR sp STR sp STR sp dotted_str
 				zc_error_prev_line("IPSECKEY must specify gateway name");
 			if(!(name = dname_parse(parser->region, $7.str)))
 				zc_error_prev_line("IPSECKEY bad gateway dname %s", $7.str);
-			if($7.str[strlen($7.str)-1] != '.')
+			if($7.str[strlen($7.str)-1] != '.') {
+				if(parser->origin == error_domain) {
+		    			zc_error("cannot concatenate origin to domain name, because origin failed to parse");
+					break;
+				}
 				name = dname_concatenate(parser->rr_region, name, 
 					domain_dname(parser->origin));
+			}
 			zadd_rdata_wireformat(alloc_rdata_init(parser->region,
 				dname_name(name), name->name_size));
 			break;
@@ -1019,6 +1029,15 @@ rdata_eui48:	STR trail
 rdata_eui64:	STR trail
     {
 	    zadd_rdata_wireformat(zparser_conv_eui(parser->region, $1.str, 64));
+    }
+    ;
+
+/* RFC7553 */
+rdata_uri:	STR sp STR sp STR trail
+    {
+	    zadd_rdata_wireformat(zparser_conv_short(parser->region, $1.str)); /* priority */
+	    zadd_rdata_wireformat(zparser_conv_short(parser->region, $3.str)); /* weight */
+	    zadd_rdata_wireformat(zparser_conv_long_text(parser->region, $5.str, $5.len)); /* target */
     }
     ;
 

@@ -1,5 +1,61 @@
 NSD RELEASE NOTES
 
+4.1.6
+================
+BUG FIXES:
+	- Fix #701: Fix that AD=1 set in a BADVERS response.
+	- Fix typo in zonec.c inside error message.
+	- Fix #711: Document that debug-mode yes is used for staying
+	  attached to the supervisor console.
+	- Document verbosity 3 prints more information.
+	- nsd-checkconf warns for master zones with no zonefile statement.
+	- Fix start failure when many file descriptors are in use.
+	- The servfail rcode is not printed with a space in the middle.
+	- print failed token for config syntax error or parse error.
+
+
+4.1.5
+================
+BUG FIXES:
+	- Fix #706: default port 53 not opened on ip4 because of getaddrinfo
+	  hints initialisation failure.
+
+
+4.1.4
+================
+FEATURES:
+	- RFC7553 RR Type URI support.
+	- removed hardcoded interface limit, --with-max-ips removed.
+	- SO_REUSEPORT support, by default on Linux, or with reuseport: yes.
+	- Admitted axfrs are logged at verbosity 1.  Refused at verbosity 2.
+	- --enable-pie and --enable-relro-now options for a safer executable.
+BUG FIXES:
+	- Fix NSID response for short edns sizes.
+	- Fix that for expired zones NSD performs an AXFR and accepts newer
+	  and older serial numbers.
+	- Document that minimal responses only minimizes responses to fit
+	  in one datagram.  It does not minimize smaller responses.
+	- Fix #618: documented need to list ip-addresses seperately in
+	  nsd.conf if there are multiple, because the source address of
+	  replies can otherwise go wrong.
+	- Fix that notify from nsd-control contains soa serial.
+	- Fix #698 formatting errors and typos in nsd.8.in.
+
+
+4.1.3
+================
+FEATURES:
+	- nsd-control addzones and delzones read list of zones from stdin.
+	- hmac sha224, sha384 and sha512 support, patch from David Gwynne.
+	- max-interfaces raised to 32.
+BUG FIXES:
+	- Fix #665: when removing subdomain, nsd does not reparse parent zone.
+	- Fix task and zonestat files to be stored in a subdirectory in tmp
+	  to stop privilege elevation.
+	- Fix crash in zone parser for relative dname after error in origin.
+	- Fix that formerrors are ratelimited.
+
+
 4.1.2
 ================
 FEATURES:

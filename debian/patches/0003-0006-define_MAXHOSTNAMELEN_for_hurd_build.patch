@@ -1,0 +1,23 @@
+From: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
+Date: Fri, 4 Dec 2015 14:50:15 +0100
+Subject: 0006-define_MAXHOSTNAMELEN_for_hurd_build
+
+---
+ nsd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/nsd.c b/nsd.c
+index 2420a65..45da15d 100644
+--- a/nsd.c
++++ b/nsd.c
+@@ -46,6 +46,10 @@
+ #include "remote.h"
+ #include "xfrd-disk.h"
+ 
++#ifndef MAXHOSTNAMELEN
++#define MAXHOSTNAMELEN 256
++#endif
++
+ /* The server handler... */
+ struct nsd nsd;
+ static char hostname[MAXHOSTNAMELEN];
