@@ -7,7 +7,7 @@ Subject: 0006-define_MAXHOSTNAMELEN_for_hurd_build
  1 file changed, 4 insertions(+)
 
 diff --git a/nsd.c b/nsd.c
-index 2420a65..45da15d 100644
+index d0e8359..47f0109 100644
 --- a/nsd.c
 +++ b/nsd.c
 @@ -46,6 +46,10 @@

@@ -3470,7 +3470,7 @@ yyreduce:
 /* Line 1792 of yacc.c  */
 #line 1054 "zparser.y"
     {
-	    /* $2 is the number of octects, currently ignored */
+	    /* $2 is the number of octets, currently ignored */
 	    (yyval.unknown) = zparser_conv_hex(parser->region, (yyvsp[(5) - (6)].data).str, (yyvsp[(5) - (6)].data).len);
 
     }

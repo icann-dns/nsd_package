@@ -1,4 +1,4 @@
-$Id: REQUIREMENTS 4474 2015-06-04 12:53:29Z wouter $
+$Id: REQUIREMENTS 4553 2015-11-18 08:50:05Z wouter $
 
 
 NSD Requirements and Specifications
@@ -837,7 +837,7 @@ RR records details.
 
   "NSEC"     47,    # RFC 4033, 4034, 4035.  RFC 3755.
   		    Signed next ownername, to disprove rrset types and 
-		    domain name existance. Uncompressed dnames.
+		    domain name existence. Uncompressed dnames.
 
   "DNSKEY"   48,    # RFC 4033, 4034, 4035.  RFC 3755.
   		    Key for zone signing or key signing. Public key part.
@@ -1053,5 +1053,5 @@ Appendix D. Changes to this file.
 - KEY->DNSKEY, SIG->RRSIG in the text, dnssec-bis style.
 
 ______________________________________________________________________
-$Id: REQUIREMENTS 4474 2015-06-04 12:53:29Z wouter $
+$Id: REQUIREMENTS 4553 2015-11-18 08:50:05Z wouter $
 

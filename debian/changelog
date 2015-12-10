@@ -1,3 +1,10 @@
+nsd (4.1.7-1) unstable; urgency=medium
+
+  * Imported Upstream version 4.1.7
+  * Refresh patches on top of 4.1.7 release
+
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 10 Dec 2015 13:53:25 +0100
+
 nsd (4.1.6-1) unstable; urgency=medium
 
   * Imported Upstream version 4.1.6
