@@ -155,6 +155,6 @@ chmod o-rw $SVR_BASE.pem $SVR_BASE.key $CTL_BASE.pem $CTL_BASE.key
 rm -f request.cfg
 rm -f $CTL_BASE"_trust.pem" $SVR_BASE"_trust.pem" $SVR_BASE"_trust.srl"
 
-echo "Setup success. Certificates created. Enable in nsd.conf file to use"
+echo "Setup success. Certificates created."
 
 exit 0
