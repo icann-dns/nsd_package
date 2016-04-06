@@ -1,13 +1,13 @@
 From: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
 Date: Fri, 4 Dec 2015 14:50:15 +0100
-Subject: 0006-define_MAXHOSTNAMELEN_for_hurd_build
+Subject: Define MAXHOSTNAMELEN for Hurd build
 
 ---
  nsd.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/nsd.c b/nsd.c
-index d0e8359..47f0109 100644
+index a33bad5..3e2c11c 100644
 --- a/nsd.c
 +++ b/nsd.c
 @@ -46,6 +46,10 @@
