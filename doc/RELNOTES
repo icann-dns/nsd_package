@@ -1,5 +1,28 @@
 NSD RELEASE NOTES
 
+4.1.9
+================
+BUG FIXES:
+        - Change the nsd.db file version because of nanosecond precision fix.
+
+4.1.8
+================
+FEATURES:
+	- #732: tcp-mss, outgoing-tcp-mss options for nsd.conf, patch
+	  from Daisuke Higashi.
+	- #739: zonefile changes when mtime is small are detected on reload,
+	  if filesystem supports precision mtime values.
+	- RR type CSYNC (RFC7477) syntax is supported.
+BUG FIXES:
+	- take advantage of arc4random_uniform if available, patch from
+	  Loganaden Velvindron.
+	- Fix flto check for OSX clang.
+	- Define _DEFAULT_SOURCE with _BSD_SOURCE for glibc 2.20 on Linux.
+	- Fix #736: segfault during zone transfer.
+	- Fix #744: Fix that NSD replies for configured but unloaded zone
+	  with SERVFAIL, not REFUSED.
+
+
 4.1.7
 ================
 FEATURES:
