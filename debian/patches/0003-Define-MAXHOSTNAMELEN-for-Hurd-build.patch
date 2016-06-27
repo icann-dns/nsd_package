@@ -7,7 +7,7 @@ Subject: Define MAXHOSTNAMELEN for Hurd build
  1 file changed, 4 insertions(+)
 
 diff --git a/nsd.c b/nsd.c
-index a33bad5..3e2c11c 100644
+index e8101a5..63d9b20 100644
 --- a/nsd.c
 +++ b/nsd.c
 @@ -46,6 +46,10 @@

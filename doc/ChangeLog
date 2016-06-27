@@ -1,3 +1,53 @@
+7 June 2016: Wouter
+	- Fix NSEC3 ent fix to use closest encloser, not wildcard denial.
+
+2 June 2016: Wouter
+	- Fix for NSEC3 with zone signed without exact match for empty
+	  nonterminals, the answer for that domain gets wildcard denial.
+	- #772 Document that recvmmsg has IPv6 problems on some linux kernels.
+	- tag for 4.1.10rc1.
+
+31 May 2016: Wouter
+	- print notice that nsd is starting before taking off.
+
+20 May 2016: Wouter
+	- Updated fix for nonterminal nsec3 answers.
+
+19 May 2016: Wouter
+	- Fix empty nonterminal nsec3 cover answers.
+
+12 May 2016: Wouter
+	- NSD includes AAAA before A for queries over IPV6 (in delegations).
+	  And TC is set if no glue can be provided with a delegation because
+	  of packet size.
+
+19 April 2016: Wouter
+	- Fix #755: NSD spins after a zone update and a lot of TCP queries.
+
+7 April 2016: Wouter
+	- If set without nsd.db print "" as the default in the man pages.
+
+4 April 2016: Wouter
+	- Fix #751: NSD fails to occlude names below a DNAME.
+
+24 March 2016: Wouter
+	- Fix for openssl 1.1.0, HMAC_CTX size not exported from openssl.
+
+21 March 2016: Wouter
+	- Update acx_nlnetlabs.m4 to version 33 with HMAC_Update test.
+	- acx_nlnetlabs.m4 to v34, with -ldl -pthread test for libcrypto.
+
+15 March 2016: Wouter
+	- ip-freebind: yesno option in nsd.conf sets IP_FREEBIND socket option
+	  for Linux, binds to interfaces and addresses that are down.
+	- Change the nsd.db file version because of nanosecond precision fix.
+	- 4.1.9 release with the nsd.db file version fix (but not freebind),
+	  trunk contains 4.1.10 in development.
+
+10 March 2016: Wouter
+	- Tag 4.1.8
+	- Trunk contains 4.1.9 in development.
+
 2 March 2016: Wouter
 	- Tag 4.1.8rc1
 

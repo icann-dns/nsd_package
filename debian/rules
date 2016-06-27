@@ -10,7 +10,7 @@ DPKG_EXPORT_BUILDFLAGS = 1
 -include /usr/share/dpkg/buildflags.mk
 
 %:
-	dh $@ --with=autoreconf --with=systemd
+	dh $@ --with=autoreconf --with=systemd -O--fail-missing
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -35,6 +35,9 @@ override_dh_auto_install:
 	dh_auto_install -- DESTDIR=$(CURDIR)/debian/nsd
 	rmdir $(CURDIR)/debian/nsd/run/nsd
 	rmdir $(CURDIR)/debian/nsd/run
+
+override_dh_install-arch:
+	dh_install -a
 	mv $(CURDIR)/debian/nsd/etc/nsd/nsd.conf.sample $(CURDIR)/debian/nsd/usr/share/doc/nsd/examples/nsd.conf
 	install -m 640 debian/nsd.conf $(CURDIR)/debian/nsd/etc/nsd/
 
