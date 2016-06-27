@@ -1,3 +1,21 @@
+nsd (4.1.10-1) unstable; urgency=medium
+
+  * Imported Upstream version 4.1.10
+   + Fix the compilation with OpenSSL 1.1.0 (Closes: #828460)
+  * Rebase patches on top of 4.1.10
+  * Fix source-only uploads (Closes: #806086)
+  * Add openssl dependency for nsd-control-setup (Closes: #802944)
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 27 Jun 2016 09:05:20 +0200
+
+nsd (4.1.9-2) unstable; urgency=medium
+
+  * Simplify preparation of rundir by using tmpfiles.d (Closes: #788236)
+  * Remove nsd3 transitional package (Closes: #806086)
+    (Courtesy of Santiago Vila)
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 09 May 2016 13:20:02 +0200
+
 nsd (4.1.9-1) unstable; urgency=medium
 
   * Imported Upstream version 4.1.9

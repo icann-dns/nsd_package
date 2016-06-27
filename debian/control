@@ -6,11 +6,12 @@ Uploaders: Ondřej Surý <ondrej@debian.org>
 Build-Depends: bison,
                debhelper (>= 9),
                dh-autoreconf,
-	       dh-systemd,
-               dpkg-dev (>= 1.16.1.1~),
+               dh-systemd,
+               dpkg-dev,
                flex,
                libevent-dev,
                libssl-dev,
+               lsb-base,
                openssl,
                po-debconf
 Standards-Version: 3.9.4
@@ -22,32 +23,9 @@ Package: nsd
 Architecture: any
 Depends: adduser,
          lsb-base (>= 3.0-10),
+         openssl,
          ${misc:Depends},
          ${shlibs:Depends}
-Replaces: nsd3 (<= 4.0.0-1~)
-Breaks: nsd3 (<= 4.0.0-1~)
 Description: authoritative domain name server
  NSD is a fast, authoritative only, high performance, simple
  and open source name server.
- .
- NSD was primarily developed by NLnet Labs on request from and in close
- cooperation with RIPE NCC, as an alternative DNS server to be run on the
- root name server operated by RIPE NCC.
-
-Package: nsd3
-Architecture: all
-Section: oldlibs
-Priority: extra
-Pre-Depends: ${misc:Pre-Depends}
-Depends: debconf,
-         nsd (>= 4.0.0-1~),
-         ${misc:Depends}
-Description: authoritative domain name server - transitional package
- NSD is a fast, authoritative only, high performance, simple
- and open source name server.
- .
- NSD was primarily developed by NLnet Labs on request from and in close
- cooperation with RIPE NCC, as an alternative DNS server to be run on the
- root name server operated by RIPE NCC.
- .
- This is a transitional dummy package. It can safely be removed.

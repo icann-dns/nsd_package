@@ -4,7 +4,7 @@ dnl
 
 sinclude(acx_nlnetlabs.m4)
 
-AC_INIT(NSD,4.1.9,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,4.1.10,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 CFLAGS="$CFLAGS"
@@ -599,7 +599,7 @@ AC_CHECK_SIZEOF(off_t)
 AC_CHECK_FUNCS([arc4random arc4random_uniform])
 AC_CHECK_FUNCS([tzset alarm chroot dup2 endpwent gethostname memset memcpy pwrite socket strcasecmp strchr strdup strerror strncasecmp strtol writev getaddrinfo getnameinfo freeaddrinfo gai_strerror sigaction sigprocmask strptime strftime localtime_r setusercontext glob initgroups setresuid setreuid setresgid setregid getpwnam mmap ppoll clock_gettime])
 
-AC_ARG_ENABLE(recvmmsg, AC_HELP_STRING([--enable-recvmmsg], [Enable recvmmsg and sendmmsg compilation, faster but some kernel versions may have implementation problems]))
+AC_ARG_ENABLE(recvmmsg, AC_HELP_STRING([--enable-recvmmsg], [Enable recvmmsg and sendmmsg compilation, faster but some kernel versions may have implementation problems for IPv6]))
 case "$enable_recvmmsg" in
         yes)
 		AC_CHECK_FUNC([recvmmsg], [
@@ -797,8 +797,30 @@ AC_SUBST(ratelimit_default)
 CHECK_SSL
 if test x$HAVE_SSL = x"yes"; then
 	ACX_LIB_SSL
+
+	# Check for -pthread
+	BAKLIBS="$LIBS"
+	LIBS="-lcrypto $LIBS"
+	AC_TRY_LINK([], [
+		int HMAC_Update(void);
+		(void)HMAC_Update();
+	], [],[
+		dnl so link fails for HMAC_Update, try with -pthread.
+		BAKCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -pthread"
+		AC_MSG_CHECKING([if libcrypto needs -pthread])
+		AC_TRY_LINK_FUNC([HMAC_Update], [
+			AC_MSG_RESULT([yes])
+		] , [
+			AC_MSG_RESULT([no])
+			dnl restore the nonpthread value
+			CFLAGS="$BAKCFLAGS"
+		])
+	])
+	LIBS="$BAKLIBS"
+
 	if test -n "$ssldir"; then 
-            AC_CHECK_LIB(crypto, HMAC_CTX_init,, [
+            AC_CHECK_LIB(crypto, HMAC_Update,, [
                     AC_MSG_ERROR([OpenSSL found in $ssldir, but version 0.9.7 or higher is required])
                 ])
 	fi
@@ -807,6 +829,7 @@ if test x$HAVE_SSL = x"yes"; then
 	AC_CHECK_HEADERS([openssl/ssl.h],,, [AC_INCLUDES_DEFAULT])
 	AC_CHECK_HEADERS([openssl/err.h],,, [AC_INCLUDES_DEFAULT])
 	AC_CHECK_HEADERS([openssl/rand.h],,, [AC_INCLUDES_DEFAULT])
+	AC_CHECK_FUNCS([HMAC_CTX_reset HMAC_CTX_new])
 else
 	AC_MSG_WARN([No SSL, therefore remote-control is disabled])
 fi

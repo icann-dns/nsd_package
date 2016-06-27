@@ -1,9 +1,29 @@
 NSD RELEASE NOTES
 
+4.1.10
+================
+FEATURES:
+	- ip-freebind: yesno option in nsd.conf sets IP_FREEBIND socket option
+	  for Linux, binds to interfaces and addresses that are down.
+	- NSD includes AAAA before A for queries over IPV6 (in delegations).
+	  And TC is set if no glue can be provided with a delegation because
+	  of packet size.
+	- print notice that nsd is starting before taking off.
+BUG FIXES:
+	- Fix for openssl 1.1.0, HMAC_CTX size not exported from openssl.
+	- Fix #751: NSD fails to occlude names below a DNAME.
+	- If set without nsd.db print "" as the default in the man pages.
+	- Fix #755: NSD spins after a zone update and a lot of TCP queries.
+	- Fix for NSEC3 with zone signed without exact match for empty
+	  nonterminals, the answer for that domain gets closest encloser.
+	- #772 Document that recvmmsg has IPv6 problems on some linux kernels.
+
+
 4.1.9
 ================
 BUG FIXES:
-        - Change the nsd.db file version because of nanosecond precision fix.
+	- Change the nsd.db file version because of nanosecond precision fix.
+
 
 4.1.8
 ================
