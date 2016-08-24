@@ -1,3 +1,9 @@
+nsd (4.1.11-1) unstable; urgency=medium
+
+  * Imported Upstream version 4.1.11
+
+ -- Ondřej Surý <ondrej@debian.org>  Wed, 24 Aug 2016 16:35:40 +0200
+
 nsd (4.1.10-1) unstable; urgency=medium
 
   * Imported Upstream version 4.1.10
