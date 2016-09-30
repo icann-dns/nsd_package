@@ -46,6 +46,10 @@
 #include "remote.h"
 #include "xfrd-disk.h"
 
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 256
+#endif
+
 /* The server handler... */
 struct nsd nsd;
 static char hostname[MAXHOSTNAMELEN];
