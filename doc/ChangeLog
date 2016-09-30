@@ -1,7 +1,73 @@
+19 September 2016: Wouter
+	- Review comments Ralph: wrapped long lines and nicer example conf.
+
+16 September 2016: Wouter
+	- NSD 4.1.13rc1 tag.
+
+15 September 2016: Wouter
+	- Test for openssl init_crypto and init_ssl functions.
+
+14 September 2016: Ralph
+	- Fix OPENSSL_INIT_ADD_ALL_DIGESTS compatibility check
+
+13 September 2016: Wouter
+	- Fix double const in dname_const() function.
+	- Silenced flex-generated sign-unsigned warning print with gcc
+	  diagnostic pragma.
+
+8 September 2016: Wouter
+	- more extensible edns option handling.
+
+2 September 2016: Wouter
+	- Release of 4.1.12; trunk is 4.1.13 and the patch for 4.1.12 (that
+	  does not contain the other changes to the trunk) is folded into
+	  the trunk.
+	- Fix #827: fix compile with openssl 1.1.0 with api=1.1.0.
+
+25 August 2016: Wouter
+	- Fix multimaster for not tried full zone transfer for a expired zone.
+	- Explain --disable-radix tree uses some more CPU.
+
+22 August 2016: Wouter
+	- Fix README spelling error of BSD license (reported by Joerg Jung).
+
+19 August 2016: Wouter
+	- for type SRV add A/AAAA to the additional section (if possible),
+	  just like we already do for type MX.
+
+17 August 2016: Wouter
+	- Add robustness against unallocated data in nsec3 trees.
+
+16 August 2016: Wouter
+	- configure --disable-radix-tree for about 15% lower memory usage.
+
+12 August 2016: Wouter
+	- Fix #817: xfrd update failed loop.
+
+9 August 2016: Wouter
+	- Can config key algorithms with the digest name, eg. 'sha256'.
+	- default tsig algorithm is sha256.
+	- Fix typo in log output, 'transfered' -> 'transferred'.
+	- Fix compile warnings about signcompare in minmax retrytime.
+
+8 August 2016: Wouter
+	- Support syntax of RR type OPENPGPKEY from RFC 7929.
+
+5 August 2016: Wouter
+	- multi-master-check: yes can be used to check all masters for the
+	  last version, using the higher version from the configured masters,
+	  from Manabu Sonoda.
+	- small fixups on patch.  And fix spacing and remove configure flag.
+	- Fix #812: make depend fails after distribution.
+
+2 August 2016: Wouter
+	- Fix unused result warnings from write and strtol.
+
 1 August 2016: Wouter
 	- Tag 4.1.11rc1.
 	- Fix nsec3 missing for nsec3 signed parent and child for DS at zonecut.
 	- Tag 4.1.11rc2.
+	- trunk is 4.1.12 in development.
 
 8 July 2016: Wouter
 	- Note down tracking numbers for issue JVN#63359718 JPCERT#91251865.

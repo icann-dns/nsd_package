@@ -553,6 +553,8 @@ char *yytext;
  * See LICENSE for the license.
  *
  */
+/* because flex keeps having sign-unsigned compare problems that are unfixed*/
+#pragma GCC diagnostic ignored "-Wsign-compare"
 
 #include "config.h"
 
@@ -639,7 +641,7 @@ parser_pop_stringbuf(void)
 #endif
 	
 #define YY_NO_INPUT 1
-#line 99 "zlexer.lex"
+#line 101 "zlexer.lex"
 #ifndef YY_NO_UNPUT
 #define YY_NO_UNPUT 1
 #endif
@@ -647,7 +649,7 @@ parser_pop_stringbuf(void)
 #define YY_NO_INPUT 1
 #endif
 
-#line 650 "<stdout>"
+#line 652 "<stdout>"
 
 #define INITIAL 0
 #define incl 1
@@ -869,11 +871,11 @@ YY_DECL
 		}
 
 	{
-#line 121 "zlexer.lex"
+#line 123 "zlexer.lex"
 
 	static int paren_open = 0;
 	static enum lexer_state lexer_state = EXPECT_OWNER;
-#line 876 "<stdout>"
+#line 878 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -939,17 +941,17 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 124 "zlexer.lex"
+#line 126 "zlexer.lex"
 /* ignore */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 125 "zlexer.lex"
+#line 127 "zlexer.lex"
 { lexer_state = PARSING_RDATA; return DOLLAR_TTL; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 126 "zlexer.lex"
+#line 128 "zlexer.lex"
 { lexer_state = PARSING_RDATA; return DOLLAR_ORIGIN; }
 	YY_BREAK
 /*
@@ -958,17 +960,17 @@ YY_RULE_SETUP
 	 */
 case 4:
 YY_RULE_SETUP
-#line 132 "zlexer.lex"
+#line 134 "zlexer.lex"
 {
 	BEGIN(incl);
 }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
-#line 136 "zlexer.lex"
+#line 138 "zlexer.lex"
 YY_RULE_SETUP
 case YY_STATE_EOF(incl):
-#line 136 "zlexer.lex"
+#line 138 "zlexer.lex"
 {
 	int error_occurred = parser->error_occurred;
 	BEGIN(INITIAL);
@@ -980,7 +982,7 @@ case YY_STATE_EOF(incl):
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 144 "zlexer.lex"
+#line 146 "zlexer.lex"
 { 	
 	char *tmp;
 	domain_type *origin = parser->origin;
@@ -1044,7 +1046,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 205 "zlexer.lex"
+#line 207 "zlexer.lex"
 {
 	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
 	if (include_stack_ptr == 0) {
@@ -1057,12 +1059,12 @@ case YY_STATE_EOF(INITIAL):
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 214 "zlexer.lex"
+#line 216 "zlexer.lex"
 { zc_warning("Unknown directive: %s", yytext); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 215 "zlexer.lex"
+#line 217 "zlexer.lex"
 {
 	LEXOUT((". "));
 	return parse_token('.', yytext, &lexer_state);
@@ -1070,7 +1072,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 219 "zlexer.lex"
+#line 221 "zlexer.lex"
 {
 	LEXOUT(("@ "));
 	return parse_token('@', yytext, &lexer_state);
@@ -1078,7 +1080,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 223 "zlexer.lex"
+#line 225 "zlexer.lex"
 {
 	LEXOUT(("\\# "));
 	return parse_token(URR, yytext, &lexer_state);
@@ -1087,7 +1089,7 @@ YY_RULE_SETUP
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 227 "zlexer.lex"
+#line 229 "zlexer.lex"
 {
 	++parser->line;
 	if (!paren_open) { 
@@ -1102,7 +1104,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 238 "zlexer.lex"
+#line 240 "zlexer.lex"
 {
 	if (paren_open) {
 		zc_error("nested parentheses");
@@ -1115,7 +1117,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 247 "zlexer.lex"
+#line 249 "zlexer.lex"
 {
 	if (!paren_open) {
 		zc_error("closing parentheses without opening parentheses");
@@ -1128,7 +1130,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 256 "zlexer.lex"
+#line 258 "zlexer.lex"
 {
 	if (!paren_open && lexer_state == EXPECT_OWNER) {
 		lexer_state = PARSING_TTL_CLASS_TYPE;
@@ -1145,11 +1147,11 @@ YY_RULE_SETUP
 /* Bitlabels.  Strip leading and ending brackets.  */
 case 15:
 YY_RULE_SETUP
-#line 270 "zlexer.lex"
+#line 272 "zlexer.lex"
 { BEGIN(bitlabel); }
 	YY_BREAK
 case YY_STATE_EOF(bitlabel):
-#line 271 "zlexer.lex"
+#line 273 "zlexer.lex"
 {
 	zc_error("EOF inside bitlabel");
 	BEGIN(INITIAL);
@@ -1159,18 +1161,18 @@ case YY_STATE_EOF(bitlabel):
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 277 "zlexer.lex"
+#line 279 "zlexer.lex"
 { yymore(); }
 	YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 278 "zlexer.lex"
+#line 280 "zlexer.lex"
 { ++parser->line; yymore(); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 279 "zlexer.lex"
+#line 281 "zlexer.lex"
 {
 	BEGIN(INITIAL);
 	yytext[yyleng - 1] = '\0';
@@ -1180,11 +1182,11 @@ YY_RULE_SETUP
 /* Quoted strings.  Strip leading and ending quotes.  */
 case 19:
 YY_RULE_SETUP
-#line 286 "zlexer.lex"
+#line 288 "zlexer.lex"
 { BEGIN(quotedstring); LEXOUT(("\" ")); }
 	YY_BREAK
 case YY_STATE_EOF(quotedstring):
-#line 287 "zlexer.lex"
+#line 289 "zlexer.lex"
 {
 	zc_error("EOF inside quoted string");
 	BEGIN(INITIAL);
@@ -1194,18 +1196,18 @@ case YY_STATE_EOF(quotedstring):
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 293 "zlexer.lex"
+#line 295 "zlexer.lex"
 { LEXOUT(("STR ")); yymore(); }
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 294 "zlexer.lex"
+#line 296 "zlexer.lex"
 { ++parser->line; yymore(); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 295 "zlexer.lex"
+#line 297 "zlexer.lex"
 {
 	LEXOUT(("\" "));
 	BEGIN(INITIAL);
@@ -1216,7 +1218,7 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 302 "zlexer.lex"
+#line 304 "zlexer.lex"
 {
 	/* Any allowed word.  */
 	return parse_token(STR, yytext, &lexer_state);
@@ -1224,7 +1226,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 306 "zlexer.lex"
+#line 308 "zlexer.lex"
 {
 	zc_error("unknown character '%c' (\\%03d) seen - is this a zonefile?",
 		 (int) yytext[0], (int) yytext[0]);
@@ -1232,10 +1234,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 310 "zlexer.lex"
+#line 312 "zlexer.lex"
 ECHO;
 	YY_BREAK
-#line 1238 "<stdout>"
+#line 1240 "<stdout>"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2200,7 +2202,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 310 "zlexer.lex"
+#line 312 "zlexer.lex"
 
 
 

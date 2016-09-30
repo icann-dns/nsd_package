@@ -73,6 +73,9 @@
 /* Define to 1 if you have the `endpwent' function. */
 #undef HAVE_ENDPWENT
 
+/* Define to 1 if you have the `ERR_load_crypto_strings' function. */
+#undef HAVE_ERR_LOAD_CRYPTO_STRINGS
+
 /* Define to 1 if you have the `event_base_free' function. */
 #undef HAVE_EVENT_BASE_FREE
 
@@ -87,6 +90,9 @@
 
 /* Define to 1 if you have the <event.h> header file. */
 #undef HAVE_EVENT_H
+
+/* Define to 1 if you have the `EVP_cleanup' function. */
+#undef HAVE_EVP_CLEANUP
 
 /* Define to 1 if you have the `ev_default_loop' function. */
 #undef HAVE_EV_DEFAULT_LOOP
@@ -193,6 +199,12 @@
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
 #undef HAVE_OPENSSL_ERR_H
+
+/* Define to 1 if you have the `OPENSSL_init_crypto' function. */
+#undef HAVE_OPENSSL_INIT_CRYPTO
+
+/* Define to 1 if you have the `OPENSSL_init_ssl' function. */
+#undef HAVE_OPENSSL_INIT_SSL
 
 /* Define to 1 if you have the <openssl/rand.h> header file. */
 #undef HAVE_OPENSSL_RAND_H
@@ -482,6 +494,9 @@
 
 /* Define this to enable mmap instead of malloc. Experimental. */
 #undef USE_MMAP_ALLOC
+
+/* Define this to configure to use the radix tree. */
+#undef USE_RADIX_TREE
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
