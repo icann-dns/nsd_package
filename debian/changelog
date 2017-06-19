@@ -1,3 +1,11 @@
+nsd (4.1.16-1) unstable; urgency=medium
+
+  * Update debian/watch and add signing-key to verify upstream releases
+  * New upstream version 4.1.16
+  * Rebase patches on top of 4.1.16 release
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 19 Jun 2017 10:49:28 +0200
+
 nsd (4.1.14-1) unstable; urgency=medium
 
   * Imported Upstream version 4.1.14

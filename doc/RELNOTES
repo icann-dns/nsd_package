@@ -1,5 +1,32 @@
 NSD RELEASE NOTES
 
+4.1.16
+================
+FEATURES:
+	- zone parser can parse acronyms for algorithms ED25519 and ED448.
+	- Fix 1243: Option to make NSD emit really minimal responses,
+	  minimal-responses: yes in nsd.conf.
+BUG FIXES:
+	- Calculate new udb index after growing the array, fix from
+	  Chaofeng Liu.
+	- Fix missing _t to _type conversion for disable-radix-tree option.
+	- Printout serial error with hint it may be too big.
+	- Fix 1228: OpenSSL include is not guarded with HAVE_SSL
+	- Patch for expire state in multi-master when masters includes
+	  broken master, from Manabu Sonoda.
+
+
+4.1.15
+================
+BUG FIXES:
+	- Fix nsd-control and ipv6 only.
+	- Squelch zone transfer error address family not supported by protocol
+	  at low verbosity levels.
+	- Fix #1195: Fix so that NSD fails on non-compliant values for Serial.
+	- Fix to rename _t typedefs because POSIX reserves them.
+	- Fix that nsec3 hash collisions only reported on verbosity level 3.
+
+
 4.1.14
 ================
 FEATURES:
