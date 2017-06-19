@@ -21,7 +21,7 @@ index b39c11c..a126ae2 100755
  
  exit 0
 diff --git a/nsd-control.8.in b/nsd-control.8.in
-index bf8d90d..9cff375 100644
+index f126e5c..4be4152 100644
 --- a/nsd-control.8.in
 +++ b/nsd-control.8.in
 @@ -154,8 +154,6 @@ these in the default run directory, or with \-d in another directory.
@@ -34,10 +34,10 @@ index bf8d90d..9cff375 100644
  The \fIstats\fR command shows a number of statistic counters.
  .TP
 diff --git a/options.c b/options.c
-index eabc8bf..604dbbb 100644
+index 94a34ae..0601d44 100644
 --- a/options.c
 +++ b/options.c
-@@ -99,7 +99,7 @@ nsd_options_create(region_type* region)
+@@ -101,7 +101,7 @@ nsd_options_create(region_type* region)
  		opt->zonefiles_write = ZONEFILES_WRITE_INTERVAL;
  	else	opt->zonefiles_write = 0;
  	opt->xfrd_reload_timeout = 1;
