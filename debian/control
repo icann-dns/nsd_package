@@ -1,7 +1,8 @@
 Source: nsd
 Section: net
 Priority: optional
-Maintainer: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
 Uploaders: Ondřej Surý <ondrej@debian.org>
 Build-Depends: bison,
                debhelper (>= 9),

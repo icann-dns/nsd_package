@@ -1,3 +1,9 @@
+nsd (4.1.16-1build1) artful; urgency=medium
+
+  * No-change rebuild against libevent-2.1-6
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 31 Jul 2017 02:47:58 +0000
+
 nsd (4.1.16-1) unstable; urgency=medium
 
   * Update debian/watch and add signing-key to verify upstream releases
