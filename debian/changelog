@@ -1,3 +1,10 @@
+nsd (4.1.17-1) unstable; urgency=medium
+
+  * Fix reading nsd.conf tmpfile configuration (Closes: #864711)
+  * New upstream version 4.1.17
+
+ -- Ondřej Surý <ondrej@debian.org>  Mon, 11 Sep 2017 09:39:08 +0200
+
 nsd (4.1.16-1) unstable; urgency=medium
 
   * Update debian/watch and add signing-key to verify upstream releases

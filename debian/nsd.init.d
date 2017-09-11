@@ -23,7 +23,7 @@ do_tmpfiles() {
     TMPFILE=/usr/lib/tmpfiles.d/$1.conf
 
     if [ -r "$TMPFILE" ]; then
-	while read type path mode user group; do
+	while read type path mode user group age argument; do
             if [ "$type" = "d" ]; then
                 mkdir -p "$path"
 		chmod "$mode" "$path"
