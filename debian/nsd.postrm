@@ -9,6 +9,9 @@ if test "$1" = "purge"; then
     rmdir $spool 2>/dev/null || true
 
     dpkg-statoverride --remove $spool >/dev/null 2>/dev/null || true
+
+    # remove server/control keys on purge
+    rm -f nsd_control.key nsd_control.pem nsd_server.key nsd_server.pem
 fi
 
 exit 0
