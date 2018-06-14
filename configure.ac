@@ -4,7 +4,7 @@ dnl
 
 sinclude(acx_nlnetlabs.m4)
 
-AC_INIT(NSD,4.1.17,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,4.1.22,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 CFLAGS="$CFLAGS"
@@ -597,7 +597,7 @@ AC_SYS_LARGEFILE
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(off_t)
 AC_CHECK_FUNCS([arc4random arc4random_uniform])
-AC_CHECK_FUNCS([tzset alarm chroot dup2 endpwent gethostname memset memcpy pwrite socket strcasecmp strchr strdup strerror strncasecmp strtol writev getaddrinfo getnameinfo freeaddrinfo gai_strerror sigaction sigprocmask strptime strftime localtime_r setusercontext glob initgroups setresuid setreuid setresgid setregid getpwnam mmap ppoll clock_gettime])
+AC_CHECK_FUNCS([tzset alarm chroot dup2 endpwent gethostname memset memcpy pwrite socket strcasecmp strchr strdup strerror strncasecmp strtol writev getaddrinfo getnameinfo freeaddrinfo gai_strerror sigaction sigprocmask strptime strftime localtime_r setusercontext glob initgroups setresuid setreuid setresgid setregid getpwnam mmap ppoll clock_gettime accept4])
 
 AC_ARG_ENABLE(recvmmsg, AC_HELP_STRING([--enable-recvmmsg], [Enable recvmmsg and sendmmsg compilation, faster but some kernel versions may have implementation problems for IPv6]))
 case "$enable_recvmmsg" in
@@ -767,6 +767,10 @@ case "$enable_checking" in
                 ;;
 esac
 
+AC_ARG_ENABLE(memclean, AC_HELP_STRING([--enable-memclean], [Cleanup memory (at exit) for eg. valgrind, memcheck]))
+if test "$enable_memclean" = "yes"; then AC_DEFINE_UNQUOTED([MEMCLEAN], [1], [Define this to cleanup memory at exit (eg. for valgrind, etc.)])
+fi
+
 AC_ARG_ENABLE(ratelimit, AC_HELP_STRING([--enable-ratelimit], [Enable rate limiting]))
 case "$enable_ratelimit" in
 	yes)
@@ -882,6 +886,16 @@ case "$enable_radix_tree" in
 	;;
 	yes|*)
 	AC_DEFINE_UNQUOTED([USE_RADIX_TREE], [], [Define this to configure to use the radix tree.])
+	;;
+esac
+
+AC_ARG_ENABLE(packed, AC_HELP_STRING([--enable-packed], [Enable packed structure alignment, uses less memory, but unaligned reads.]))
+case "$enable_packed" in
+	yes)
+	AC_DEFINE_UNQUOTED([PACKED_STRUCTS], [], [Define this to use packed structure alignment.])
+	ACX_CHECK_COMPILER_FLAG(Wno-address-of-packed-member, [CFLAGS="$CFLAGS -Wno-address-of-packed-member"])
+	;;
+	no|*)
 	;;
 esac
 
@@ -1065,6 +1079,12 @@ AH_BOTTOM([
 #endif /* !__timespec_defined */
 #endif /* !HAVE_STRUCT_TIMESPEC */
 #endif /* !CONFIG_DEFINES */
+
+#ifdef PACKED_STRUCTS
+#define ATTR_PACKED __attribute__((packed))
+#else
+#define ATTR_PACKED
+#endif
 ])
 
 # big fat warning

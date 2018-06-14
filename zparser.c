@@ -3295,7 +3295,7 @@ yyreduce:
 #line 1079 "zparser.y" /* yacc.c:1646  */
     {
 	    /* $2 is the number of octets, currently ignored */
-	    (yyval.unknown) = zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len);
+	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, (yyvsp[-1].data).str, (yyvsp[-1].data).len);
 
     }
 #line 3302 "zparser.c" /* yacc.c:1646  */
@@ -3304,7 +3304,7 @@ yyreduce:
   case 232:
 #line 1085 "zparser.y" /* yacc.c:1646  */
     {
-	    (yyval.unknown) = zparser_conv_hex(parser->region, "", 0);
+	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, "", 0);
     }
 #line 3310 "zparser.c" /* yacc.c:1646  */
     break;
@@ -3312,7 +3312,7 @@ yyreduce:
   case 233:
 #line 1089 "zparser.y" /* yacc.c:1646  */
     {
-	    (yyval.unknown) = zparser_conv_hex(parser->region, "", 0);
+	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, "", 0);
     }
 #line 3318 "zparser.c" /* yacc.c:1646  */
     break;

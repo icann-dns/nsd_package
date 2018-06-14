@@ -1,3 +1,14 @@
+nsd (4.1.22-1) unstable; urgency=medium
+
+  * New upstream version 4.1.22 (Closes: #894283, #765831)
+  * Remove generated certs for nsd-control on purge (Closes: #832345)
+  * Remove deprecated upstart configuration
+  * Update rules and compat to debhelper 11
+  * Update standards version to 4.1.4
+  * Change maintainer from deprecated alioth list (Closes: #899621)
+
+ -- Markus Schade <markus.schade@gmail.com>  Thu, 14 Jun 2018 14:15:54 +0200
+
 nsd (4.1.17-1) unstable; urgency=medium
 
   * Fix reading nsd.conf tmpfile configuration (Closes: #864711)
@@ -238,7 +249,7 @@ nsd3 (3.2.12-2) unstable; urgency=low
 nsd3 (3.2.12-1) unstable; urgency=low
 
   * Imported Upstream version 3.2.12
-   - Fix for VU#624931 CVE-2012-2978: NSD denial of service 
+   - Fix for VU#624931 CVE-2012-2978: NSD denial of service
      vulnerability from non-standard DNS packet from any host
      on the internet as discovered by Marek Vavrusa and Lubos
      Slovak from CZ.NIC Labs
