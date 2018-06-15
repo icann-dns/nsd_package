@@ -11,7 +11,9 @@ if test "$1" = "purge"; then
     dpkg-statoverride --remove $spool >/dev/null 2>/dev/null || true
 
     # remove server/control keys on purge
-    rm -f nsd_control.key nsd_control.pem nsd_server.key nsd_server.pem
+    for f in nsd_control.key nsd_control.pem nsd_server.key nsd_server.pem; do
+	rm -f "/etc/nsd/$f"
+    done
 fi
 
 exit 0
