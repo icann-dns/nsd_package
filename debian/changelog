@@ -1,11 +1,25 @@
+nsd (4.1.22-2) unstable; urgency=medium
+
+  * Remove generated certs for nsd-control on purge (Closes: #832345)
+    (Removed from previous changelog entry to reflect this)
+  * Add missing changes to previous changelog entry
+
+ -- Markus Schade <markus.schade@gmail.com>  Fri, 15 Jun 2018 08:34:28 +0200
+
 nsd (4.1.22-1) unstable; urgency=medium
 
   * New upstream version 4.1.22 (Closes: #894283, #765831)
-  * Remove generated certs for nsd-control on purge (Closes: #832345)
   * Remove deprecated upstart configuration
   * Update rules and compat to debhelper 11
   * Update standards version to 4.1.4
   * Change maintainer from deprecated alioth list (Closes: #899621)
+  * Fix global-files-wildcard-not-first-paragraph-in-dep5-copyright
+  * Extend description and remove outdate speed comparison pdf
+  * Update Vcs-Urls to salsa.debian.org
+  * Remove obsolete lintian override
+  * Fix build dependencies
+  * Remove duplicate sample config
+  * Add upstream gpg sig and update watch accordingly
 
  -- Markus Schade <markus.schade@gmail.com>  Thu, 14 Jun 2018 14:15:54 +0200
 
