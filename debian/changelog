@@ -1,3 +1,25 @@
+nsd (4.1.25-1) unstable; urgency=medium
+
+  [ Markus Schade ]
+  * New upstream version 4.1.25
+  * Rebase patches on top of 4.1.25 release
+  * Update standards version to 4.2.1
+  * Drop outdated configure flags (with-max-ips, difffile)
+  * Enable new systemd notify support
+  * Build without root
+  * wrap-and-sort -ast
+
+  [ Daniel Kahn Gillmor ]
+  * Ensure the build is clean by configuring with --enable-checking
+  * avoid importing auto-generated files into git for future releases
+  * d/copyright: update dates and upstream URL
+  * add myself to uploaders
+  * use --fail-missing only with dh_missing
+  * drop unnecessary override of dh_auto_clean
+  * simplify dh_auto_install override and dh_install-arch overrides
+
+ -- Markus Schade <markus.schade@gmail.com>  Thu, 25 Oct 2018 11:00:31 +0200
+
 nsd (4.1.22-2) unstable; urgency=medium
 
   * Remove generated certs for nsd-control on purge (Closes: #832345)

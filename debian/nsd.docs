@@ -1,3 +1,4 @@
+contrib/
 doc/CREDITS
 doc/NSD-DATABASE
 doc/NSD-DIFFFILE
@@ -7,5 +8,3 @@ doc/RELNOTES
 doc/REQUIREMENTS
 doc/TODO
 doc/UPGRADING
-
-contrib/
