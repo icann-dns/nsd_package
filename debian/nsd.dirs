@@ -1,3 +1,2 @@
-/var/lib/nsd
-/usr/share/doc/nsd/examples
 /etc/nsd/nsd.conf.d
+/var/lib/nsd

@@ -1,10 +1,10 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: NSD
-Source: http://www.nlnetlabs.nl/nsd/
+Source: https://www.nlnetlabs.nl/projects/nsd/about/
 
 Files: *
 Copyright:
-  2001-2011, NLnet Labs.  All rights reserved.
+  2001-2018, NLnet Labs.  All rights reserved.
 License: NSD-BSD-like
 
 License: BSD-2-clause
@@ -109,4 +109,3 @@ Copyright:
   2011-2012, Jeroen Schot <schot@a-eskwadraat.nl>.
   2018, Markus Schade <markus.schade@gmail.com>
 License: BSD-2-clause
-

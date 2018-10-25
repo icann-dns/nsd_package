@@ -2,28 +2,35 @@ Source: nsd
 Section: net
 Priority: optional
 Maintainer: nsd packagers <nsd@packages.debian.org>
-Uploaders: Ondřej Surý <ondrej@debian.org>,
-	   Markus Schade <markus.schade@gmail.com>
-Build-Depends: bison,
-               debhelper (>= 11),
-               flex,
-               libevent-dev,
-               libssl-dev,
-               lsb-base,
-               openssl,
-               po-debconf
-Standards-Version: 4.1.4
+Uploaders:
+ Ondřej Surý <ondrej@debian.org>,
+ Markus Schade <markus.schade@gmail.com>,
+ Daniel Kahn Gillmor <dkg@fifthhorseman.net>,
+Build-Depends:
+ bison,
+ debhelper (>= 11),
+ flex,
+ libevent-dev,
+ libssl-dev,
+ libsystemd-dev,
+ lsb-base,
+ openssl,
+ pkg-config,
+ po-debconf,
+Rules-Requires-Root: no
+Standards-Version: 4.2.1
 Vcs-Browser: https://salsa.debian.org/dns-team/nsd
 Vcs-Git: https://salsa.debian.org/dns-team/nsd.git
 Homepage: https://www.nlnetlabs.nl/nsd/
 
 Package: nsd
 Architecture: any
-Depends: adduser,
-         lsb-base,
-         openssl,
-         ${misc:Depends},
-         ${shlibs:Depends}
+Depends:
+ adduser,
+ lsb-base,
+ openssl,
+ ${misc:Depends},
+ ${shlibs:Depends},
 Description: authoritative domain name server
  The NLnet Labs Name Server Daemon (NSD) is an authoritative DNS name server.
  It has been developed for operations in environments where speed,
