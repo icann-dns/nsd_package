@@ -20,17 +20,20 @@ DESC="Name Server Daemon" # Introduce a short description here
 do_tmpfiles() {
     local type path mode user group
 
-    TMPFILE=/usr/lib/tmpfiles.d/$1.conf
-
-    if [ -r "$TMPFILE" ]; then
-	while read type path mode user group age argument; do
-            if [ "$type" = "d" ]; then
-                mkdir -p "$path"
-		chmod "$mode" "$path"
-                chown "$user:$group" "$path"
-            fi
-        done < "$TMPFILE"
+    if [ -r "/usr/lib/tmpfiles.d/$1.conf" ]; then
+        TMPFILE=/usr/lib/tmpfiles.d/$1.conf
     fi
+    if [ -r "/etc/tmpfiles.d/$1.conf" ]; then
+        TMPFILE=/etc/tmpfiles.d/$1.conf
+    fi
+
+    while read type path mode user group age argument; do
+        if [ "$type" = "d" ]; then
+            mkdir -p "$path"
+            chmod "$mode" "$path"
+            chown "$user:$group" "$path"
+        fi
+    done < "$TMPFILE"
 }
 
 do_start_prepare() {

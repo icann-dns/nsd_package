@@ -1,3 +1,12 @@
+nsd (4.1.25-2) unstable; urgency=medium
+
+  * Build without systemd-notify on non-linux arch
+  * Emulate systemd tmpfiles.d handling in init script
+    Thanks to Harald Jenny (Closes: #906439)
+  * Update changelog for CVE-2016-6173 fixed in 4.1.11
+
+ -- Markus Schade <markus.schade@gmail.com>  Fri, 26 Oct 2018 11:40:44 +0200
+
 nsd (4.1.25-1) unstable; urgency=medium
 
   [ Markus Schade ]
@@ -76,6 +85,7 @@ nsd (4.1.13-1) unstable; urgency=medium
 nsd (4.1.11-1) unstable; urgency=medium
 
   * Imported Upstream version 4.1.11
+  * Implements zone_size_limit_xfr (CVE-2016-6173)
 
  -- Ondřej Surý <ondrej@debian.org>  Wed, 24 Aug 2016 16:35:40 +0200
 
