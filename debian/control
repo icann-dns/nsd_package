@@ -12,7 +12,7 @@ Build-Depends:
  flex,
  libevent-dev,
  libssl-dev,
- libsystemd-dev,
+ libsystemd-dev [linux-any],
  lsb-base,
  openssl,
  pkg-config,
