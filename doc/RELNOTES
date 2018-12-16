@@ -1,5 +1,26 @@
 NSD RELEASE NOTES
 
+4.1.26
+================
+FEATURES:
+	- DNSTAP support for NSD, --enable-dnstap and then config in nsd.conf.
+	- Support SO_REUSEPORT_LB in FreeBSD 12 with the reuseport: yes
+	  option in nsd.conf.
+	- Added nsd-control changezone.  nsd-control changezone name pattern
+	  allows the change of a zone pattern option without downtime for
+	  the zone, in one operation.
+BUG FIXES:
+	- Fix #4194: Zone file parser derailed by non-FQDN names in RHS of
+	  DNSSEC RRs.
+	- Fix #4202: nsd-control delzone incorrect exit code on error.
+	- Tab style fix to use tab for 8 spaces, from Xiaobo Liu.
+	- Fix #4205: enable-recvmmsg in mixed IPv4/IPv6 environment fails.
+	  This sets the msg_hdr.msg_namelen correctly after receipt.
+	- Fix to not set GLOB_NOSORT so the nsd.conf include: files are
+	  sorted and in a predictable order.
+	- Fix #3433: document that reconfig does not change per-zone stats.
+
+
 4.1.25
 ================
 FEATURES:

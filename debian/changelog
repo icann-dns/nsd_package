@@ -1,3 +1,16 @@
+nsd (4.1.26-1) unstable; urgency=medium
+
+  * New upstream version 4.1.26
+  * Enable dnstap support
+  * Switch systemd service from simple to notify (Closes: #803614)
+  * Add systemd protection directives (Closes: #913918)
+    Thanks to Simon Deziel for improvements
+  * Explicitly set PIDFILE for chrooted run (Closes: #906438)
+  * Drop MAXHOSTNAMELEN patch for hurd (was fixed in 3.2.14 by upstream)
+  * d/upstream/signing-key.asc: minimize OpenPGP certificate
+
+ -- Markus Schade <markus.schade@gmail.com>  Sun, 16 Dec 2018 16:19:27 +0100
+
 nsd (4.1.25-2) unstable; urgency=medium
 
   * Build without systemd-notify on non-linux arch

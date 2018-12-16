@@ -1,0 +1,3 @@
+dnstap/dnstap.pb-c.c
+dnstap/dnstap.pb-c.h
+dnstap/dnstap_config.h
