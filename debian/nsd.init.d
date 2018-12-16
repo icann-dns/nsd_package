@@ -16,6 +16,7 @@ fi
 NAME=nsd                  # Introduce the short server's name here
 DAEMON=/usr/sbin/$NAME    # Introduce the server's location here
 DESC="Name Server Daemon" # Introduce a short description here
+PIDFILE=$(nsd-checkconf -o pidfile /etc/nsd/nsd.conf)
 
 do_tmpfiles() {
     local type path mode user group
