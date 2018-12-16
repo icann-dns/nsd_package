@@ -161,8 +161,6 @@ these in the default run directory, or with \-d in another directory.
 If you change the access control permissions on the key files you can decide
 who can use nsd\-control, by default owner and group but not all users.
 The script preserves private keys present in the directory.
-After running the script as root, turn on \fBcontrol\-enable\fR in 
-\fInsd.conf\fR.
 .SH "STATISTIC COUNTERS"
 The \fIstats\fR command shows a number of statistic counters.
 .TP
