@@ -1,3 +1,9 @@
+nsd (4.1.26-1build1) focal; urgency=medium
+
+  * No-change rebuild for libevent soname changes.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 19 Oct 2019 19:57:15 +0000
+
 nsd (4.1.26-1) unstable; urgency=medium
 
   * New upstream version 4.1.26
