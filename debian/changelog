@@ -1,3 +1,14 @@
+nsd (4.2.4-1) unstable; urgency=medium
+
+  * New upstream version 4.2.4
+    Closes: #935418 (new upstream version)
+    Closes: #931476, CVE-2019-13207 (Overflow in dname_concatenate() function)
+  * Update standards version to 4.4.1
+  * Update to debhelper 12
+  * Enable per zone stats (feature present since 4.1.4)
+
+ -- Markus Schade <markus.schade@gmail.com>  Thu, 19 Dec 2019 11:28:57 +0100
+
 nsd (4.1.26-1) unstable; urgency=medium
 
   * New upstream version 4.1.26

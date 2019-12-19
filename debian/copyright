@@ -1,5 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: NSD
+Upstream-Contact: nsd-users@NLnetLabs.nl
 Source: https://www.nlnetlabs.nl/projects/nsd/about/
 
 Files: *
