@@ -9,7 +9,7 @@ Subject: Enable control by default
  3 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/nsd-control-setup.sh.in b/nsd-control-setup.sh.in
-index b39c11c..a126ae2 100755
+index 705caef..f9e4fa4 100755
 --- a/nsd-control-setup.sh.in
 +++ b/nsd-control-setup.sh.in
 @@ -155,6 +155,6 @@ chmod o-rw $SVR_BASE.pem $SVR_BASE.key $CTL_BASE.pem $CTL_BASE.key
@@ -21,10 +21,10 @@ index b39c11c..a126ae2 100755
  
  exit 0
 diff --git a/nsd-control.8.in b/nsd-control.8.in
-index f126e5c..4be4152 100644
+index fa10a50..e8ee2df 100644
 --- a/nsd-control.8.in
 +++ b/nsd-control.8.in
-@@ -154,8 +154,6 @@ these in the default run directory, or with \-d in another directory.
+@@ -186,8 +186,6 @@ these in the default run directory, or with \-d in another directory.
  If you change the access control permissions on the key files you can decide
  who can use nsd\-control, by default owner and group but not all users.
  The script preserves private keys present in the directory.
@@ -34,13 +34,13 @@ index f126e5c..4be4152 100644
  The \fIstats\fR command shows a number of statistic counters.
  .TP
 diff --git a/options.c b/options.c
-index 94a34ae..0601d44 100644
+index 534203f..ffb5886 100644
 --- a/options.c
 +++ b/options.c
-@@ -103,7 +103,7 @@ nsd_options_create(region_type* region)
- 		opt->zonefiles_write = ZONEFILES_WRITE_INTERVAL;
- 	else	opt->zonefiles_write = 0;
- 	opt->xfrd_reload_timeout = 1;
+@@ -118,7 +118,7 @@ nsd_options_create(region_type* region)
+ 	opt->tls_service_ocsp = NULL;
+ 	opt->tls_service_pem = NULL;
+ 	opt->tls_port = TLS_PORT;
 -	opt->control_enable = 0;
 +	opt->control_enable = 1;
  	opt->control_interface = NULL;

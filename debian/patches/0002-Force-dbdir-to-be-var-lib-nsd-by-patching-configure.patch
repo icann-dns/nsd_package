@@ -10,10 +10,10 @@ Signed-off-by: Pierre Habouzit <madcoder@debian.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 6da5f1f..89046bf 100644
+index d613720..a4fff20 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -64,7 +64,7 @@ AC_SUBST(logfile)
+@@ -65,7 +65,7 @@ AC_SUBST(logfile)
  #
  # Database directory
  #

@@ -28,6 +28,7 @@ override_dh_auto_configure:
 	       --enable-root-server			\
 	       --enable-mmap				\
 	       --enable-ratelimit			\
+	       --enable-zone-stats			\
 	       $(WITH_SYSTEMD)				\
 	       --enable-checking			\
 	       --enable-dnstap				\
