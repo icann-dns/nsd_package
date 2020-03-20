@@ -5,7 +5,7 @@ dnl
 sinclude(acx_nlnetlabs.m4)
 sinclude(dnstap/dnstap.m4)
 
-AC_INIT(NSD,4.2.4,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,4.3.0,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 CFLAGS="$CFLAGS"
@@ -439,7 +439,7 @@ fi
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([time.h arpa/inet.h signal.h string.h strings.h fcntl.h limits.h netinet/in.h netinet/tcp.h stddef.h sys/param.h sys/socket.h sys/un.h syslog.h unistd.h sys/select.h stdarg.h stdint.h netdb.h sys/bitypes.h tcpd.h glob.h grp.h endian.h])
+AC_CHECK_HEADERS([time.h arpa/inet.h signal.h string.h strings.h fcntl.h limits.h netinet/in.h netinet/tcp.h stddef.h sys/param.h sys/socket.h sys/un.h syslog.h unistd.h sys/select.h stdarg.h stdint.h netdb.h sys/bitypes.h tcpd.h glob.h grp.h endian.h sys/random.h])
 
 AC_DEFUN([CHECK_VALIST_DEF],
 [
@@ -626,7 +626,7 @@ AC_FUNC_FSEEKO
 AC_SYS_LARGEFILE
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(off_t)
-AC_CHECK_FUNCS([arc4random arc4random_uniform])
+AC_CHECK_FUNCS([getrandom arc4random arc4random_uniform])
 AC_SEARCH_LIBS([setusercontext],[util],[AC_CHECK_HEADERS([login_cap.h])])
 AC_CHECK_FUNCS([tzset alarm chroot dup2 endpwent gethostname memset memcpy pwrite socket strcasecmp strchr strdup strerror strncasecmp strtol writev getaddrinfo getnameinfo freeaddrinfo gai_strerror sigaction sigprocmask strptime strftime localtime_r setusercontext glob initgroups setresuid setreuid setresgid setregid getpwnam mmap ppoll clock_gettime accept4])
 
@@ -681,6 +681,30 @@ if echo $target_os | grep darwin8 > /dev/null; then
 	AC_DEFINE(DARWIN_BROKEN_SETREUID, 1, [Define this if on macOSX10.4-darwin8 and setreuid and setregid do not work])
 fi
 
+AC_CHECK_HEADERS([sched.h sys/cpuset.h])
+
+# Check for cpu_set_t (Linux) and cpuset_t (FreeBSD and NetBSD)
+AC_CHECK_TYPES([cpu_set_t, cpuset_t, cpuid_t],,,[
+AC_INCLUDES_DEFAULT
+#if HAVE_SCHED_H
+# include <sched.h>
+#endif
+#if HAVE_SYS_CPUSET_H
+# include <sys/cpuset.h>
+#endif
+])
+
+AS_IF([test x"$ac_cv_type_cpuset_t" = xyes -o x"$ac_cv_type_cpu_set_t" = xyes ],[
+	AC_CHECK_FUNC(cpuset_create)
+	AC_CHECK_FUNC(cpuset_destroy)
+	AC_CHECK_FUNC(cpuset_zero)
+	AC_CHECK_FUNC(cpuset_set)
+	AC_CHECK_FUNC(cpuset_clr)
+	AC_CHECK_FUNC(cpuset_isset)
+	AC_CHECK_FUNC(cpuset_size)
+	AC_LIBOBJ(cpuset)
+])
+
 #
 # Checking for missing functions we can replace
 #
@@ -696,6 +720,7 @@ AC_REPLACE_FUNCS(b64_pton)
 AC_REPLACE_FUNCS(b64_ntop)
 AC_REPLACE_FUNCS(pselect)
 AC_REPLACE_FUNCS(memmove)
+AC_REPLACE_FUNCS(setproctitle)
 AC_MSG_CHECKING([for reallocarray])
 AC_LINK_IFELSE([AC_LANG_SOURCE(AC_INCLUDES_DEFAULT
 [[
@@ -1171,6 +1196,16 @@ char *strptime(const char *s, const char *format, struct tm *tm);
 #define STRPTIME_WORKS 1
 char *nsd_strptime(const char *s, const char *format, struct tm *tm); 
 #define strptime(a,b,c) nsd_strptime((a),(b),(c))
+#endif
+#if (HAVE_CPU_SET_T || HAVE_CPUSET_T)
+#include "compat/cpuset.h"
+#endif
+#ifndef HAVE_SETPROCTITLE
+#ifdef __linux__
+#define HAVE_SETPROCTITLE 1
+#include <stdarg.h>
+void setproctitle(char *fmt, ...);
+#endif
 #endif
 ])
 AH_BOTTOM(
