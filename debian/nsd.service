@@ -23,7 +23,7 @@ ReadWritePaths=/var/lib/nsd /etc/nsd /run
 RuntimeDirectory=nsd
 RestrictRealtime=true
 SystemCallArchitectures=native
-SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module mount @obsolete @resources
+SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @resources
 
 [Install]
 WantedBy=multi-user.target

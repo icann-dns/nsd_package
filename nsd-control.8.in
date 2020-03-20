@@ -1,4 +1,4 @@
-.TH "nsd\-control" "8" "Dec 10, 2019" "NLnet Labs" "nsd 4.2.4"
+.TH "nsd\-control" "8" "Mar 17, 2020" "NLnet Labs" "nsd 4.3.0"
 .\" Copyright (c) 2011, NLnet Labs. All rights reserved.
 .\" See LICENSE for the license.
 .SH "NAME"
