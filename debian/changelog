@@ -1,3 +1,15 @@
+nsd (4.3.1-1) unstable; urgency=medium
+
+  * New upstream version 4.3.1
+  * Update URLs in upstream metadata
+  * Add upstream patch to fix return code in nsd-control-setup
+  * Drop previously included FTBFS patch for missing headers
+  * Refresh enable control by default patch
+  * Add new FTBFS patch to remove test target depending on excluded files in
+    upstream tarball
+
+ -- Markus Schade <markus.schade@gmail.com>  Sun, 19 Apr 2020 15:44:00 +0200
+
 nsd (4.3.0-1) unstable; urgency=medium
 
   * New upstream version 4.3.0

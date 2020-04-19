@@ -1,0 +1,29 @@
+From 79c2dbc2d8265f511033d1113425849b024806f4 Mon Sep 17 00:00:00 2001
+From: Jeroen Koekkoek <jeroen@nlnetlabs.nl>
+Date: Wed, 15 Apr 2020 17:23:49 +0200
+Subject: [PATCH] Fix help return code in nsd-control-setup script
+
+---
+ nsd-control-setup.sh.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/nsd-control-setup.sh.in
++++ b/nsd-control-setup.sh.in
+@@ -99,7 +99,7 @@
+ while getopts 'd:hr' arg; do
+     case "$arg" in
+       d) DESTDIR="$OPTARG" ;;
+-      h) usage; exit 0 ;;
++      h) usage; exit 1 ;;
+       r) RECREATE=1 ;;
+       ?) fatal "'$arg' unknown option" ;;
+     esac
+@@ -110,7 +110,7 @@
+ echo "setup in directory $DESTDIR"
+ cd "$DESTDIR"
+ 
+-trap cleanup SIGINT
++trap cleanup INT
+ 
+ # ===
+ # Generate server certificate

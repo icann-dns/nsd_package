@@ -1,4 +1,5 @@
 ---
 Name: NSD
-Repository: https://www.nlnetlabs.nl/svn/nsd/
-Repository-Browse: https://www.nlnetlabs.nl/svn/nsd/
+Repository: https://github.com/NLnetLabs/nsd
+Repository-Browse: https://github.com/NLnetLabs/nsd
+Bug-Database: https://github.com/NLnetLabs/nsd/issues
