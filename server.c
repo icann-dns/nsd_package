@@ -673,7 +673,7 @@ set_cloexec(struct nsd_socket *sock)
 {
 	assert(sock != NULL);
 
-	if(fcntl(sock->s, F_SETFD, O_CLOEXEC) == -1) {
+	if(fcntl(sock->s, F_SETFD, FD_CLOEXEC) == -1) {
 		const char *socktype =
 			sock->addr.ai_family == SOCK_DGRAM ? "udp" : "tcp";
 		log_msg(LOG_ERR, "fcntl(..., O_CLOEXEC) failed for %s: %s",
@@ -1104,7 +1104,7 @@ set_setfib(struct nsd_socket *sock)
 {
 #if defined(SO_SETFIB)
 	if(setsockopt(sock->s, SOL_SOCKET, SO_SETFIB,
-	              (const void *)(uintptr_t)sock->fib, sizeof(sock->fib)) == -1)
+	              (const void *)&sock->fib, sizeof(sock->fib)) == -1)
 	{
 		log_msg(LOG_ERR, "setsockopt(..., %s, %d, ...) failed: %s",
 		                 "SO_SETFIB", sock->fib, strerror(errno));
