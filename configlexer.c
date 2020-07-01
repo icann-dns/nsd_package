@@ -183,7 +183,7 @@ extern FILE *yyin, *yyout;
 	do \
 		{ \
 		/* Undo effects of setting up yytext. */ \
-        int yyless_macro_arg = (n); \
+        yy_size_t yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
 		*yy_cp = (yy_hold_char); \
 		YY_RESTORE_YY_MORE_OFFSET \
@@ -1225,7 +1225,9 @@ char *yytext;
  *
  */
 /* because flex keeps having sign-unsigned compare problems that are unfixed*/
+#if defined(__clang__)||(defined(__GNUC__)&&((__GNUC__ >4)||(defined(__GNUC_MINOR__)&&(__GNUC__ ==4)&&(__GNUC_MINOR__ >=2))))
 #pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 
 #include "config.h"
 
@@ -1285,15 +1287,6 @@ static void config_start_include(const char* filename)
 		c_error_msg("include %s: malloc failure", filename);
 		return;
 	}
-	if (cfg_parser->chroot) {
-		int l = strlen(cfg_parser->chroot); /* chroot has trailing slash */
-		if (strncmp(cfg_parser->chroot, filename, l) != 0) {
-			c_error_msg("include file '%s' is not relative to chroot '%s'",
-				filename, cfg_parser->chroot);
-			return;
-		}
-		filename += l - 1; /* strip chroot without trailing slash */
-	}
 	nm = strdup(filename);
 	if(!nm) {
 		c_error_msg("include %s: strdup failure", filename);
@@ -1322,12 +1315,23 @@ static void config_start_include(const char* filename)
 
 static void config_start_include_glob(const char* filename)
 {
-	 /* check for wildcards */
+	/* check for wildcards */
 #ifdef HAVE_GLOB
-	 glob_t g;
-	 size_t i;
-	 int r, flags;
-	 if(!(!strchr(filename, '*') && !strchr(filename, '?') &&
+	glob_t g;
+	size_t i;
+	int r, flags;
+#endif /* HAVE_GLOB */
+	if (cfg_parser->chroot) {
+		int l = strlen(cfg_parser->chroot); /* chroot has trailing slash */
+		if (strncmp(cfg_parser->chroot, filename, l) != 0) {
+			c_error_msg("include file '%s' is not relative to chroot '%s'",
+				filename, cfg_parser->chroot);
+			return;
+		}
+		filename += l - 1; /* strip chroot without trailing slash */
+	}
+#ifdef HAVE_GLOB
+	if(!(!strchr(filename, '*') && !strchr(filename, '?') &&
 		 !strchr(filename, '[') && !strchr(filename, '{') &&
 		 !strchr(filename, '~'))) {
 		 flags = 0
@@ -1360,9 +1364,9 @@ static void config_start_include_glob(const char* filename)
 		}
 		globfree(&g);
 		return;
-	 }
+	}
 #endif /* HAVE_GLOB */
-	 config_start_include(filename);
+	config_start_include(filename);
 }
 
 static void config_end_include(void)
@@ -1389,7 +1393,7 @@ static void config_end_include(void)
 #endif
 
 #define YY_NO_INPUT 1
-#line 178 "configlexer.lex"
+#line 182 "configlexer.lex"
 #ifndef YY_NO_UNPUT
 #define YY_NO_UNPUT 1
 #endif
@@ -1397,7 +1401,7 @@ static void config_end_include(void)
 #define YY_NO_INPUT 1
 #endif
 
-#line 1400 "<stdout>"
+#line 1404 "<stdout>"
 
 #define INITIAL 0
 #define quotedstring 1
@@ -1616,9 +1620,9 @@ YY_DECL
 		}
 
 	{
-#line 196 "configlexer.lex"
+#line 200 "configlexer.lex"
 
-#line 1621 "<stdout>"
+#line 1625 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1683,428 +1687,428 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 197 "configlexer.lex"
+#line 201 "configlexer.lex"
 { LEXOUT(("SP ")); /* ignore */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 198 "configlexer.lex"
+#line 202 "configlexer.lex"
 { LEXOUT(("comment(%s) ", yytext)); /* ignore */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 199 "configlexer.lex"
+#line 203 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SERVER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 200 "configlexer.lex"
+#line 204 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_NAME;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 201 "configlexer.lex"
+#line 205 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP_ADDRESS;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 202 "configlexer.lex"
+#line 206 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP_ADDRESS;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 203 "configlexer.lex"
+#line 207 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP_TRANSPARENT;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 204 "configlexer.lex"
+#line 208 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP_FREEBIND;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 205 "configlexer.lex"
+#line 209 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_DEBUG_MODE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 206 "configlexer.lex"
+#line 210 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_HIDE_VERSION;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 207 "configlexer.lex"
+#line 211 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP4_ONLY;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 208 "configlexer.lex"
+#line 212 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IP6_ONLY;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 209 "configlexer.lex"
+#line 213 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_DO_IP4;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 210 "configlexer.lex"
+#line 214 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_DO_IP6;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 211 "configlexer.lex"
+#line 215 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_DATABASE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 212 "configlexer.lex"
+#line 216 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IDENTITY;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 213 "configlexer.lex"
+#line 217 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_VERSION;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 214 "configlexer.lex"
+#line 218 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_NSID;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 215 "configlexer.lex"
+#line 219 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_LOGFILE;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 216 "configlexer.lex"
+#line 220 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SERVER_COUNT;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 217 "configlexer.lex"
+#line 221 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_TCP_COUNT;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 218 "configlexer.lex"
+#line 222 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_TCP_QUERY_COUNT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 219 "configlexer.lex"
+#line 223 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_TCP_TIMEOUT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 220 "configlexer.lex"
+#line 224 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_TCP_MSS;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 221 "configlexer.lex"
+#line 225 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_OUTGOING_TCP_MSS;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 222 "configlexer.lex"
+#line 226 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IPV4_EDNS_SIZE;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 223 "configlexer.lex"
+#line 227 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_IPV6_EDNS_SIZE;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 224 "configlexer.lex"
+#line 228 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_PIDFILE;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 225 "configlexer.lex"
+#line 229 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_PORT;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 226 "configlexer.lex"
+#line 230 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_REUSEPORT;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 227 "configlexer.lex"
+#line 231 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_STATISTICS;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 228 "configlexer.lex"
+#line 232 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CHROOT;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 229 "configlexer.lex"
+#line 233 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_USERNAME;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 230 "configlexer.lex"
+#line 234 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONESDIR;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 231 "configlexer.lex"
+#line 235 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONELISTFILE;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 232 "configlexer.lex"
+#line 236 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_DIFFFILE;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 233 "configlexer.lex"
+#line 237 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_XFRDFILE;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 234 "configlexer.lex"
+#line 238 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_XFRDIR;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 235 "configlexer.lex"
+#line 239 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_XFRD_RELOAD_TIMEOUT;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 236 "configlexer.lex"
+#line 240 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_VERBOSITY;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 237 "configlexer.lex"
+#line 241 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONE;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 238 "configlexer.lex"
+#line 242 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONEFILE;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 239 "configlexer.lex"
+#line 243 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONESTATS;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 240 "configlexer.lex"
+#line 244 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ALLOW_NOTIFY;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 241 "configlexer.lex"
+#line 245 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SIZE_LIMIT_XFR;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 242 "configlexer.lex"
+#line 246 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_REQUEST_XFR;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 243 "configlexer.lex"
+#line 247 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_NOTIFY;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 244 "configlexer.lex"
+#line 248 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_NOTIFY_RETRY;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 245 "configlexer.lex"
+#line 249 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_PROVIDE_XFR;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 246 "configlexer.lex"
+#line 250 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_OUTGOING_INTERFACE;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 247 "configlexer.lex"
+#line 251 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ALLOW_AXFR_FALLBACK;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 248 "configlexer.lex"
+#line 252 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_KEY;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 249 "configlexer.lex"
+#line 253 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ALGORITHM;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 250 "configlexer.lex"
+#line 254 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SECRET;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 251 "configlexer.lex"
+#line 255 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_PATTERN;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 252 "configlexer.lex"
+#line 256 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_INCLUDEPATTERN;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 253 "configlexer.lex"
+#line 257 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_REMOTE_CONTROL;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 254 "configlexer.lex"
+#line 258 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CONTROL_ENABLE;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 255 "configlexer.lex"
+#line 259 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CONTROL_INTERFACE;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 256 "configlexer.lex"
+#line 260 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CONTROL_PORT;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 257 "configlexer.lex"
+#line 261 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SERVER_KEY_FILE;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 258 "configlexer.lex"
+#line 262 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_SERVER_CERT_FILE;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 259 "configlexer.lex"
+#line 263 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CONTROL_KEY_FILE;}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 260 "configlexer.lex"
+#line 264 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_CONTROL_CERT_FILE;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 261 "configlexer.lex"
+#line 265 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_AXFR;}
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 262 "configlexer.lex"
+#line 266 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_UDP;}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 263 "configlexer.lex"
+#line 267 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_SIZE;}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 264 "configlexer.lex"
+#line 268 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_RATELIMIT;}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 265 "configlexer.lex"
+#line 269 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_SLIP;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 266 "configlexer.lex"
+#line 270 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_IPV4_PREFIX_LENGTH;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 267 "configlexer.lex"
+#line 271 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_IPV6_PREFIX_LENGTH;}
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 268 "configlexer.lex"
+#line 272 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_WHITELIST_RATELIMIT;}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 269 "configlexer.lex"
+#line 273 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_RRL_WHITELIST;}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 270 "configlexer.lex"
+#line 274 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONEFILES_CHECK;}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 271 "configlexer.lex"
+#line 275 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ZONEFILES_WRITE;}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 272 "configlexer.lex"
+#line 276 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_LOG_TIME_ASCII;}
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 273 "configlexer.lex"
+#line 277 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_ROUND_ROBIN;}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 274 "configlexer.lex"
+#line 278 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_MAX_REFRESH_TIME;}
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 275 "configlexer.lex"
+#line 279 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_MIN_REFRESH_TIME;}
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 276 "configlexer.lex"
+#line 280 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_MAX_RETRY_TIME;}
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 277 "configlexer.lex"
+#line 281 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_MIN_RETRY_TIME;}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 278 "configlexer.lex"
+#line 282 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); return VAR_MULTI_MASTER_CHECK;}
 	YY_BREAK
 case 83:
 /* rule 83 can match eol */
 YY_RULE_SETUP
-#line 279 "configlexer.lex"
+#line 283 "configlexer.lex"
 { LEXOUT(("NL\n")); cfg_parser->line++;}
 	YY_BREAK
 /* Quoted strings. Strip leading and ending quotes */
 case 84:
 YY_RULE_SETUP
-#line 282 "configlexer.lex"
+#line 286 "configlexer.lex"
 { BEGIN(quotedstring); LEXOUT(("QS ")); }
 	YY_BREAK
 case YY_STATE_EOF(quotedstring):
-#line 283 "configlexer.lex"
+#line 287 "configlexer.lex"
 {
         yyerror("EOF inside quoted string");
         BEGIN(INITIAL);
@@ -2112,18 +2116,18 @@ case YY_STATE_EOF(quotedstring):
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 287 "configlexer.lex"
+#line 291 "configlexer.lex"
 { LEXOUT(("STR(%s) ", yytext)); yymore(); }
 	YY_BREAK
 case 86:
 /* rule 86 can match eol */
 YY_RULE_SETUP
-#line 288 "configlexer.lex"
+#line 292 "configlexer.lex"
 { cfg_parser->line++; yymore(); }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 289 "configlexer.lex"
+#line 293 "configlexer.lex"
 {
         LEXOUT(("QE "));
         BEGIN(INITIAL);
@@ -2135,11 +2139,11 @@ YY_RULE_SETUP
 /* include: directive */
 case 88:
 YY_RULE_SETUP
-#line 298 "configlexer.lex"
+#line 302 "configlexer.lex"
 { LEXOUT(("v(%s) ", yytext)); BEGIN(include); }
 	YY_BREAK
 case YY_STATE_EOF(include):
-#line 299 "configlexer.lex"
+#line 303 "configlexer.lex"
 {
         yyerror("EOF inside include directive");
         BEGIN(INITIAL);
@@ -2147,23 +2151,23 @@ case YY_STATE_EOF(include):
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 303 "configlexer.lex"
+#line 307 "configlexer.lex"
 { LEXOUT(("ISP ")); /* ignore */ }
 	YY_BREAK
 case 90:
 /* rule 90 can match eol */
 YY_RULE_SETUP
-#line 304 "configlexer.lex"
+#line 308 "configlexer.lex"
 { LEXOUT(("NL\n")); cfg_parser->line++;}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 305 "configlexer.lex"
+#line 309 "configlexer.lex"
 { LEXOUT(("IQS ")); BEGIN(include_quoted); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 306 "configlexer.lex"
+#line 310 "configlexer.lex"
 {
 	LEXOUT(("Iunquotedstr(%s) ", yytext));
 	config_start_include_glob(yytext);
@@ -2171,7 +2175,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(include_quoted):
-#line 311 "configlexer.lex"
+#line 315 "configlexer.lex"
 {
         yyerror("EOF inside quoted string");
         BEGIN(INITIAL);
@@ -2179,18 +2183,18 @@ case YY_STATE_EOF(include_quoted):
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 315 "configlexer.lex"
+#line 319 "configlexer.lex"
 { LEXOUT(("ISTR(%s) ", yytext)); yymore(); }
 	YY_BREAK
 case 94:
 /* rule 94 can match eol */
 YY_RULE_SETUP
-#line 316 "configlexer.lex"
+#line 320 "configlexer.lex"
 { cfg_parser->line++; yymore(); }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 317 "configlexer.lex"
+#line 321 "configlexer.lex"
 {
 	LEXOUT(("IQE "));
 	yytext[yyleng - 1] = '\0';
@@ -2199,7 +2203,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 323 "configlexer.lex"
+#line 327 "configlexer.lex"
 {
 	yy_set_bol(1); /* Set beginning of line, so "^" rules match.  */
 	if (!config_include_stack) {
@@ -2212,16 +2216,16 @@ case YY_STATE_EOF(INITIAL):
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 333 "configlexer.lex"
+#line 337 "configlexer.lex"
 { LEXOUT(("unquotedstr(%s) ", yytext)); 
 			yylval.str = region_strdup(cfg_parser->opt->region, yytext); return STRING; }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 336 "configlexer.lex"
+#line 340 "configlexer.lex"
 ECHO;
 	YY_BREAK
-#line 2224 "<stdout>"
+#line 2228 "<stdout>"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2857,7 +2861,7 @@ static void yyensure_buffer_stack (void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1; // After all that talk, this was set to 1 anyways...
+      num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
@@ -2993,7 +2997,7 @@ static void yy_fatal_error (yyconst char* msg )
 	do \
 		{ \
 		/* Undo effects of setting up yytext. */ \
-        int yyless_macro_arg = (n); \
+        yy_size_t yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
 		yytext[yyleng] = (yy_hold_char); \
 		(yy_c_buf_p) = yytext + yyless_macro_arg; \
@@ -3183,7 +3187,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 336 "configlexer.lex"
+#line 340 "configlexer.lex"
 
 
 

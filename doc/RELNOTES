@@ -1,5 +1,22 @@
 NSD RELEASE NOTES
 
+4.1.14
+================
+FEATURES:
+	- Fix #1132 for SERVFAIL zones perform backoff, and remembers the
+	  timeout on next startup.
+BUG FIXES:
+	- Fix null memcpy for radixtree with single link element.
+	- Robust fix against missing master in tcp_open for xfrd.
+	- Fix wildcards in include: config statements with chroot enabled.
+	- suppress compile warning in lex files.
+	- Fix to try every master once, then wait for timeout or notify.
+	- Save backoff timeout into xfrd.state file, this file has a higher
+	  version number now.  Old files are skipped silently (causes
+	  refresh) and created as new files upon exit.
+	- Fix restart of zone transfers when new config becomes available.
+
+
 4.1.13
 ================
 FEATURES:
