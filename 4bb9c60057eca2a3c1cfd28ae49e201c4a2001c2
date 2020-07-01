@@ -1,0 +1,8 @@
+  * New upstream release.
+  * Pass pidfile to nsd to allow chrooting.
+  * Prepare config files to allow easier chrooting.
+  * Move uid of nsd setuid user to nsd_user and add it to flags automatically.
+  * New upstream release.
+  * Chown database file to nsd_user before reload and start.
+  * New upstream release.
+  * Recompile with openssl 0.9.8
