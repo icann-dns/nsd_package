@@ -1,0 +1,4 @@
+  * New upstream version 4.3.0
+  * Update standards version to 4.5.0
+  * Correct typo (mount/@mount) in nsd.service SystemCallFilter list
+  * Add upstream patch to include missing headers file to fix FTBFS
