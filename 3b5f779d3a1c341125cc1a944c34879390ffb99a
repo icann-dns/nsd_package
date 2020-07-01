@@ -1,0 +1,2 @@
+  * Non-maintainer upload by the Security Team.
+  * Fix off-by-one error allowing a DoS (VU#710316, closes: #529420).
