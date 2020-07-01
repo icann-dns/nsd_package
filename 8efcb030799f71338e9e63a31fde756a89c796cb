@@ -1,0 +1,6 @@
+  * New upstream version 4.1.22 (Closes: #894283, #765831)
+  * Remove generated certs for nsd-control on purge (Closes: #832345)
+  * Remove deprecated upstart configuration
+  * Update rules and compat to debhelper 11
+  * Update standards version to 4.1.4
+  * Change maintainer from deprecated alioth list (Closes: #899621)
