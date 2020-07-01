@@ -19,7 +19,7 @@
 
 1.0 Introduction
 
-This is NSD Name Server Daemon (NSD) version 4.1.6.
+This is NSD Name Server Daemon (NSD) version 4.1.7.
 
 The NLnet Labs Name Server Daemon (NSD) is an authoritative RFC compliant 
 DNS nameserver. It was first conceived to allow for more genetic 
@@ -55,7 +55,7 @@ and uses a simple configuration file 'nsd.conf'.
 
 1.2 Quick build and install
 
-Step 1: Unpack the source with gtar -xzvf nsd-4.1.6.tar.gz
+Step 1: Unpack the source with gtar -xzvf nsd-4.1.7.tar.gz
 
 Step 2: Create user nsd or any other unprivileged user of your
         choice. In case of later make sure to use
@@ -109,9 +109,9 @@ Step 11: If desired add 'nsd-control write' to your superuser crontab to
 Use your favorite combination of tar and gnu zip to unpack the source,
 for example
 
-$ gtar -xzvf nsd-4.1.6.tar.gz
+$ gtar -xzvf nsd-4.1.7.tar.gz
 
-will unpack the source into the ./nsd-4.1.6 directory...
+will unpack the source into the ./nsd-4.1.7 directory...
 
 
 2.2 Configuring NSD
@@ -242,7 +242,7 @@ addition to standard configure options, one may use the following:
   	Disable minimal responses. If disabled, responses are more likely
 	to get truncated, resulting in TCP fallback.  When enabled (by default)
 	NSD will leave out RRsets to make responses fit inside one datagram,
-	but for shorter reponses the full normal response is carried.
+	but for shorter responses the full normal response is carried.
 
   --disable-largefile
 
@@ -756,4 +756,4 @@ larger and regular donations please contact us at users@NLnetLabs.nl. Also
 see http://www.nlnetlabs.nl/labs/contributors/.
 
 
-$Id: README 4482 2015-07-10 14:45:17Z wouter $
+$Id: README 4553 2015-11-18 08:50:05Z wouter $

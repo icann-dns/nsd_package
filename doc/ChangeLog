@@ -1,3 +1,65 @@
+3 December 2015: Wouter
+	- tag for 4.1.7rc1 prerelease.
+
+2 December 2015: Wouter
+	- configure --enable-ratelimit-default-is-off with --enable-ratelimit
+	  to set the default ratelimit to disabled but available in nsd.conf.
+	- Document that ratelimit qps and slip are updated in reconfig.
+	- version: "string" option to set chaos version query reply string.
+	- Fix up defaults in manpage.
+
+1 December 2015: Wouter
+	- Explain rrl-slip better in documentation.
+
+30 November 2015: Wouter
+	- Fix TCP responses when REUSEPORT is in use by turning it off.
+	- reuseport: no is the default, because the feature is not troublefree.
+	- Document default in manpage for rrl-slip, ip4 and 6 prefixlength.
+
+24 November 2015: Wouter
+	- Fix zonec ttl mismatch printout to include more information.
+
+18 November 2015: Wouter
+	- RELNOTES more descriptive.
+	- newer acx_nlnetlabs.m4.
+	- spelling fixes from Igor Sobrado Delgado.
+
+17 November 2015: Wouter
+	- Fix #721: Fix wrong error code (FORMERR) returned for unknown
+	  opcode.  NOTIMP expected.
+
+16 November 2015: Wouter
+	- Allocate less memory for TSIG digest.
+
+6 November 2015: Wouter
+	- Fixup for newer acx_nlnetlabs.m4, test for openssl version after
+	  testing for libdl need.
+
+5 November 2015: Wouter
+	- newer acx_nlnetlabs.m4, does not needlessly link with -ldl.
+
+30 October 2015: Wouter
+	- Fix tpkg tests for portability.
+
+29 October 2015: Wouter
+	- patch from Doug Hogan for SSL_OP_NO_SSLvx options.
+	- updated contrib/nsd.spec, from Bálint Szigeti.
+	- support configure --with-dbfile="" for nodb mode by default, where
+	  there is no binary database, but nsd reads and writes zonefiles.
+
+27 October 2015: Wouter
+	- portability fixes.
+
+26 October 2015: Wouter
+	- Init pfd for handlers added during handler-event-walk.
+
+23 October 2015: Wouter
+	- Fix many interfaces and zones updates from nsd parent event loop.
+
+22 October 2015: Wouter
+	- 4.1.6 release tag.
+	- trunk contain 4.1.7 in development.
+
 20 October 2015: Wouter
 	- 4.1.6rc2 tag created.
 
@@ -66,7 +128,7 @@
 	- SO_REUSEPORT support.
 
 16 July 2015: Wouter
-	- Fix #618: documented need to list ip-addresses seperately in
+	- Fix #618: documented need to list ip-addresses separately in
 	  nsd.conf if there are multiple, because the source address of
 	  replies can otherwise go wrong.
 
@@ -894,7 +956,7 @@
 10 December 2012: Matthijs
 	- Bug #483: Better error messages for TSIG errors.
 	- RFC 2845: If BADKEY or BADSIG, RCODE should be NOTAUTH.
-	  Also, continue TSIG verication if NOTAUTH.
+	  Also, continue TSIG verification if NOTAUTH.
 
 7 December 2012: Wouter
 	- stable pidfile, xfrd is process leader and forks server-parent.
@@ -1048,7 +1110,7 @@
 	  patch is no longer needed.
 
 8 June 2012: Wouter
-	- Fix tpkg test cutest_qroot and rr-test for prinout of algorithms
+	- Fix tpkg test cutest_qroot and rr-test for printout of algorithms
 	  as numbers, and copy of DO flag to the answer.
 	- pick up fd fix from 3_2 branch: Some more fd >= 0 to fd != -1 fixes
 
@@ -1196,7 +1258,7 @@
 	- Fix to have no authority NS set processing for CNAMEs.
 
 9 June 2011: Wouter
-	- fix bug that relptrs have to be inited with rel_ptr_init() when
+	- fix bug that relptrs have to be initialized with rel_ptr_init() when
 	  created and zeroed with rptr_zero before deletion.
 	- tag 4.0.0-imp4 created
 	- trunk is 4.0.0-imp5 under development.
@@ -1512,7 +1574,7 @@
 
 14 April 2010: Matthijs
 	- uintptr_t fallback value to void*
-	- Backwards compatibality for MAP_ANONYMOUS
+	- Backwards compatibility for MAP_ANONYMOUS
 	- Tag 3.2.5.
 
 31 March 2010: Matthijs
@@ -1536,20 +1598,20 @@
 	- Skip memory cleanup to speed up reload (Martin Svec)
 
 1 February 2010: Wouter
-	- compat code for memcmp unsigned comparsions.
+	- compat code for memcmp unsigned comparisons.
 
 21 January 2010: Wouter
 	- fixup debug sprintf to snprintf.
 
-21 Januari 2010: Matthijs
+21 January 2010: Matthijs
 	- Secure string functions, including compat code for strlcat.
 	- Randomness utility function
 	- Prepare for default chroot
 
-6 Januari 2010: Wouter
+6 January 2010: Wouter
 	- check write errors when marking commit failed when difffile is broken.
 
-6 Januari 2010: Matthijs
+6 January 2010: Matthijs
 	- Move to 3.2.5
 
 23 December 2009: Matthijs
@@ -1727,7 +1789,7 @@
 
 17 July 2008: Matthijs
 	- Make the maximum number of interfaces configurable.
-	- Write pidfile *after* succesfull server initialization,
+	- Write pidfile *after* successful server initialization,
 		instead of writing, and unlink if fail.
 
 16 July 2008: Matthijs
@@ -2302,7 +2364,7 @@
 23 August 2006: Wouter
 	- Fixed % by 0 exception in the bugfix #139.
 	- Fixed RFC 4035 says CD flag SHOULD be cleared on authoritative
-	  reponses, now NSD clears the CD flag. This is bug #140.
+	  responses, now NSD clears the CD flag. This is bug #140.
 	  RFC 4035 could be confusing on this, as it states 'all servers
 	  MUST copy the CD bit' more than once, but then makes clear only 
 	  recursive servers are meant with that statement.
@@ -2362,7 +2424,7 @@
 	  because the handshaking can take very long too.
 	- difffile and xfrdfile set via configure, to absolute pathnames,
 	  so that chroot checks work for them.
-	- updated tpkgs, they need to set relative paths now for diffile.
+	- updated tpkgs, they need to set relative paths now for difffile.
 	- gcov says 2821 of 10617 total code lines are not covered.
 	  compiled with --coverage, not -O2, ran tpkg/* and long/testplan*.
 	  counted grep '#####:' *.gcov | wc and grep '^ *[0-9]*:' *.gcov | wc.
@@ -2389,7 +2451,7 @@
 7 August 2006: Wouter
 	- Made the tests a little more portable.
 	- fixed mempcy unable to handle unaligned memory addresses on Solaris,
-	  used memmove istead of memcpy in zonec LOC conversion code.
+	  used memmove instead of memcpy in zonec LOC conversion code.
 	- another unaligned memory access, when storing off_t pointer in 
 	  difffile.c, used memmove.
 
@@ -2787,7 +2849,7 @@
 8 May 2006: Wouter
 	- updated zparser.y to handle empty nsec_seq lists.
 	  for empty nonterminals in NSEC3.
-	- nicer without ambiguous grammer.
+	- nicer without ambiguous grammar.
 
 5 May 2006: Wouter
 	- nsd-notify handles option -y key:secret to TSIG sign outgoing
@@ -3016,7 +3078,7 @@
 	  it will first see if it has to quit itself, before restarting
 	  the children.
 	- destroy tempregion xfrd read on error.
-	- check for serial existance in xfrd_handle_incoming_soa.
+	- check for serial existence in xfrd_handle_incoming_soa.
 	- handle_incoming_soa uses set_timer_refresh routine.
 	  and can handle expire times < refresh times.
 	- log msg for udp socket() error.
@@ -3098,7 +3160,7 @@
 	- Fixed up domain table insert, it was being used in routines
 	  that originate from nsd-xfer that do not set compression numbers
 	  correctly.
-	- memleak fix in diffile in case of error.
+	- memleak fix in difffile in case of error.
 	- difffile processing works so that NSD can read an axfr saved
 	  into the nsd.diff file. (xfrd already request and save it there).
 	- split off xfrd tcp handling into xfrd-tcp.c.
@@ -3107,7 +3169,7 @@
 	- xfrd sets state from ok to refresh to expired based on timeout.
 	- xfrd sets reload timeout.
 	- Added zone updated to keep track of zones that are changed
-	  after a reload. These zones get their information notifified
+	  after a reload. These zones get their information notified
 	  to xfrd.
 	- removed unused zprintrr declaration from zonec.h
 	- nsd sends soa information to xfrd.
@@ -3139,7 +3201,7 @@
 	- sets read/write event flags for tcp fd right.
 
 9 Mar 2006: Wouter
-	- Removed header from DIFF file format. CRC not that imporant there,
+	- Removed header from DIFF file format. CRC not that important there,
 	  you have to check the packets anyway.
 	- cutest rbtree removed unused clean_rbtree and always_fail routines.
 	- xfrd timeout handler, more work. Checks expire.
@@ -3172,7 +3234,7 @@
 3 Mar 2006: Wouter
 	- Removed double kill after reload. Only socket cmd send.
 	- Added code to handle race condition where xfrd is restarted
-	  during a succesfull reload. Afterwards, the new server_main
+	  during a successful reload. Afterwards, the new server_main
 	  only has the old xfrd pid, new xfrd is an orphan.
 	  Solution: when xfrd closes cmd channel (i.e. it quit)
 	  unexpectedly, send sighup to all processes in the group.
@@ -3289,7 +3351,7 @@
    * Wouter: Improved configure.ac to detect pselect in sys/select.
 	The check works on freebsd(yes) and fedoracore 3 and 4 (no).
 	I hope it also works on Solaris.
-	Also various other protoypes were implicit: chroot, strptime, ...
+	Also various other prototypes were implicit: chroot, strptime, ...
 	These are also solved.
    * Wouter: Checked configure on sparc5(solaris). Added check for
 	ctime_r in time.h (for tsig.c). This conf also works on freebsd/linux.
