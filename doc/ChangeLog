@@ -1,3 +1,62 @@
+14 March 2014: Wouter
+	- tag 4.0.3
+
+13 March 2014: Wouter
+	- Fix nsd.db unclean close check.  Previous databases are considered
+	  unclean by the code and are created anew.
+	- Adds nsd.db larger than 400Tb check for sanity. Also test if
+	  filesize as documented in the file is correct.
+	- nsd waits for tasks to complete on stop, prevents nsd.db corruption.
+	- fix to not delete tmpdir too early in shutdown process.
+
+12 March 2014: Wouter
+	- tag 4.0.2
+	- trunk has 4.0.3 in development.
+	- disabled udb checking functionality that made it very slow,
+	  this was enabled when enable-checking was turned on.
+
+27 February 2014: Wouter
+	- tag 4.0.2rc1
+
+26 February 2014: Wouter
+	- Fix that NSD will delete and recreate not-clean-closed databases.
+
+20 February 2014: Wouter
+	- Fix from 3.2: make SOA RDATA comparisons in XFR more lenient (only
+	check serial).
+
+18 February 2014: Wouter
+	- Fix leak of zone name after zonefile read.
+	- Fix malloc too large that would be leaked in the radix tree.
+
+14 February 2014: Wouter
+	- configure change for easier compile on Minix.
+
+10 February 2014: Wouter
+	- Fix #552: zonefile loads on nsd-control reconfig when the name
+	  of the file has changed.
+
+7 February 2014: Wouter
+	- Fix #551: change Regent to Copyright holder in the LICENSE,
+	  to match the definition on opensource.org for the BSD License.
+
+3 February 2014: Wouter
+	- Disabled recvmmsg and sendmmsg usage by default because kernel
+	  versions have implementation issues: ipv6 ignored, security issues.
+	- Detect libevent2 install automatically by configure, and use
+	  event2 header files if necessary.
+	- Fixup link with lib/event2 subdir.
+
+30 January 2014: Wouter
+	- Fix expired zones to give SERVFAIL, also when parent zone loaded.
+
+27 January 2014: Wouter
+	- tag 4.0.1.
+	- trunk is 4.0.2 in development.
+	- rcode REFUSED for queries to non-hosted zones.
+	- documented nsd-control zonestatus output in nsd-control manpage.
+	- remove mention of nsdc from nsd-checkconf manpage.
+
 21 January 2014: Wouter
 	- tag 4.0.1rc2
 
