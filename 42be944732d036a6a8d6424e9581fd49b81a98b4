@@ -1,0 +1,3 @@
+  * New upstream release.
+  * makefile-destdir.patch:
+    - Removed, merged upstream.
