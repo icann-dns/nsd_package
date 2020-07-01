@@ -1,0 +1,2 @@
+  * Fix reading nsd.conf tmpfile configuration (Closes: #864711)
+  * New upstream version 4.1.17
