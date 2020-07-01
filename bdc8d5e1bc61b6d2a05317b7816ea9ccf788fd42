@@ -1,0 +1,2 @@
+  * Fix off-by-one error (Closes: #529420)
+    - debian/patches/nsd-2.3.7-vuln.patch
