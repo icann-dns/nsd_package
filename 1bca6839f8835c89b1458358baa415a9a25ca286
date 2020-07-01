@@ -1,0 +1,1 @@
+  * Don't fail when nsd3 is not installed (Closes: #729612)
