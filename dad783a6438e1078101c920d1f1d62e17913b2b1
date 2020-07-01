@@ -1,0 +1,4 @@
+  * New upstream release.
+  * Fix bashism in postinst, so dbfile gets created (Closes: #417892)
+  * Enabled root server functionality (shoot yourself in foot if you want).
+  * Remove config.log and config.status in clean target (Closes: #424600)
