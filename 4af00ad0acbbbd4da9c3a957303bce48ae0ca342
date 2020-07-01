@@ -1,0 +1,4 @@
+  * Build without systemd-notify on non-linux arch
+  * Emulate systemd tmpfiles.d handling in init script
+    Thanks to Harald Jenny (Closes: #906439)
+  * Update changelog for CVE-2016-6173 fixed in 4.1.11
