@@ -1,10 +1,10 @@
-.TH "NSD" "8" "Jul 15, 2013" "NLnet Labs" "NSD 4.0.0b5"
+.TH "NSD" "8" "Oct 24, 2013" "NLnet Labs" "NSD 4.0.0rc3"
 .\" Copyright (c) 2001\-2008, NLnet Labs. All rights reserved.
 .\" See LICENSE for the license.
 .SH "NAME"
 .LP
 .B nsd
-\- Name Server Daemon (NSD) version 4.0.0b5.
+\- Name Server Daemon (NSD) version 4.0.0rc3.
 .SH "SYNOPSIS"
 .LP
 .B nsd
@@ -112,7 +112,7 @@ Read specified
 For format description see nsd.conf(5).
 .TP
 .B \-d
-Turn on debugging mode, do not fork, stay in the foreground.
+Do not fork, stay in the foreground.
 .TP
 .B \-f\fI database
 Use the specified

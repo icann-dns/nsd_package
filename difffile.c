@@ -25,6 +25,12 @@
 #include "rrl.h"
 
 static int
+write_64(FILE *out, uint64_t val)
+{
+	return write_data(out, &val, sizeof(val));
+}
+
+static int
 write_32(FILE *out, uint32_t val)
 {
 	val = htonl(val);
@@ -51,10 +57,10 @@ diff_write_packet(const char* zone, const char* pat, uint32_t old_serial,
 	uint32_t new_serial, uint32_t seq_nr, uint8_t* data, size_t len,
 	struct nsd* nsd, uint64_t filenumber)
 {
-	FILE *df = xfrd_open_xfrfile(nsd, filenumber, seq_nr?"a":"w");
+	FILE* df = xfrd_open_xfrfile(nsd, filenumber, seq_nr?"a":"w");
 	if(!df) {
-		log_msg(LOG_ERR, "could not open transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not open transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 		return;
 	}
 
@@ -68,16 +74,16 @@ diff_write_packet(const char* zone, const char* pat, uint32_t old_serial,
 		if(!write_32(df, DIFF_PART_XFRF) ||
 			!write_8(df, 0) /* notcommitted(yet) */ ||
 			!write_32(df, 0) /* numberofparts when done */ ||
-			!write_32(df, (uint32_t) tv.tv_sec) ||
+			!write_64(df, (uint64_t) tv.tv_sec) ||
 			!write_32(df, (uint32_t) tv.tv_usec) ||
 			!write_32(df, old_serial) ||
 			!write_32(df, new_serial) ||
-			!write_32(df, (uint32_t) tv.tv_sec) ||
+			!write_64(df, (uint64_t) tv.tv_sec) ||
 			!write_32(df, (uint32_t) tv.tv_usec) ||
 			!write_str(df, zone) ||
 			!write_str(df, pat)) {
-			log_msg(LOG_ERR, "could not write transfer %s file %llu: %s",
-				zone, (unsigned long long)filenumber, strerror(errno));
+			log_msg(LOG_ERR, "could not write transfer %s file %lld: %s",
+				zone, (long long)filenumber, strerror(errno));
 			fclose(df);
 			return;
 		}
@@ -88,8 +94,8 @@ diff_write_packet(const char* zone, const char* pat, uint32_t old_serial,
 		!write_data(df, data, len) ||
 		!write_32(df, len))
 	{
-		log_msg(LOG_ERR, "could not write transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not write transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 	}
 	fclose(df);
 }
@@ -100,7 +106,7 @@ diff_write_commit(const char* zone, uint32_t old_serial, uint32_t new_serial,
 	struct nsd* nsd, uint64_t filenumber)
 {
 	struct timeval tv;
-	FILE *df;
+	FILE* df;
 
 	if (gettimeofday(&tv, NULL) != 0) {
 		log_msg(LOG_ERR, "could not set timestamp for %s: %s",
@@ -114,40 +120,50 @@ diff_write_commit(const char* zone, uint32_t old_serial, uint32_t new_serial,
 
 	df = xfrd_open_xfrfile(nsd, filenumber, "r+");
 	if(!df) {
-		log_msg(LOG_ERR, "could not open transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not open transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 		return;
 	}
 	if(!write_32(df, DIFF_PART_XFRF) ||
 		!write_8(df, commit) /* committed */ ||
 		!write_32(df, num_parts) ||
-		!write_32(df, (uint32_t) tv.tv_sec) ||
+		!write_64(df, (uint64_t) tv.tv_sec) ||
 		!write_32(df, (uint32_t) tv.tv_usec) ||
 		!write_32(df, old_serial) ||
 		!write_32(df, new_serial))
 	{
-		log_msg(LOG_ERR, "could not write transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not write transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 		fclose(df);
 		return;
 	}
 
 	/* append the log_str to the end of the file */
 	if(fseek(df, 0, SEEK_END) == -1) {
-		log_msg(LOG_ERR, "could not fseek transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not fseek transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 		fclose(df);
 		return;
 	}
 	if(!write_str(df, log_str)) {
-		log_msg(LOG_ERR, "could not write transfer %s file %llu: %s",
-			zone, (unsigned long long)filenumber, strerror(errno));
+		log_msg(LOG_ERR, "could not write transfer %s file %lld: %s",
+			zone, (long long)filenumber, strerror(errno));
 		fclose(df);
 		return;
 
 	}
 	fflush(df);
 	fclose(df);
+}
+
+int
+diff_read_64(FILE *in, uint64_t* result)
+{
+	if (fread(result, sizeof(*result), 1, in) == 1) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 int
@@ -281,44 +297,113 @@ rrset_delete(namedb_type* db, domain_type* domain, rrset_type* rrset)
 }
 
 static int
-rdatas_equal(rdata_atom_type *a, rdata_atom_type *b, int num, uint16_t type)
+rdatas_equal(rdata_atom_type *a, rdata_atom_type *b, int num, uint16_t type,
+	int* rdnum, char** reason)
 {
 	int k;
 	for(k = 0; k < num; k++)
 	{
 		if(rdata_atom_is_domain(type, k)) {
 			if(dname_compare(domain_dname(a[k].domain),
-				domain_dname(b[k].domain))!=0)
+				domain_dname(b[k].domain))!=0) {
+				*rdnum = k;
+				*reason = "dname data";
 				return 0;
+			}
+		} else if(rdata_atom_is_literal_domain(type, k)) {
+			/* literal dname, but compare case insensitive */
+			if(a[k].data[0] != b[k].data[0]) {
+				*rdnum = k;
+				*reason = "literal dname len";
+				return 0; /* uncompressed len must be equal*/
+			}
+			if(!dname_equal_nocase((uint8_t*)(a[k].data+1),
+				(uint8_t*)(b[k].data+1), a[k].data[0])) {
+				*rdnum = k;
+				*reason = "literal dname data";
+				return 0;
+			}
 		} else {
 			/* check length */
-			if(a[k].data[0] != b[k].data[0])
+			if(a[k].data[0] != b[k].data[0]) {
+				*rdnum = k;
+				*reason = "rdata len";
 				return 0;
+			}
 			/* check data */
-			if(memcmp(a[k].data+1, b[k].data+1, a[k].data[0])!=0)
+			if(memcmp(a[k].data+1, b[k].data+1, a[k].data[0])!=0) {
+				*rdnum = k;
+				*reason = "rdata data";
 				return 0;
+			}
 		}
 	}
 	return 1;
 }
 
-static int
-find_rr_num(rrset_type* rrset,
-	uint16_t type, uint16_t klass,
+static void
+debug_find_rr_num(rrset_type* rrset, uint16_t type, uint16_t klass,
 	rdata_atom_type *rdatas, ssize_t rdata_num)
 {
-	int i;
+	int i, rd;
+	char* reason = "";
+
+	for(i=0; i < rrset->rr_count; ++i) {
+		if (rrset->rrs[i].type != type) {
+			log_msg(LOG_WARNING, "diff: RR <%s, %s> does not match "
+				"RR num %d type %s",
+				dname_to_string(rrset->rrs[i].owner->dname,0),
+				rrtype_to_string(type),	i,
+				rrtype_to_string(rrset->rrs[i].type));
+		}
+		if (rrset->rrs[i].klass != klass) {
+			log_msg(LOG_WARNING, "diff: RR <%s, %s> class %d "
+				"does not match RR num %d class %d",
+				dname_to_string(rrset->rrs[i].owner->dname,0),
+				rrtype_to_string(type),
+				klass, i,
+				rrset->rrs[i].klass);
+		}
+		if (rrset->rrs[i].rdata_count != rdata_num) {
+			log_msg(LOG_WARNING, "diff: RR <%s, %s> rdlen %u "
+				"does not match RR num %d rdlen %d",
+				dname_to_string(rrset->rrs[i].owner->dname,0),
+				rrtype_to_string(type),
+				(unsigned) rdata_num, i,
+				(unsigned) rrset->rrs[i].rdata_count);
+		}
+		if (!rdatas_equal(rdatas, rrset->rrs[i].rdatas, rdata_num, type,
+			&rd, &reason)) {
+			log_msg(LOG_WARNING, "diff: RR <%s, %s> rdata element "
+				"%d differs from RR num %d rdata (%s)",
+				dname_to_string(rrset->rrs[i].owner->dname,0),
+				rrtype_to_string(type),
+				rd, i, reason);
+		}
+	}
+}
+
+static int
+find_rr_num(rrset_type* rrset, uint16_t type, uint16_t klass,
+	rdata_atom_type *rdatas, ssize_t rdata_num, int add)
+{
+	int i, rd;
+	char* reason;
 
 	for(i=0; i < rrset->rr_count; ++i) {
 		if(rrset->rrs[i].type == type &&
 		   rrset->rrs[i].klass == klass &&
 		   rrset->rrs[i].rdata_count == rdata_num &&
-		   rdatas_equal(rdatas, rrset->rrs[i].rdatas, rdata_num, type))
+		   rdatas_equal(rdatas, rrset->rrs[i].rdatas, rdata_num, type,
+			&rd, &reason))
 		{
 			return i;
 		}
 	}
-
+        /* this is odd. Log why rr cannot be found. */
+	if (!add) {
+		debug_find_rr_num(rrset, type, klass, rdatas, rdata_num);
+	}
 	return -1;
 }
 
@@ -555,7 +640,7 @@ delete_RR(namedb_type* db, const dname_type* dname,
 				dname_to_string(dname,0));
 			return 0;
 		}
-		rrnum = find_rr_num(rrset, type, klass, rdatas, rdata_num);
+		rrnum = find_rr_num(rrset, type, klass, rdatas, rdata_num, 0);
 		if(rrnum == -1) {
 			log_msg(LOG_WARNING, "diff: RR <%s, %s> does not exist",
 				dname_to_string(dname,0), rrtype_to_string(type));
@@ -667,7 +752,7 @@ add_RR(namedb_type* db, const dname_type* dname,
 			dname_to_string(dname,0));
 		return 0;
 	}
-	rrnum = find_rr_num(rrset, type, klass, rdatas, rdata_num);
+	rrnum = find_rr_num(rrset, type, klass, rdatas, rdata_num, 1);
 	if(rrnum != -1) {
 		DEBUG(DEBUG_XFRD, 2, (LOG_ERR, "diff: RR <%s, %s> already exists",
 			dname_to_string(dname,0), rrtype_to_string(type)));
@@ -1115,7 +1200,8 @@ apply_ixfr_for_zone(nsd_type* nsd, zone_type* zonedb, FILE* in,
 	char patname_buf[2048];
 
 	uint32_t old_serial, new_serial, num_parts, type;
-	uint32_t time_end[2], time_start[2];
+	uint64_t time_end_0, time_start_0;
+	uint32_t time_end_1, time_start_1;
 	uint8_t committed;
 	uint32_t i;
 	int num_bytes = 0;
@@ -1136,12 +1222,12 @@ apply_ixfr_for_zone(nsd_type* nsd, zone_type* zonedb, FILE* in,
 	 * new zone is created, we know what the options-pattern is */
 	if(!diff_read_8(in, &committed) ||
 		!diff_read_32(in, &num_parts) ||
-		!diff_read_32(in, &time_end[0]) ||
-		!diff_read_32(in, &time_end[1]) ||
+		!diff_read_64(in, &time_end_0) ||
+		!diff_read_32(in, &time_end_1) ||
 		!diff_read_32(in, &old_serial) ||
 		!diff_read_32(in, &new_serial) ||
-		!diff_read_32(in, &time_start[0]) ||
-		!diff_read_32(in, &time_start[1]) ||
+		!diff_read_64(in, &time_start_0) ||
+		!diff_read_32(in, &time_start_1) ||
 		!diff_read_str(in, zone_buf, sizeof(zone_buf)) ||
 		!diff_read_str(in, patname_buf, sizeof(patname_buf))) {
 		log_msg(LOG_ERR, "diff file bad commit part");
@@ -1222,15 +1308,15 @@ apply_ixfr_for_zone(nsd_type* nsd, zone_type* zonedb, FILE* in,
 #endif /* NSEC3 */
 		zonedb->is_changed = 1;
 		ZONE(&z)->is_changed = 1;
-		ZONE(&z)->mtime = time_end[0];
+		ZONE(&z)->mtime = time_end_0;
 		udb_zone_set_log_str(nsd->db->udb, &z, log_buf);
 		udb_ptr_unlink(&z, nsd->db->udb);
 		if(taskudb) task_new_soainfo(taskudb, last_task, zonedb);
 
 		if(1 <= verbosity) {
-			double elapsed = (double)(time_end[0] - time_start[0])+
-				(double)((double)time_end[1]
-				-(double)time_start[1]) / 1000000.0;
+			double elapsed = (double)(time_end_0 - time_start_0)+
+				(double)((double)time_end_1
+				-(double)time_start_1) / 1000000.0;
 			VERBOSITY(2, (LOG_INFO, "zone %s %s of %d bytes in %g seconds",
 				zone_buf, log_buf, num_bytes, elapsed));
 		}
@@ -1802,13 +1888,15 @@ task_process_apply_xfr(struct nsd* nsd, udb_base* udb, udb_ptr *last_task,
 	df = xfrd_open_xfrfile(nsd, TASKLIST(task)->yesno, "r");
 	if(!df) {
 		/* could not open file to update */
-		/* TODO: reply to xfrd failed-update */
+		/* there is no reply to xfrd failed-update,
+		 * because xfrd has a scan for apply-failures. */
 		return;
 	}
 	/* read and apply zone transfer */
 	if(!apply_ixfr_for_zone(nsd, zone, df, nsd->options, udb,
 		last_task, TASKLIST(task)->yesno)) {
-		/* TODO: reply to xfrd failed-update */
+		/* there is no reply to xfrd failed-update,
+		 * because xfrd has a scan for apply-failures. */
 	}
 
 	fclose(df);

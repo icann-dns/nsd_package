@@ -179,7 +179,9 @@ xfrd_init(int socket, struct nsd* nsd, int shortsoa, int reload_active)
 
 	xfrd->tcp_set = xfrd_tcp_set_create(xfrd->region);
 	xfrd->tcp_set->tcp_timeout = nsd->tcp_timeout;
+#ifndef HAVE_ARC4RANDOM
 	srandom((unsigned long) getpid() * (unsigned long) time(NULL));
+#endif
 
 	DEBUG(DEBUG_XFRD,1, (LOG_INFO, "xfrd pre-startup"));
 	xfrd_init_zones();
@@ -655,16 +657,21 @@ xfrd_set_timer_retry(xfrd_zone_t* zone)
 	/* set timer for next retry or expire timeout if earlier. */
 	if(zone->soa_disk_acquired == 0) {
 		/* if no information, use reasonable timeout */
+#ifdef HAVE_ARC4RANDOM
+		xfrd_set_timer(zone, zone->fresh_xfr_timeout
+			+ arc4random()%zone->fresh_xfr_timeout);
+#else
 		xfrd_set_timer(zone, zone->fresh_xfr_timeout
 			+ random()%zone->fresh_xfr_timeout);
+#endif
 		/* exponential backoff - some master data in zones is paid-for
 		   but non-working, and will not get fixed. */
 		zone->fresh_xfr_timeout *= 2;
 		if(zone->fresh_xfr_timeout > XFRD_TRANSFER_TIMEOUT_MAX)
 			zone->fresh_xfr_timeout = XFRD_TRANSFER_TIMEOUT_MAX;
 	} else if(zone->state == xfrd_zone_expired ||
-		xfrd_time() + ntohl(zone->soa_disk.retry) <
-		zone->soa_disk_acquired + ntohl(zone->soa_disk.expire))
+		xfrd_time() + (time_t)ntohl(zone->soa_disk.retry) <
+		zone->soa_disk_acquired + (time_t)ntohl(zone->soa_disk.expire))
 	{
 		if(ntohl(zone->soa_disk.retry) < XFRD_LOWERBOUND_RETRY)
 			xfrd_set_timer(zone, XFRD_LOWERBOUND_RETRY);
@@ -729,13 +736,13 @@ xfrd_handle_zone(int ATTR_UNUSED(fd), short event, void* arg)
 	if(zone->soa_disk_acquired)
 	{
 		if (zone->state != xfrd_zone_expired &&
-			(uint32_t)xfrd_time() >= zone->soa_disk_acquired + ntohl(zone->soa_disk.expire)) {
+			xfrd_time() >= zone->soa_disk_acquired + (time_t)ntohl(zone->soa_disk.expire)) {
 			/* zone expired */
 			log_msg(LOG_ERR, "xfrd: zone %s has expired", zone->apex_str);
 			xfrd_set_zone_state(zone, xfrd_zone_expired);
 		}
 		else if(zone->state == xfrd_zone_ok &&
-			(uint32_t)xfrd_time() >= zone->soa_disk_acquired + ntohl(zone->soa_disk.refresh)) {
+			xfrd_time() >= zone->soa_disk_acquired + (time_t)ntohl(zone->soa_disk.refresh)) {
 			/* zone goes to refreshing state. */
 			DEBUG(DEBUG_XFRD,1, (LOG_INFO, "xfrd: zone %s is refreshing", zone->apex_str));
 			xfrd_set_zone_state(zone, xfrd_zone_refreshing);
@@ -972,7 +979,11 @@ xfrd_set_timer(xfrd_zone_t* zone, time_t t)
 	/* only for times far in the future */
 	if(t > 10) {
 		time_t base = t*9/10;
+#ifdef HAVE_ARC4RANDOM
+		t = base + arc4random()%(t-base);
+#else
 		t = base + random()%(t-base);
+#endif
 	}
 
 	/* keep existing flags and fd, but re-add with timeout */
@@ -1012,22 +1023,22 @@ xfrd_handle_incoming_soa(xfrd_zone_t* zone,
 			(unsigned)ntohl(soa->serial));
 		zone->soa_nsd = zone->soa_disk;
 		zone->soa_nsd_acquired = zone->soa_disk_acquired;
-		if((uint32_t)xfrd_time() - zone->soa_disk_acquired
-			< ntohl(zone->soa_disk.refresh))
+		if(xfrd_time() - zone->soa_disk_acquired
+			< (time_t)ntohl(zone->soa_disk.refresh))
 		{
 			/* zone ok, wait for refresh time */
 			xfrd_set_zone_state(zone, xfrd_zone_ok);
 			zone->round_num = -1;
 			xfrd_set_timer_refresh(zone);
-		} else if((uint32_t)xfrd_time() - zone->soa_disk_acquired
-			< ntohl(zone->soa_disk.expire))
+		} else if(xfrd_time() - zone->soa_disk_acquired
+			< (time_t)ntohl(zone->soa_disk.expire))
 		{
 			/* zone refreshing */
 			xfrd_set_zone_state(zone, xfrd_zone_refreshing);
 			xfrd_set_refresh_now(zone);
 		}
-		if((uint32_t)xfrd_time() - zone->soa_disk_acquired
-			>= ntohl(zone->soa_disk.expire)) {
+		if(xfrd_time() - zone->soa_disk_acquired
+			>= (time_t)ntohl(zone->soa_disk.expire)) {
 			/* zone expired */
 			xfrd_set_zone_state(zone, xfrd_zone_expired);
 			xfrd_set_refresh_now(zone);
@@ -1955,7 +1966,7 @@ xfrd_set_reload_timeout()
 	if(xfrd->nsd->options->xfrd_reload_timeout == -1)
 		return; /* automatic reload disabled. */
 	if(xfrd->reload_timeout.tv_sec == 0 ||
-		xfrd_time() >= xfrd->reload_timeout.tv_sec ) {
+		xfrd_time() >= (time_t)xfrd->reload_timeout.tv_sec ) {
 		/* no reload wait period (or it passed), do it right away */
 		xfrd_set_reload_now(xfrd);
 		/* start reload wait period */

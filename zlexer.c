@@ -1120,22 +1120,24 @@ case YY_STATE_EOF(bitlabel):
 {
 	zc_error("EOF inside bitlabel");
 	BEGIN(INITIAL);
+	yyrestart(yyin); /* this is so that lex does not give an internal err */
+	yyterminate();
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 273 "zlexer.lex"
+#line 275 "zlexer.lex"
 { yymore(); }
 	YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 274 "zlexer.lex"
+#line 276 "zlexer.lex"
 { ++parser->line; yymore(); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 275 "zlexer.lex"
+#line 277 "zlexer.lex"
 {
 	BEGIN(INITIAL);
 	yytext[yyleng - 1] = '\0';
@@ -1145,30 +1147,32 @@ YY_RULE_SETUP
 /* Quoted strings.  Strip leading and ending quotes.  */
 case 19:
 YY_RULE_SETUP
-#line 282 "zlexer.lex"
+#line 284 "zlexer.lex"
 { BEGIN(quotedstring); LEXOUT(("\" ")); }
 	YY_BREAK
 case YY_STATE_EOF(quotedstring):
-#line 283 "zlexer.lex"
+#line 285 "zlexer.lex"
 {
 	zc_error("EOF inside quoted string");
 	BEGIN(INITIAL);
+	yyrestart(yyin); /* this is so that lex does not give an internal err */
+	yyterminate();
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 287 "zlexer.lex"
+#line 291 "zlexer.lex"
 { LEXOUT(("STR ")); yymore(); }
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 288 "zlexer.lex"
+#line 292 "zlexer.lex"
 { ++parser->line; yymore(); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 289 "zlexer.lex"
+#line 293 "zlexer.lex"
 {
 	LEXOUT(("\" "));
 	BEGIN(INITIAL);
@@ -1179,7 +1183,7 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 296 "zlexer.lex"
+#line 300 "zlexer.lex"
 {
 	/* Any allowed word.  */
 	return parse_token(STR, yytext, &lexer_state);
@@ -1187,7 +1191,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 300 "zlexer.lex"
+#line 304 "zlexer.lex"
 {
 	zc_error("unknown character '%c' (\\%03d) seen - is this a zonefile?",
 		 (int) yytext[0], (int) yytext[0]);
@@ -1195,10 +1199,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 304 "zlexer.lex"
+#line 308 "zlexer.lex"
 ECHO;
 	YY_BREAK
-#line 1201 "<stdout>"
+#line 1205 "<stdout>"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2156,7 +2160,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 304 "zlexer.lex"
+#line 308 "zlexer.lex"
 
 
 
