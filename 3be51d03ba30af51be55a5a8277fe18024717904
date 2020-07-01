@@ -1,0 +1,3 @@
+  * Don't chown database file to nsd_user before reload and start.
+  * Build database file as nsd_user instead. (Closes: #513717)
+  * Acknowledge NMU.
