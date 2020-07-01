@@ -1,0 +1,5 @@
+  * New upstream release.
+  * Enable stripping of nsd-xfer again (Closes: #302776)
+  * New upstream release.
+  * New upstream release.
+  * Includes it's own nsd-xfer program.
