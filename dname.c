@@ -1,40 +1,12 @@
 /*
- * dname.c -- dname operations
- *
- * Alexis Yushin, <alexis@nlnetlabs.nl>
+ * dname.c -- Domain name handling.
  *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
+
 
 #include <config.h>
 
@@ -48,14 +20,10 @@
 
 #include "dns.h"
 #include "dname.h"
-#include "namedb.h"
-#include "util.h"
-
-
-static const uint8_t *strdname (const char *source, const uint8_t *o);
+#include "query.h"
 
 const dname_type *
-dname_make(region_type *region, const uint8_t *name)
+dname_make(region_type *region, const uint8_t *name, int normalize)
 {
 	size_t name_size = 0;
 	uint8_t label_offsets[MAXDOMAINLEN];
@@ -101,60 +69,201 @@ dname_make(region_type *region, const uint8_t *name)
 	memcpy((uint8_t *) dname_label_offsets(result),
 	       label_offsets,
 	       label_count * sizeof(uint8_t));
-	memcpy((uint8_t *) dname_name(result),
-	       name,
-	       name_size * sizeof(uint8_t));
+	if (normalize) {
+		uint8_t *dst = (uint8_t *) dname_name(result);
+		const uint8_t *src = name;
+		while (!label_is_root(src)) {
+			ssize_t len = label_length(src);
+			*dst++ = *src++;
+			for (i = 0; i < len; ++i) {
+				*dst++ = DNAME_NORMALIZE(*src++);
+			}
+		}
+		*dst = *src;
+	} else {
+		memcpy((uint8_t *) dname_name(result),
+		       name,
+		       name_size * sizeof(uint8_t));
+	}
 	return result;
 }
 
 
 const dname_type *
-dname_parse(region_type *region, const char *name, const dname_type *origin)
+dname_make_from_packet(region_type *region, buffer_type *packet,
+		       int allow_pointers, int normalize)
 {
 	uint8_t buf[MAXDOMAINLEN + 1];
-	if (origin) {
-		buf[0] = origin->name_size;
-		memcpy(buf + 1, dname_name(origin), origin->name_size);
-	} else {
-		buf[0] = 1;
-		buf[1] = 0;
+	int done = 0;
+	uint8_t visited[(MAX_PACKET_SIZE+7)/8];
+	size_t dname_length = 0;
+	const uint8_t *label;
+	ssize_t mark = -1;
+	
+	memset(visited, 0, (buffer_limit(packet)+7)/8);
+	
+	while (!done) {
+		if (!buffer_available(packet, 1)) {
+/* 			error("dname out of bounds"); */
+			return NULL;
+		}
+
+		if (get_bit(visited, buffer_position(packet))) {
+/* 			error("dname loops"); */
+			return NULL;
+		}
+		set_bit(visited, buffer_position(packet));
+
+		label = buffer_current(packet);
+		if (label_is_pointer(label)) {
+			size_t pointer;
+			if (!allow_pointers) {
+				return NULL;
+			}
+			if (!buffer_available(packet, 2)) {
+/* 				error("dname pointer out of bounds"); */
+				return NULL;
+			}
+			pointer = label_pointer_location(label);
+			if (pointer >= buffer_limit(packet)) {
+/* 				error("dname pointer points outside packet"); */
+				return NULL;
+			}
+			buffer_skip(packet, 2);
+			if (mark == -1) {
+				mark = buffer_position(packet);
+			}
+			buffer_set_position(packet, pointer);
+		} else if (label_is_normal(label)) {
+			size_t length = label_length(label) + 1;
+			done = label_is_root(label);
+			if (!buffer_available(packet, length)) {
+/* 				error("dname label out of bounds"); */
+				return NULL;
+			}
+			if (dname_length + length >= sizeof(buf)) {
+/* 				error("dname too large"); */
+				return NULL;
+			}
+			buffer_read(packet, buf + dname_length, length);
+			dname_length += length;
+		} else {
+/* 			error("bad label type"); */
+			return NULL;
+		}
 	}
-	return dname_make(region, strdname(name, buf) + 1);
+
+	if (mark != -1) {
+		buffer_set_position(packet, mark);
+	}
+
+	return dname_make(region, buf, normalize);
+}
+
+const dname_type *
+dname_parse(region_type *region, const char *name)
+{
+	uint8_t dname[MAXDOMAINLEN];
+
+	const uint8_t *s = (const uint8_t *) name;
+	uint8_t *h;
+	uint8_t *p;
+	uint8_t *d = dname;
+	size_t label_length;
+
+	if (strcmp(name, ".") == 0) {
+		/* Root domain.  */
+		dname[0] = 0;
+		return dname_make(region, dname, 1);
+	}
+	
+	for (h = d, p = h + 1; *s; ++s, ++p) {
+		if (p - dname >= MAXDOMAINLEN) {
+			return NULL;
+		}
+		
+		switch (*s) {
+		case '.':
+			if (p == h + 1) {
+				/* Empty label.  */
+				return NULL;
+			} else {
+				label_length = p - h - 1;
+				if (label_length > MAXLABELLEN) {
+					return NULL;
+				}
+				*h = label_length;
+				h = p;
+			}
+			break;
+		case '\\':
+			/* Handle escaped characters (RFC1035 5.1) */
+			if (isdigit(s[1]) && isdigit(s[2]) && isdigit(s[3])) {
+				int val = (hexdigit_to_int(s[1]) * 100 +
+					   hexdigit_to_int(s[2]) * 10 +
+					   hexdigit_to_int(s[3]));
+				if (0 <= val && val <= 255) {
+					s += 3;
+					*p = val;
+				} else {
+					*p = *++s;
+				}
+			} else if (s[1] != '\0') {
+				*p = *++s;
+			}
+			break;
+		default:
+			*p = *s;
+			break;
+		}
+	}
+
+	if (p != h + 1) {
+		/* Terminate last label.  */
+		label_length = p - h - 1;
+		if (label_length > MAXLABELLEN) {
+			return NULL;
+		}
+		*h = label_length;
+		h = p;
+	}
+
+	/* Add root label.  */
+	*h = 0;
+	
+	return dname_make(region, dname, 1);
 }
 
 
 const dname_type *
 dname_copy(region_type *region, const dname_type *dname)
 {
-	dname_type *result;
-
-	assert(dname);
-
-	result = (dname_type *) region_alloc(region, dname_total_size(dname));
-	result->name_size = dname->name_size;
-	result->label_count = dname->label_count;
-	memcpy((uint8_t *) dname_label_offsets(result),
-	       dname_label_offsets(dname),
-	       result->label_count * sizeof(uint8_t));
-	memcpy((uint8_t *) dname_name(result),
-	       dname_name(dname),
-	       result->name_size * sizeof(uint8_t));
-	
-	return result;
+	return (dname_type *) region_alloc_init(
+		region, dname, dname_total_size(dname));
 }
 
 
 const dname_type *
 dname_partial_copy(region_type *region, const dname_type *dname, uint8_t label_count)
 {
-	assert(label_count > 0);
-
 	if (!dname)
 		return NULL;
+
+	if (label_count == 0) {
+		/* Always copy the root label.  */
+		label_count = 1;
+	}
 	
 	assert(label_count <= dname->label_count);
 
-	return dname_make(region, dname_label(dname, label_count - 1));
+	return dname_make(region, dname_label(dname, label_count - 1), 0);
+}
+
+
+const dname_type *
+dname_origin(region_type *region, const dname_type *dname)
+{
+	return dname_partial_copy(region, dname, dname->label_count - 1);
 }
 
 
@@ -254,130 +363,76 @@ dname_label_match_count(const dname_type *left, const dname_type *right)
 	return i;
 }
 
-
 const char *
-dname_to_string(const dname_type *dname)
+dname_to_string(const dname_type *dname, const dname_type *origin)
 {
-	return labels_to_string(dname_name(dname));
-}
+	static char buf[MAXDOMAINLEN * 5];
+	size_t i;
+	size_t labels_to_convert = dname->label_count - 1;
+	int absolute = 1;
+	char *dst;
+	const uint8_t *src;
 
-
-const char *
-labels_to_string(const uint8_t *dname)
-{
-	static char buf[MAXDOMAINLEN + 1];
-	char *p = buf;
-	const uint8_t *label = dname;
-
-	while (!label_is_root(label)) {
-		const uint8_t *data = label_data(label);
-		uint8_t i;
-		for (i = 0; i < label_length(label); ++i) {
-			*p++ = data[i];
-		}
-		*p++ = '.';
-		label = label_next(label);
+	if (dname->label_count == 1) {
+		strcpy(buf, ".");
+		return buf;
+	}
+	
+	if (origin && dname_is_subdomain(dname, origin)) {
+		int common_labels = dname_label_match_count(dname, origin);
+		labels_to_convert = dname->label_count - common_labels;
+		absolute = 0;
 	}
 
-	if (buf == p)
-		*p++ = '.';
-	*p++ = '\0';
-	
+	dst = buf;
+	src = dname_name(dname);
+	for (i = 0; i < labels_to_convert; ++i) {
+		size_t len = label_length(src);
+		size_t j;
+		++src;
+		for (j = 0; j < len; ++j) {
+			uint8_t ch = *src++;
+			if (isalnum(ch) || ch == '-' || ch == '_') {
+				*dst++ = ch;
+			} else if (ch == '.' || ch == '\\') {
+				*dst++ = '\\';
+				*dst++ = ch;
+			} else {
+				snprintf(dst, 5, "\\%03u", ch);
+				dst += 4;
+			}
+		}
+		*dst++ = '.';
+	}
+	if (absolute) {
+		*dst = '\0';
+	} else {
+		*--dst = '\0';
+	}
 	return buf;
 }
 
 
-/*
- * Parses the string and returns a dname with
- * the first byte indicating the size of the entire
- * dname.
- *
- * XXX Check if we dont run out of space (p < d + len)
- * XXX Verify that every label dont exceed MAXLABELLEN
- * XXX Complain about empty labels (.nlnetlabs..nl)
- */
-static const uint8_t *
-strdname (const char *source, const uint8_t *o)
-{
-	static uint8_t dname[MAXDOMAINLEN+1];
-
-	const uint8_t *s = (const uint8_t *) source;
-	uint8_t *h;
-	uint8_t *p;
-	uint8_t *d = dname + 1;
-
-	if (*s == '@' && *(s+1) == 0) {
-		for (p = dname, s = o; s < o + *o + 1; p++, s++)
-			*p = DNAME_NORMALIZE(*s);
-	} else {
-		for (h = d, p = h + 1; *s; s++, p++) {
-			switch (*s) {
-			case '.':
-				if (p == (h + 1)) p--;	/* Suppress empty labels */
-				*h = p - h - 1;
-				h = p;
-				break;
-			case '\\':
-				/* Handle escaped characters (RFC1035 5.1) */
-				if ('0' <= s[1] && s[1] <= '9' &&
-				    '0' <= s[2] && s[2] <= '9' &&
-				    '0' <= s[3] && s[3] <= '9')
-				{
-					int val = ((s[1] - '0') * 100 +
-						   (s[2] - '0') * 10 +
-						   (s[3] - '0'));
-					if (val >= 0 && val <= UCHAR_MAX) {
-						s += 3;
-						*p = NAMEDB_NORMALIZE(val);
-					} else {
-						*p = NAMEDB_NORMALIZE(*++s);
-					}
-				} else if (s[1] != '\0') {
-					*p = NAMEDB_NORMALIZE(*++s);
-				}
-				break;
-			default:
-				*p = DNAME_NORMALIZE(*s);
-			}
-		}
-		*h = p - h - 1;
-
-		/* If not absolute, append origin... */
-		if ((*(p-1) != 0) && (o != NULL)) {
-			for (s = o + 1; s < o + *o + 1; p++, s++)
-				*p = DNAME_NORMALIZE(*s);
-		}
-
-		*dname = (uint8_t) (p - d);
-
-	}
-
-	return dname;
-}
-
-
 const dname_type *
-create_dname(region_type *region, const uint8_t *str, const size_t len)
+dname_make_from_label(region_type *region,
+		      const uint8_t *label, const size_t length)
 {
-	uint8_t temp[MAXDOMAINLEN];
-	size_t i;
+	uint8_t temp[MAXLABELLEN + 2];
 
-	assert(len > 0 && len <= MAXLABELLEN);
+	assert(length > 0 && length <= MAXLABELLEN);
 
-	temp[0] = len;
-	for (i = 0; i < len; ++i) {
-		temp[i + 1] = DNAME_NORMALIZE(str[i]);
-	}
-	temp[len + 1] = '\000';
+	temp[0] = length;
+	memcpy(temp + 1, label, length * sizeof(uint8_t));
+	temp[length + 1] = '\000';
 
-	return dname_make(region, temp);
+	return dname_make(region, temp, 1);
 }
          
 
 const dname_type *
-cat_dname(region_type *region,
-	  const dname_type *left,
-	  const dname_type *right)
+dname_concatenate(region_type *region,
+		  const dname_type *left,
+		  const dname_type *right)
 {
 	uint8_t temp[MAXDOMAINLEN];
 
@@ -386,5 +441,5 @@ cat_dname(region_type *region,
 	memcpy(temp, dname_name(left), left->name_size - 1);
 	memcpy(temp + left->name_size - 1, dname_name(right), right->name_size);
 
-	return dname_make(region, temp);
+	return dname_make(region, temp, 0);
 }

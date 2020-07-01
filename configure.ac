@@ -1,7 +1,7 @@
 dnl
 dnl Some global settings
 dnl
-AC_INIT(NSD,2.1.5,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,2.3.0,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 dnl
@@ -90,14 +90,6 @@ AC_ARG_WITH([user],
 	[user=$withval])
 AC_SUBST(user)
 
-#
-# Determine the location of namedxfer
-#
-AC_ARG_WITH([namedxfer],
-	AC_HELP_STRING([--with-namedxfer=path], [Pathname to BIND8 named-xfer program if any]),
-	[namedxfer=$withval], [namedxfer=""])
-AC_SUBST(namedxfer)
-
 # Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
@@ -161,10 +153,48 @@ AC_CHECK_UNUSED_ATTRIBUTE
 
 # Checks for libraries.
 
+# Check for SSL, original taken from
+# http://www.gnu.org/software/ac-archive/htmldoc/check_ssl.html and
+# modified for NSD.
+AC_DEFUN([CHECK_SSL], [
+    AC_ARG_WITH(ssl, AC_HELP_STRING([--with-ssl=pathname],
+                                    [enable SSL (will check /usr/local/ssl
+                            /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr)]),[
+        ],[
+            withval="yes"
+        ])
+    if test x_$withval != x_no; then
+        AC_MSG_CHECKING(for SSL)
+        if test x_$withval = x_ -o x_$withval = x_yes; then
+            withval="/usr/local/ssl /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr"
+        fi
+        for dir in $withval; do
+            ssldir="$dir"
+            if test -f "$dir/include/openssl/ssl.h"; then
+                found_ssl="yes";
+                AC_DEFINE_UNQUOTED([HAVE_SSL], [], [Define if you have the SSL libraries installed.])
+                CPPFLAGS="$CPPFLAGS -I$ssldir/include";
+                break;
+            fi
+        done 
+        if test x_$found_ssl != x_yes; then
+            AC_MSG_ERROR(Cannot find the SSL libraries in $withval)
+        else
+            AC_MSG_RESULT(found in $ssldir)
+            HAVE_SSL=yes 
+            LDFLAGS="$LDFLAGS -L$ssldir/lib";
+            AC_CHECK_LIB(crypto, HMAC_CTX_init,, [
+                    AC_MSG_ERROR([OpenSSL found in $ssldir, but version 0.9.7 or higher is required])
+                ])
+        fi
+        AC_SUBST(HAVE_SSL)
+    fi
+])dnl
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h strings.h fcntl.h limits.h netinet/in.h stddef.h sys/param.h sys/socket.h syslog.h unistd.h sys/select.h stdarg.h stdint.h netdb.h sys/bitypes.h dlfcn.h tcpd.h])
+AC_CHECK_HEADERS([arpa/inet.h signal.h strings.h fcntl.h limits.h netinet/in.h stddef.h sys/param.h sys/socket.h syslog.h unistd.h sys/select.h stdarg.h stdint.h netdb.h sys/bitypes.h dlfcn.h tcpd.h])
 
 AC_SEARCH_LIBS(inet_pton, [nsl])
 AC_SEARCH_LIBS(socket, [socket])
@@ -204,6 +234,10 @@ changequote([,]), [
 #include <arpa/inet.h>
 #endif
 
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
 /* For Tru64 */
 #ifdef HAVE_SYS_BITYPES_H
 #include <sys/bitypes.h>
@@ -218,10 +252,13 @@ fi
 AC_LIBGTOP_CHECK_TYPE(int8_t, char) 
 AC_LIBGTOP_CHECK_TYPE(int16_t, short)
 AC_LIBGTOP_CHECK_TYPE(int32_t, int)
+AC_LIBGTOP_CHECK_TYPE(int64_t, long long)
 AC_LIBGTOP_CHECK_TYPE(uint8_t, unsigned char)
 AC_LIBGTOP_CHECK_TYPE(uint16_t, unsigned short)
 AC_LIBGTOP_CHECK_TYPE(uint32_t, unsigned int)
+AC_LIBGTOP_CHECK_TYPE(uint64_t, unsigned long long)
 AC_LIBGTOP_CHECK_TYPE(socklen_t, int)
+AC_LIBGTOP_CHECK_TYPE(sig_atomic_t, int)
 
 AC_CHECK_TYPE(in_addr_t, [], [AC_DEFINE([in_addr_t], [uint32_t], [in_addr_t])], [
 #if HAVE_SYS_TYPES_H
@@ -281,7 +318,6 @@ case "$withval" in
 esac
 AC_SUBST(LIBWRAP)
 
-
 dnl
 dnl Some random defines's
 dnl
@@ -289,7 +325,7 @@ AC_DEFINE_UNQUOTED([IDENTITY], ["unindentified server"], [Define to the default 
 AC_DEFINE_UNQUOTED([VERSION], [PACKAGE_STRING], [Define to the NSD version to answer version.server query.])
 AC_DEFINE_UNQUOTED([TCP_BACKLOG], [5], [Define to the backlog to be used with listen.])
 AC_DEFINE_UNQUOTED([TCP_PORT], ["53"], [Define to the default tcp port.])
-AC_DEFINE_UNQUOTED([TCP_MAX_MESSAGE_LEN], [16384], [Define to the default maxium message length.])
+AC_DEFINE_UNQUOTED([TCP_MAX_MESSAGE_LEN], [65535], [Define to the default maximum message length.])
 AC_DEFINE_UNQUOTED([TCP_TIMEOUT], [120], [Define to the default tcp timeout.])
 AC_DEFINE_UNQUOTED([UDP_PORT], ["53"], [Define to the default udp port.])
 AC_DEFINE_UNQUOTED([UDP_MAX_MESSAGE_LEN], [512], [Define to the default maximum udp message length.])
@@ -330,13 +366,13 @@ case "$enable_ipv6" in
 		;;
 esac
 
-AC_ARG_ENABLE(dnssec, AC_HELP_STRING([--enable-dnssec], [Enable experimental DNSSEC support according to the latest drafts.]))
+AC_ARG_ENABLE(dnssec, AC_HELP_STRING([--disable-dnssec], [Disable DNSSEC support.]))
 case "$enable_dnssec" in
-        yes)
-		AC_DEFINE_UNQUOTED([DNSSEC], [], [Define this enable experimental DNSSEC support.])
-		;;
-        no|*)
+        no)
                 ;;
+        yes|*)
+		AC_DEFINE_UNQUOTED([DNSSEC], [], [Define this enable DNSSEC (RFCs 4033, 4034, and 4035) support.])
+		;;
 esac
 
 AC_ARG_ENABLE(axfr, AC_HELP_STRING([--disable-axfr], [Disables AXFR]))
@@ -373,6 +409,19 @@ case "$enable_checking" in
 		;;
         no|*)
                 AC_DEFINE([NDEBUG], [], [Undefine this to enable internal runtime checks.])
+                ;;
+esac
+
+AC_ARG_ENABLE(tsig, AC_HELP_STRING([--disable-tsig], [Disable TSIG support]))
+case "$enable_tsig" in
+        no)
+		;;
+        yes|*)
+                CHECK_SSL
+                if test x_$HAVE_SSL != x_yes; then
+                   AC_MSG_ERROR(SSL is required to enable TSIG support.  Use --with-ssl to specify the location of the SSL libraries or --disable-tsig to disable TSIG support.)
+                fi
+                AC_DEFINE([TSIG], [], [Define this to enable TSIG support.])
                 ;;
 esac
 
@@ -424,17 +473,33 @@ AH_BOTTOM([
 #else /* !HAVE_ATTR_FORMAT */
 #define ATTR_FORMAT(archetype, string_index, first_to_check) /* empty */
 #endif /* !HAVE_ATTR_FORMAT */
-#ifdef HAVE_ATTR_UNUSED
-#define ATTR_UNUSED __attribute__((unused))
+#if defined(__cplusplus)
+#define ATTR_UNUSED(x)
+#elif defined(HAVE_ATTR_UNUSED)
+#define ATTR_UNUSED(x)  x __attribute__((unused))
 #else /* !HAVE_ATTR_UNUSED */
-#define ATTR_UNUSED /* empty */
+#define ATTR_UNUSED(x)  x
 #endif /* !HAVE_ATTR_UNUSED */
 ])
 
 AH_BOTTOM([
 #ifndef IPV6_MIN_MTU
 #define IPV6_MIN_MTU 1280
-#endif
+#endif /* IPV6_MIN_MTU */
+
+#ifndef AF_INET6
+#define AF_INET6	28
+#endif /* AF_INET6 */
+])
+
+AH_BOTTOM([
+#ifndef B64_PTON
+int b64_ntop(uint8_t const *src, size_t srclength,
+	     char *target, size_t targsize);
+#endif /* !B64_PTON */
+#ifndef B64_NTOP
+int b64_pton(char const *src, uint8_t *target, size_t targsize);
+#endif /* !B64_NTOP */
 ])
 
 AC_CONFIG_FILES([Makefile])

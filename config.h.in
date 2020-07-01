@@ -12,7 +12,7 @@
 /* Define this to disable axfr. */
 #undef DISABLE_AXFR
 
-/* Define this enable experimental DNSSEC support. */
+/* Define this enable DNSSEC (RFCs 4033, 4034, and 4035) support. */
 #undef DNSSEC
 
 /* Define to the default maximum message length with EDNS. */
@@ -96,6 +96,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the `crypto' library (-lcrypto). */
+#undef HAVE_LIBCRYPTO
+
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
@@ -127,6 +130,9 @@
 /* Define to 1 if you have the `sigaction' function. */
 #undef HAVE_SIGACTION
 
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
 /* Define to 1 if you have the `sigprocmask' function. */
 #undef HAVE_SIGPROCMASK
 
@@ -135,6 +141,9 @@
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
+
+/* Define if you have the SSL libraries installed. */
+#undef HAVE_SSL
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
@@ -265,7 +274,7 @@
 /* Define to the backlog to be used with listen. */
 #undef TCP_BACKLOG
 
-/* Define to the default maxium message length. */
+/* Define to the default maximum message length. */
 #undef TCP_MAX_MESSAGE_LEN
 
 /* Define to the default tcp port. */
@@ -273,6 +282,9 @@
 
 /* Define to the default tcp timeout. */
 #undef TCP_TIMEOUT
+
+/* Define this to enable TSIG support. */
+#undef TSIG
 
 /* Define to the default maximum udp message length. */
 #undef UDP_MAX_MESSAGE_LEN
@@ -309,6 +321,9 @@
 /* Define "int32_t" to "int" if "int32_t" is missing */
 #undef int32_t
 
+/* Define "int64_t" to "long long" if "int64_t" is missing */
+#undef int64_t
+
 /* Define "int8_t" to "char" if "int8_t" is missing */
 #undef int8_t
 
@@ -317,6 +332,9 @@
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
+
+/* Define "sig_atomic_t" to "int" if "sig_atomic_t" is missing */
+#undef sig_atomic_t
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t
@@ -332,6 +350,9 @@
 
 /* Define "uint32_t" to "unsigned int" if "uint32_t" is missing */
 #undef uint32_t
+
+/* Define "uint64_t" to "unsigned long long" if "uint64_t" is missing */
+#undef uint64_t
 
 /* Define "uint8_t" to "unsigned char" if "uint8_t" is missing */
 #undef uint8_t
@@ -375,15 +396,31 @@
 #else /* !HAVE_ATTR_FORMAT */
 #define ATTR_FORMAT(archetype, string_index, first_to_check) /* empty */
 #endif /* !HAVE_ATTR_FORMAT */
-#ifdef HAVE_ATTR_UNUSED
-#define ATTR_UNUSED __attribute__((unused))
+#if defined(__cplusplus)
+#define ATTR_UNUSED(x)
+#elif defined(HAVE_ATTR_UNUSED)
+#define ATTR_UNUSED(x)  x __attribute__((unused))
 #else /* !HAVE_ATTR_UNUSED */
-#define ATTR_UNUSED /* empty */
+#define ATTR_UNUSED(x)  x
 #endif /* !HAVE_ATTR_UNUSED */
 
 
 
 #ifndef IPV6_MIN_MTU
 #define IPV6_MIN_MTU 1280
-#endif
+#endif /* IPV6_MIN_MTU */
+
+#ifndef AF_INET6
+#define AF_INET6	28
+#endif /* AF_INET6 */
+
+
+
+#ifndef B64_PTON
+int b64_ntop(uint8_t const *src, size_t srclength,
+	     char *target, size_t targsize);
+#endif /* !B64_PTON */
+#ifndef B64_NTOP
+int b64_pton(char const *src, uint8_t *target, size_t targsize);
+#endif /* !B64_NTOP */
 

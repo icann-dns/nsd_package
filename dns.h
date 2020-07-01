@@ -1,50 +1,76 @@
 /*
- * dns.h -- everything we wanted to know but were afraid
- *		to ask about DNS
- *
- * Alexis Yushin, <alexis@nlnetlabs.nl>
+ * dns.h -- DNS definitions.
  *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
 #ifndef _DNS_H_
 #define _DNS_H_
 
+enum rr_section {
+	QUESTION_SECTION,
+	ANSWER_SECTION,
+	AUTHORITY_SECTION,
+	ADDITIONAL_SECTION,
+	/*
+	 * Use a split additional section to ensure A records appear
+	 * before any AAAA records (this is recommended practice to
+	 * avoid truncating the additional section for IPv4 clients
+	 * that do not specify EDNS0), and AAAA records before other
+	 * types of additional records (such as X25 and ISDN).
+	 * Encode_answer sets the ARCOUNT field of the response packet
+	 * correctly.
+	 */
+	ADDITIONAL_A_SECTION = ADDITIONAL_SECTION,
+	ADDITIONAL_AAAA_SECTION,
+	ADDITIONAL_OTHER_SECTION,
+
+	RR_SECTION_COUNT
+};
+typedef enum rr_section rr_section_type;
+
+/* Possible OPCODE values */
+#define OPCODE_QUERY		0 	/* a standard query (QUERY) */
+#define OPCODE_IQUERY		1 	/* an inverse query (IQUERY) */
+#define OPCODE_STATUS		2 	/* a server status request (STATUS) */
+#define OPCODE_NOTIFY		4 	/* NOTIFY */
+#define OPCODE_UPDATE		5 	/* Dynamic update */
+
+/* Possible RCODE values */
+#define RCODE_OK		0 	/* No error condition */
+#define RCODE_FORMAT		1 	/* Format error */
+#define RCODE_SERVFAIL		2 	/* Server failure */
+#define RCODE_NXDOMAIN		3 	/* Name Error */
+#define RCODE_IMPL		4 	/* Not implemented */
+#define RCODE_REFUSE		5 	/* Refused */
+#define RCODE_NOTAUTH		9	/* Not authorized */
+
+/* Standardized NSD return code.  Partially maps to DNS RCODE values.  */
+enum nsd_rc
+{
+	/* Discard the client request.  */
+	NSD_RC_DISCARD  = -1,
+	/* OK, continue normal processing.  */
+	NSD_RC_OK       = RCODE_OK,
+	/* Return the appropriate error code to the client.  */
+	NSD_RC_FORMAT   = RCODE_FORMAT,
+	NSD_RC_SERVFAIL = RCODE_SERVFAIL,
+	NSD_RC_NXDOMAIN = RCODE_NXDOMAIN,
+	NSD_RC_IMPL     = RCODE_IMPL,
+	NSD_RC_REFUSE   = RCODE_REFUSE,
+	NSD_RC_NOTAUTH  = RCODE_NOTAUTH
+};
+typedef enum nsd_rc nsd_rc_type;
+
 /* RFC1035 */
-#define	CLASS_IN	1	/* Class IN */
-#define	CLASS_CHAOS	3	/* Class CHAOS */
-#define CLASS_HS        4       /* Class HS */
-#define	CLASS_ANY	255	/* Class IN */
+#define CLASS_IN	1	/* Class IN */
+#define CLASS_CS	2	/* Class CS */
+#define CLASS_CH	3	/* Class CHAOS */
+#define CLASS_HS	4	/* Class HS */
+#define CLASS_ANY	255	/* Class ANY */
 
 #define TYPE_A		1	/* a host address */
 #define TYPE_NS		2	/* an authoritative name server */
@@ -62,53 +88,57 @@
 #define TYPE_MINFO	14	/* mailbox or mail list information */
 #define TYPE_MX		15	/* mail exchange */
 #define TYPE_TXT	16	/* text strings */
-#define	TYPE_RP		17	/* RFC1183 */
-#define	TYPE_AFSDB	18	/* RFC1183 */
-#define TYPE_X25        19	/* RFC1183 */
-#define TYPE_ISDN       20	/* RFC1183 */
-#define TYPE_RT         21	/* RFC1183 */
-#define TYPE_NSAP       22	/* RFC1706 */
+#define TYPE_RP		17	/* RFC1183 */
+#define TYPE_AFSDB	18	/* RFC1183 */
+#define TYPE_X25	19	/* RFC1183 */
+#define TYPE_ISDN	20	/* RFC1183 */
+#define TYPE_RT		21	/* RFC1183 */
+#define TYPE_NSAP	22	/* RFC1706 */
 
-#define	TYPE_SIG	24	/* 2535typecode */
-#define	TYPE_KEY	25	/* 2535typecode */
-#define TYPE_PX         26	/* RFC2163 */
+#define TYPE_SIG	24	/* 2535typecode */
+#define TYPE_KEY	25	/* 2535typecode */
+#define TYPE_PX		26	/* RFC2163 */
 
 #define TYPE_AAAA	28	/* ipv6 address */
 #define TYPE_LOC	29	/* LOC record  RFC1876 */
-#define	TYPE_NXT	30 	/* 2535typecode */
+#define TYPE_NXT	30	/* 2535typecode */
 
-#define	TYPE_SRV	33	/* SRV record RFC2782 */
+#define TYPE_SRV	33	/* SRV record RFC2782 */
 
-#define TYPE_NAPTR      35	/* RFC2915 */
-#define TYPE_KX         36	/* RFC2230 */
-#define TYPE_CERT       37	/* RFC2538 */
+#define TYPE_NAPTR	35	/* RFC2915 */
+#define TYPE_KX		36	/* RFC2230 */
+#define TYPE_CERT	37	/* RFC2538 */
 
-#define TYPE_DNAME      39	/* RFC2672 */
+#define TYPE_DNAME	39	/* RFC2672 */
 
-#define	TYPE_OPT	41	/* Pseudo OPT record... */
-#define TYPE_APL        42	/* RFC3123 */
-#define	TYPE_DS		43	/* draft-ietf-dnsext-delegation */
+#define TYPE_OPT	41	/* Pseudo OPT record... */
+#define TYPE_APL	42	/* RFC3123 */
+#define TYPE_DS		43	/* RFC 4033, 4034, and 4035 */
 #define TYPE_SSHFP	44	/* SSH Key Fingerprint */
 
-#define TYPE_RRSIG	46	/* draft-ietf-dnsext-dnssec-25 */
-#define TYPE_NSEC	47	
-#define TYPE_DNSKEY	48
+#define TYPE_RRSIG	46	/* RFC 4033, 4034, and 4035 */
+#define TYPE_NSEC	47	/* RFC 4033, 4034, and 4035 */
+#define TYPE_DNSKEY	48	/* RFC 4033, 4034, and 4035 */
 
-#define	TYPE_IXFR	251
-#define	TYPE_AXFR	252
-#define	TYPE_MAILB	253 	/* A request for mailbox-related records (MB, MG or MR) */
-#define	TYPE_MAILA	254	/* A request for mail agent RRs (Obsolete - see MX) */
+#define TYPE_TSIG	250
+#define TYPE_IXFR	251
+#define TYPE_AXFR	252
+#define TYPE_MAILB	253	/* A request for mailbox-related records (MB, MG or MR) */
+#define TYPE_MAILA	254	/* A request for mail agent RRs (Obsolete - see MX) */
 #define TYPE_ANY	255	/* any type (wildcard) */
 
-#define	MAXLABELLEN	63
-#define	MAXDOMAINLEN	255
+#define MAXLABELLEN	63
+#define MAXDOMAINLEN	255
 
-#define	MAXRDATALEN	64		/* This is more than enough, think multiple TXT */
-#define MAX_RDLENGTH            65535
+#define MAXRDATALEN	64 /* This is more than enough, think multiple TXT.  */
+#define MAX_RDLENGTH	65535
 
 /* Maximum size of a single RR.  */
 #define MAX_RR_SIZE \
 	(MAXDOMAINLEN + sizeof(uint32_t) + 4*sizeof(uint16_t) + MAX_RDLENGTH)
+
+#define IP4ADDRLEN	(32/8)
+#define IP6ADDRLEN	(128/8)
 
 /*
  * The different types of RDATA wireformat data.
@@ -140,7 +170,6 @@ enum rdata_zoneformat
 	RDATA_ZF_LONG,		/* 32-bit integer.  */
 	RDATA_ZF_A,		/* 32-bit IPv4 address.  */
 	RDATA_ZF_AAAA,		/* 128-bit IPv6 address.  */
-	RDATA_ZF_PROTOCOL,	/* IP Protocol (TCP/UDP/...).  */
 	RDATA_ZF_RRTYPE,	/* RR type.  */
 	RDATA_ZF_ALGORITHM,	/* Cryptographic algorithm.  */
 	RDATA_ZF_CERTIFICATE_TYPE,
@@ -150,7 +179,7 @@ enum rdata_zoneformat
 	RDATA_ZF_HEX,		/* Hexadecimal binary data.  */
 	RDATA_ZF_NSAP,		/* NSAP.  */
 	RDATA_ZF_APL,		/* APL.  */
-	RDATA_ZF_SERVICES,	/* Port number bitmap.  */
+	RDATA_ZF_SERVICES,	/* Protocol and port number bitmap.  */
 	RDATA_ZF_NXT,		/* NXT type bitmap.  */
 	RDATA_ZF_NSEC,		/* NSEC type bitmap.  */
 	RDATA_ZF_LOC,		/* Location data.  */
@@ -186,5 +215,27 @@ rrtype_descriptor_by_type(uint16_t type)
 }
 
 rrtype_descriptor_type *rrtype_descriptor_by_name(const char *name);
+
+const char *rrtype_to_string(uint16_t rrtype);
+
+/*
+ * Lookup the type in the ztypes lookup table.  If not found, check if
+ * the type uses the "TYPExxx" notation for unknown types.
+ *
+ * Return 0 if no type matches.
+ */
+uint16_t rrtype_from_string(const char *name);
+
+const char *rrclass_to_string(uint16_t rrclass);
+uint16_t rrclass_from_string(const char *name);
+
+#ifdef __cplusplus
+inline rr_section_type
+operator++(rr_section_type &lhs)
+{
+	lhs = (rr_section_type) ((int) lhs + 1);
+	return lhs;
+}
+#endif /* __cplusplus */
 
 #endif /* _DNS_H_ */

@@ -1,38 +1,9 @@
 /*
- * dname.h -- domain name operations
- *
- * Alexis Yushin, <alexis@nlnetlabs.nl>
+ * dname.h -- Domain name handling.
  *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
@@ -42,10 +13,14 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "heap.h"
+#include "buffer.h"
 #include "region-allocator.h"
 
+#if defined(NAMEDB_UPPERCASE) || defined(USE_NAMEDB_UPPERCASE)
+#define DNAME_NORMALIZE        toupper
+#else
 #define DNAME_NORMALIZE        tolower
+#endif
 
 
 /*
@@ -75,11 +50,24 @@ struct dname
 
 /*
  * Construct a new domain name based on NAME in wire format.  NAME
- * cannot contain (compression) pointers.
+ * cannot contain compression pointers.
  *
  * Pre: NAME != NULL.
  */
-const dname_type *dname_make(region_type *region, const uint8_t *name);
+const dname_type *dname_make(region_type *region, const uint8_t *name,
+			     int normalize);
+
+
+/*
+ * Construct a new domain name based on wire format dname stored at
+ * PACKET's current position.  Compression pointers are followed.  The
+ * PACKET's current position is changed to the end of the wire format
+ * dname or set to just after the first compression pointer.
+ */
+const dname_type *dname_make_from_packet(region_type *region,
+					 buffer_type *packet,
+					 int allow_pointers,
+					 int normalize);
 
 
 /*
@@ -93,9 +81,7 @@ const dname_type *dname_make(region_type *region, const uint8_t *name);
  *
  * Pre: name != NULL.
  */
-const dname_type *dname_parse(region_type *region,
-			      const char *name,
-			      const dname_type *origin);
+const dname_type *dname_parse(region_type *region, const char *name);
 
 
 /*
@@ -111,6 +97,11 @@ const dname_type *dname_partial_copy(region_type *region,
 				     const dname_type *dname,
 				     uint8_t label_count);
 
+
+/*
+ * The origin of DNAME.
+ */
+const dname_type *dname_origin(region_type *region, const dname_type *dname);
 
 /*
  * Return true if LEFT is a subdomain of RIGHT.
@@ -184,7 +175,7 @@ int dname_compare(const dname_type *left, const dname_type *right);
  * ordering based on the characters in the labels.
  *
  * Return < 0 if LEFT < RIGHT, 0 if LEFT == RIGHT, and > 0 if LEFT >
- * RIGHT.  The comparison is case insensitive.
+ * RIGHT.  The comparison is case sensitive.
  *
  * Pre: left != NULL && right != NULL
  *      label_is_normal(left) && label_is_normal(right)
@@ -333,33 +324,29 @@ label_next(const uint8_t *label)
  * static buffer that is overwritten the next time this function is
  * invoked.
  *
- * Pre: dname != NULL
- */
-const char *dname_to_string(const dname_type *dname);
-
-
-/*
- * Convert DNAME to its string representation.  The result points to a
- * static buffer that is overwritten the next time this function is
- * invoked.
+ * If ORIGIN is provided and DNAME is a subdomain of ORIGIN the dname
+ * will be represented relative to ORIGIN.
  *
  * Pre: dname != NULL
  */
-const char *labels_to_string(const uint8_t *dname);
+const char *dname_to_string(const dname_type *dname,
+			    const dname_type *origin);
 
 
 /*
- * Create a dname containing the single label specified by STR followd
- * by the root label.
+ * Create a dname containing the single label specified by STR
+ * followed by the root label.
  */
-const dname_type *create_dname(region_type *region, const uint8_t *str, const size_t len);
+const dname_type *dname_make_from_label(region_type *region,
+					const uint8_t *label,
+					const size_t length);
 
 
 /*
  * Concatenate two dnames.
  */
-const dname_type *cat_dname(region_type *region,
-			    const dname_type *left,
-			    const dname_type *right);
+const dname_type *dname_concatenate(region_type *region,
+				    const dname_type *left,
+				    const dname_type *right);
 
 #endif /* _DNAME_H_ */

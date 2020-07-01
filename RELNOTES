@@ -1,5 +1,75 @@
 NSD RELEASE NOTES
 
+2.3.0
+=============
+FEATURES:
+        - DNSSEC is now enabled by default. NSD should be fully
+          compliant with RFC4033, RFC4034, and RFC4035.
+
+BUG FIXES:
+        - nsd: Ensure that the number of -a flags does not exceed the
+          maximum specified by MAX_INTERFACES in config.h.
+        - nsd-xfer: Use serial number arithmetic (RFC1982) for the
+          zone serial check
+        - nsdc: Don't pass (fake) serial number to nsd-xfer if the
+          zone file does not exist.
+        - zonec: Loading many zones would cause namedb_find_zone to
+          slow down, performance patch by Kazunori Fujiwara.
+        - Bug #96: nsd-xfer did not handle 8-bit domain names
+          correctly.
+
+2.2.1
+=============
+FEATURES:
+        - The message priority is now included when logging to a file.
+
+BUG FIXES:
+        - Zero length RDATA using the unknown RR notation was not
+          working (except for the APL RR type).
+        - Bug #93: './configure' error message containing a comma must
+          be properly bracketed.
+        - Bug #94: nsd-xfer: Handle unexpected EOF when receiving AXFR
+          data.  Timeout if no data is received for more than 120
+          seconds (see the TCP_TIMEOUT parameter in config.h).
+        - Bug #95: An owner starting with an asterisk label ("*") was
+          being treated as its own wildcard child.
+
+2.2.0
+=============
+FEATURES:
+        - nsd-xfer: replacement program for named-xfer to perform zone
+          transfers using AXFR. TSIG is supported by nsd-xfer but not
+          yet by the nsd server. DNSSEC is also supported.  TSIG
+          requires OpenSSL version 0.9.7 or higher, configure using
+          --disable-tsig if you do not have OpenSSL installed.
+          Configure using --with-ssl=path if OpenSSL is not installed
+          at a standard location.
+
+CODE CHANGES:
+        - New data structure 'buffer_type' for representing binary
+          buffers that can be read, written, and resized.  Data in
+          these buffers is stored in network byte order.  This data
+          structure replaces the iobuf field of 'struct query'.
+
+BUG FIXES:
+        - Fixed endian problem in WKS record.
+        - Protocol can now be specified numerically in WKS record.
+        - Allow escape sequences (\DDD) in TTL, RR class, and RR type.
+        - The zone compiler now accepts many more characters in
+          unquoted strings such as domain name labels.  The characters
+          no longer need to be escaped with a backslash.
+        - Close included files after reading.
+        - Maximum TCP message size is now 65535 bytes.  AXFR response
+          packets are still limited to 16383 bytes for optimal
+          compression of dnames.
+        - The TSIG key for AXFRs can now also be stored in the file
+          <zonename>.tsiginfo.  This makes it possible to use TSIG
+          with multiple master servers.
+        - Signals are no longer blocked while performing I/O so the
+          server should respond quicker to signals.
+        - Fixed parsing of LOC rdata.  Fractions and altitude were not
+          handled correctly.
+
 2.1.5
 =============
 BUG FIXES:

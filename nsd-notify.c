@@ -1,38 +1,9 @@
 /*
  * nsd-notify.c -- sends notify(rfc1996) message to a list of servers
  *
- * Alexis Yushin, <alexis@nlnetlabs.nl>
- *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
@@ -52,12 +23,7 @@
 #include <unistd.h>
 #include <netdb.h>
 
-#include "dns.h"
-#include "dname.h"
-#include "nsd.h"
 #include "query.h"
-#include "region-allocator.h"
-#include "util.h"
 
 static void 
 usage (void)
@@ -75,8 +41,6 @@ main (int argc, char *argv[])
 	int c, udp_s;
 	struct query q;
 	const dname_type *zone = NULL;
-	uint16_t qtype = htons(TYPE_SOA);
-	uint16_t qclass = htons(CLASS_IN);
 	struct addrinfo hints, *res0, *res;
 	int error;
 	int default_family = DEFAULT_AI_FAMILY;
@@ -96,15 +60,20 @@ main (int argc, char *argv[])
 			default_family = AF_INET6;
 			break;
 #else /* !INET6 */
-			fprintf(stderr, "nsd-notify: IPv6 support not enabled\n");
+			log_msg(LOG_ERR, "IPv6 support not enabled\n");
 			exit(1);
 #endif /* !INET6 */
 		case 'p':
 			port = optarg;
 			break;
 		case 'z':
-			if ((zone = dname_parse(region, optarg, NULL)) == NULL)
-				usage();
+			zone = dname_parse(region, optarg);
+			if (!zone) {
+				log_msg(LOG_ERR,
+					"incorrect domain name '%s'",
+					optarg);
+				exit(1);
+			}
 			break;
 		default:
 			usage();
@@ -119,24 +88,20 @@ main (int argc, char *argv[])
 	/* Initialize the query */
 	memset(&q, 0, sizeof(struct query));
 	q.addrlen = sizeof(q.addr);
-	q.iobufptr = q.iobuf;
 	q.maxlen = 512;
+	q.packet = buffer_create(region, QIOBUFSZ);
+	memset(buffer_begin(q.packet), 0, buffer_remaining(q.packet));
 
 	/* Set up the header */
-	OPCODE_SET(&q, OPCODE_NOTIFY);
-	ID(&q) = 42;          /* Does not need to be random. */
-	AA_SET(&q);
-
-	q.iobufptr = q.iobuf + QHEADERSZ;
-
-	query_write(&q, dname_name(zone), zone->name_size);
-
-	/* Add type & class */
-	query_write(&q, &qtype, sizeof(qtype));
-	query_write(&q, &qclass, sizeof(qclass));
-
-	/* Set QDCOUNT=1 */
-	QDCOUNT((&q)) = htons(1);
+	OPCODE_SET(q.packet, OPCODE_NOTIFY);
+	ID_SET(q.packet, 42);	/* Does not need to be random. */
+	AA_SET(q.packet);
+	QDCOUNT_SET(q.packet, 1);
+	buffer_skip(q.packet, QHEADERSZ);
+	buffer_write(q.packet, dname_name(zone), zone->name_size);
+	buffer_write_u16(q.packet, TYPE_SOA);
+	buffer_write_u16(q.packet, CLASS_IN);
+	buffer_flip(q.packet);
 
 	for (/*empty*/; *argv; argv++) {
 		/* Set up UDP */
@@ -163,8 +128,9 @@ main (int argc, char *argv[])
 			memcpy(&q.addr, res->ai_addr, res->ai_addrlen);
 
 			/* WE ARE READY SEND IT OUT */
-
-			if (sendto(udp_s, q.iobuf, query_used_size(&q), 0,
+			if (sendto(udp_s,
+				   buffer_current(q.packet),
+				   buffer_remaining(q.packet), 0,
 				   res->ai_addr, res->ai_addrlen) == -1)
 			{
 				fprintf(stderr,

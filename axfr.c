@@ -1,47 +1,17 @@
 /*
  * axfr.c -- generating AXFR responses.
  *
- * Erik Rozendaal, <erik@nlnetlabs.nl>
- *
  * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
  *
- * This software is an open source.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * Neither the name of the NLNET LABS nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * See LICENSE for the license.
  *
  */
 
 #include <config.h>
 
-#include "answer.h"
 #include "axfr.h"
 #include "dns.h"
-#include "query.h"
+#include "packet.h"
 
 #ifdef LIBWRAP
 #include <tcpd.h>
@@ -62,12 +32,15 @@ query_axfr (struct nsd *nsd, struct query *query)
 	if (query->axfr_is_done)
 		return QUERY_PROCESSED;
 
-	assert(!query_overflow(query));
+	if (query->maxlen > AXFR_MAX_MESSAGE_LEN)
+		query->maxlen = AXFR_MAX_MESSAGE_LEN;
 	
+	assert(!query_overflow(query));
+
 	if (query->axfr_zone == NULL) {
 		/* Start AXFR.  */
 		exact = namedb_lookup(nsd->db,
-				      query->name,
+				      query->qname,
 				      &closest_match,
 				      &closest_encloser);
 		
@@ -79,7 +52,7 @@ query_axfr (struct nsd *nsd, struct query *query)
 		    || query->axfr_zone->apex != query->domain)
 		{
 			/* No SOA no transfer */
-			RCODE_SET(query, RCODE_REFUSE);
+			RCODE_SET(query->packet, RCODE_REFUSE);
 			return QUERY_PROCESSED;
 		}
 
@@ -90,20 +63,24 @@ query_axfr (struct nsd *nsd, struct query *query)
 
 		query_add_compression_domain(query, query->domain, QHEADERSZ);
 
-		assert(query->axfr_zone->soa_rrset->rrslen == 1);
-		added = encode_rr(query,
-				  query->axfr_zone->apex,
-				  query->axfr_zone->soa_rrset,
-				  0);
+		assert(query->axfr_zone->soa_rrset->rr_count == 1);
+		added = packet_encode_rr(query,
+					 query->axfr_zone->apex,
+					 &query->axfr_zone->soa_rrset->rrs[0]);
 		if (!added) {
 			/* XXX: This should never happen... generate error code? */
 			abort();
 		}
 		++total_added;
 	} else {
-		/* Query name only needs to be preserved in first answer packet.  */
-		query->iobufptr = query->iobuf + QHEADERSZ;
-		QDCOUNT(query) = 0;
+		/*
+		 * Query name and EDNS need not be repeated after the
+		 * first response packet.
+		 */
+		query->edns.status = EDNS_NOT_PRESENT;
+		buffer_set_limit(query->packet, QHEADERSZ);
+		QDCOUNT_SET(query->packet, 0);
+		query_prepare_response(query);
 	}
 
 	/* Add zone RRs until answer is full.  */
@@ -120,11 +97,11 @@ query_axfr (struct nsd *nsd, struct query *query)
 			if (query->axfr_current_rrset != query->axfr_zone->soa_rrset
 			    && query->axfr_current_rrset->zone == query->axfr_zone)
 			{
-				while (query->axfr_current_rr < query->axfr_current_rrset->rrslen) {
-					added = encode_rr(query,
-							  query->axfr_current_domain,
-							  query->axfr_current_rrset,
-							  query->axfr_current_rr);
+				while (query->axfr_current_rr < query->axfr_current_rrset->rr_count) {
+					added = packet_encode_rr(
+						query,
+						query->axfr_current_domain,
+						&query->axfr_current_rrset->rrs[query->axfr_current_rr]);
 					if (!added)
 						goto return_answer;
 					++total_added;
@@ -141,20 +118,19 @@ query_axfr (struct nsd *nsd, struct query *query)
 	}
 
 	/* Add terminating SOA RR.  */
-	assert(query->axfr_zone->soa_rrset->rrslen == 1);
-	added = encode_rr(query,
-			  query->axfr_zone->apex,
-			  query->axfr_zone->soa_rrset,
-			  0);
+	assert(query->axfr_zone->soa_rrset->rr_count == 1);
+	added = packet_encode_rr(query,
+				 query->axfr_zone->apex,
+				 &query->axfr_zone->soa_rrset->rrs[0]);
 	if (added) {
 		++total_added;
 		query->axfr_is_done = 1;
 	}
 
 return_answer:
-	ANCOUNT(query) = htons(total_added);
-	NSCOUNT(query) = 0;
-	ARCOUNT(query) = 0;
+	ANCOUNT_SET(query->packet, total_added);
+	NSCOUNT_SET(query->packet, 0);
+	ARCOUNT_SET(query->packet, 0);
 	query_clear_compression_tables(query);
 	return QUERY_IN_AXFR;
 }
@@ -166,14 +142,14 @@ query_state_type
 answer_axfr_ixfr(struct nsd *nsd, struct query *q)
 {
 	/* Is it AXFR? */
-	switch (q->type) {
+	switch (q->qtype) {
 	case TYPE_AXFR:
 #ifndef DISABLE_AXFR		/* XXX Should be a run-time flag */
 		if (q->tcp) {
 #ifdef LIBWRAP
 			struct request_info request;
 #ifdef AXFR_DAEMON_PREFIX
-			const uint8_t *qptr = dname_name(q->name);
+			const uint8_t *qptr = dname_name(q->qname);
 			char axfr_daemon[MAXDOMAINLEN + sizeof(AXFR_DAEMON_PREFIX)];
 			char *t = axfr_daemon + sizeof(AXFR_DAEMON_PREFIX) - 1;
 
@@ -199,7 +175,7 @@ answer_axfr_ixfr(struct nsd *nsd, struct query *q)
 				log_msg(LOG_ERR, "checking %s", axfr_daemon);
 				if (!hosts_access(&request)) {
 #endif /* AXFR_DAEMON_PREFIX */
-					RCODE_SET(q, RCODE_REFUSE);
+					RCODE_SET(q->packet, RCODE_REFUSE);
 					return QUERY_PROCESSED;
 #ifdef AXFR_DAEMON_PREFIX
 				}
@@ -210,7 +186,7 @@ answer_axfr_ixfr(struct nsd *nsd, struct query *q)
 		}
 #endif	/* DISABLE_AXFR */
 	case TYPE_IXFR:
-		RCODE_SET(q, RCODE_REFUSE);
+		RCODE_SET(q->packet, RCODE_REFUSE);
 		return QUERY_PROCESSED;
 	default:
 		return QUERY_DISCARDED;
