@@ -1,4 +1,4 @@
-.TH "nsd.conf" "5" "Mar 15, 2016" "NLnet Labs" "nsd 4.1.9"
+.TH "nsd.conf" "5" "Jun 14, 2016" "NLnet Labs" "nsd 4.1.10"
 .\" Copyright (c) 2001\-2008, NLnet Labs. All rights reserved.
 .\" See LICENSE for the license.
 .SH "NAME"
@@ -169,6 +169,10 @@ Allows NSD to bind to non local addresses. This is useful to have NSD
 listen to IP addresses that are not (yet) added to the network interface, so
 that it can answer immediately when the address is added. Default is no.
 .TP
+.B ip\-freebind:\fR <yes or no>
+Set the IP_FREEBIND option to bind to nonlocal addresses and interfaces
+that are down.  Similar to ip\-transparent.  Default is no.
+.TP
 .B reuseport:\fR <yes or no>
 Use the SO_REUSEPORT socket option, and create file descriptors for every
 server in the server\-count.  This improves performance of the network
@@ -193,7 +197,7 @@ If yes, NSD listens to IPv6 connections.  Default yes.
 .TP
 .B database:\fR <filename>
 By default 
-.I @dbfile@
+.I '@dbfile@'
 is used. The specified file is used to store the compiled 
 zone information. Same as commandline option 
 .BR \-f.
@@ -812,7 +816,7 @@ also function as a resolver or cache. The configuration options that
 BIND9 has for the resolver or caching thus have no equivalents for NSD.
 .SH "FILES"
 .TP
-@dbfile@
+"@dbfile@"
 default
 .B NSD
 database
