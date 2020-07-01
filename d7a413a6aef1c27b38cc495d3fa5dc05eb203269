@@ -1,0 +1,3 @@
+  * Drop the cronjob as it is no longer needed
+  * Bump the urgency to high, so people don't install 4.0.0~rc3 from
+    testing for too long
