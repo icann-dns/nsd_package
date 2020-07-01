@@ -1,0 +1,3 @@
+  * Update debian/watch and add signing-key to verify upstream releases
+  * New upstream version 4.1.16
+  * Rebase patches on top of 4.1.16 release
