@@ -205,7 +205,9 @@ sig_handler (int sig)
 		return;
 	case SIGALRM:
 #ifdef BIND8_STATS
-		alarm(nsd.st.period);
+		/* resync to the next whole minute */
+		if(nsd.st.period > 0)
+			alarm(nsd.st.period - (time(NULL) % nsd.st.period));
 #endif
 		sig = SIGUSR1;
 		break;
@@ -400,6 +402,7 @@ main (int argc, char *argv[])
 	nsd.child_count = 1;
 	nsd.maximum_tcp_count = 10;
 	nsd.current_tcp_count = 0;
+	nsd.grab_ip6_optional = 0;
 	
 	/* EDNS0 */
 	edns_init_data(&nsd.edns_ipv4, EDNS_MAX_MESSAGE_LEN);
@@ -604,11 +607,12 @@ main (int argc, char *argv[])
 		 * automatically mapped to our IPv6 socket.
 		 */
 #ifdef INET6
-		if (hints[i].ai_family == AF_UNSPEC) {
+		if (hints[0].ai_family == AF_UNSPEC) {
 # ifdef IPV6_V6ONLY
 			hints[0].ai_family = AF_INET6;
 			hints[1].ai_family = AF_INET;
 			nsd.ifs = 2;
+			nsd.grab_ip6_optional = 1;
 # else /* !IPV6_V6ONLY */
 			hints[0].ai_family = AF_INET6;
 # endif	/* !IPV6_V6ONLY */

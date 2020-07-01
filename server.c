@@ -239,6 +239,13 @@ server_init(struct nsd *nsd)
 	/* Make a socket... */
 	for (i = 0; i < nsd->ifs; i++) {
 		if ((nsd->udp[i].s = socket(nsd->udp[i].addr->ai_family, nsd->udp[i].addr->ai_socktype, 0)) == -1) {
+#if defined(INET6)
+			if (nsd->udp[i].addr->ai_family == AF_INET6 && 
+				errno == EAFNOSUPPORT && nsd->grab_ip6_optional) {
+				log_msg(LOG_WARNING, "fallback to UDP4, no IPv6: not supported");
+				continue;
+			}
+#endif /* INET6 */
 			log_msg(LOG_ERR, "can't create a socket: %s", strerror(errno));
 			return -1;
 		}
@@ -288,6 +295,13 @@ server_init(struct nsd *nsd)
 	/* Make a socket... */
 	for (i = 0; i < nsd->ifs; i++) {
 		if ((nsd->tcp[i].s = socket(nsd->tcp[i].addr->ai_family, nsd->tcp[i].addr->ai_socktype, 0)) == -1) {
+#if defined(INET6)
+			if (nsd->tcp[i].addr->ai_family == AF_INET6 && 
+				errno == EAFNOSUPPORT && nsd->grab_ip6_optional) {
+				log_msg(LOG_WARNING, "fallback to TCP4, no IPv6: not supported");
+				continue;
+			}
+#endif /* INET6 */
 			log_msg(LOG_ERR, "can't create a socket: %s", strerror(errno));
 			return -1;
 		}
@@ -352,7 +366,8 @@ server_init(struct nsd *nsd)
 #ifdef	BIND8_STATS
 	/* Initialize times... */
 	time(&nsd->st.boot);
-	alarm(nsd->st.period);
+	if(nsd->st.period > 0)
+		alarm(nsd->st.period - (time(NULL) % nsd->st.period));
 #endif /* BIND8_STATS */
 
 	return 0;
@@ -493,7 +508,8 @@ server_main(struct nsd *nsd)
 #ifdef BIND8_STATS
 				/* Restart dumping stats if required.  */
 				time(&nsd->st.boot);
-				alarm(nsd->st.period);
+				if(nsd->st.period > 0)
+					alarm(nsd->st.period - (time(NULL) % nsd->st.period));
 #endif
 
 				if (server_start_children(nsd) != 0) {
