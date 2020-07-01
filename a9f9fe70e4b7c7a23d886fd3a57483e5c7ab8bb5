@@ -1,0 +1,3 @@
+  * Remove generated certs for nsd-control on purge (Closes: #832345)
+    (Removed from previous changelog entry to reflect this)
+  * Add missing changes to previous changelog entry
