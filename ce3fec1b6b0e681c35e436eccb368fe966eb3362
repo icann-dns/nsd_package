@@ -1,0 +1,15 @@
+  * New upstream release.
+  * Include bind named-xfer build in nsd sources (Closes: #282237)
+  * New upstream release.
+  * New upstream release.
+  * Remove patch to fix usage of '@' as it was merged upstream.
+  * Add conflicts to mico and aolserver, which have conflicting files
+    (Closes: #274781)
+  * Exclude nsd-xfer from dh_strip to fix FTBFS on mips, this will
+    reset 'sarge' counter, so urgency set to high.
+  * Also update zparser.c and now build in pbuilder environment.
+  * Add bison to build depends.
+  * Fix usage of '@' in zone data (urgency to medium, to push this
+    changes to sarge).
+  * New upstream release.
+  * New upstream release.
