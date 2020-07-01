@@ -1,0 +1,2 @@
+  * Non-maintainer upload to solve release goal.
+  * Add LSB dependency header to init.d scripts (Closes: #465060).
