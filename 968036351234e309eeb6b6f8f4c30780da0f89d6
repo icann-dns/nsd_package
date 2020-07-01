@@ -1,0 +1,3 @@
+  * New upstream version 4.0.0
+  * $PIDFILE in init script should be file and not a directory
+  * lintian: transitional package should be oldlibs extra
