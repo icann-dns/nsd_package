@@ -1,7 +1,7 @@
 /*
  * nsd.c -- nsd(8)
  *
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved.
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved.
  *
  * See LICENSE for the license.
  *
@@ -61,6 +61,9 @@ usage (void)
 		);
 	fprintf(stderr,
 		"  -i identity     Specify the identity when queried for id.server CHAOS TXT.\n"
+#ifdef NSID
+		"  -I nsid         Specify the NSID. This must be a hex string.\n"
+#endif /* NSID */
 		"  -l filename     Specify the log file.\n"
 		"  -N server-count The number of servers to start.\n"
 		"  -n tcp-count    The maximum number of TCP connections per server.\n"
@@ -84,7 +87,7 @@ version(void)
 	fprintf(stderr, "%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
 	fprintf(stderr, "Written by NLnet Labs.\n\n");
 	fprintf(stderr,
-		"Copyright (C) 2001-2004 NLnet Labs.  This is free software.\n"
+		"Copyright (C) 2001-2006 NLnet Labs.  This is free software.\n"
 		"There is NO warranty; not even for MERCHANTABILITY or FITNESS\n"
 		"FOR A PARTICULAR PURPOSE.\n");
 	exit(0);
@@ -198,7 +201,6 @@ sig_handler (int sig)
 	case SIGCHLD:
 		return;
 	case SIGHUP:
-		/* log_msg(LOG_WARNING, "signal %d received, reloading...", sig); */
 		nsd.mode = NSD_RELOAD;
 		return;
 	case SIGALRM:
@@ -224,7 +226,6 @@ sig_handler (int sig)
 	case SIGTERM:
 	default:
 		nsd.mode = NSD_SHUTDOWN;
-		/* log_msg(LOG_WARNING, "signal %d received, shutting down...", sig); */
 		sig = SIGTERM;
 		break;
 	}
@@ -232,6 +233,7 @@ sig_handler (int sig)
 	/* Distribute the signal to the servers... */
 	for (i = 0; i < nsd.child_count; ++i) {
 		if (nsd.children[i].pid > 0 && kill(nsd.children[i].pid, sig) == -1) {
+			/* we're so in trouble here, so do log this! */
 			log_msg(LOG_ERR, "problems killing %d: %s",
 				(int) nsd.children[i].pid, strerror(errno));
 		}
@@ -257,14 +259,14 @@ bind8_stats (struct nsd *nsd)
 		"RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP_PTR", "SIG",		/* 24 */
 		"KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC",		/* 32 */
 		"SRV", "ATMA", "NAPTR", "KX", "CERT", "A6", "DNAME", "SINK",		/* 40 */
-		"OPT", NULL, "DS", NULL, NULL, "RRSIG", "NSEC", "DNSKEY",		/* 48 */
+		"OPT", "APL", "DS", "SSHFP", NULL, "RRSIG", "NSEC", "DNSKEY",		/* 48 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 56 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 64 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 72 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 80 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 88 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 96 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 104 */
+		NULL, NULL, "SPF", NULL, NULL, NULL, NULL, NULL,			/* 104 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 112 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 120 */
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 128 */
@@ -389,6 +391,8 @@ main (int argc, char *argv[])
 	}
 
 	nsd.identity	= IDENTITY;
+	nsd.nsid        = NULL;
+	nsd.nsid_len  	= 0;
 	nsd.version	= VERSION;
 	nsd.username	= USER;
 	nsd.chrootdir	= NULL;
@@ -418,7 +422,7 @@ main (int argc, char *argv[])
 
 
 	/* Parse the command line... */
-	while ((c = getopt(argc, argv, "46a:df:hi:l:N:n:P:p:s:u:t:X:vF:L:")) != -1) {
+	while ((c = getopt(argc, argv, "46a:df:hi:I:l:N:n:P:p:s:u:t:X:vF:L:")) != -1) {
 		switch (c) {
 		case '4':
 			for (i = 0; i < MAX_INTERFACES; ++i) {
@@ -439,7 +443,7 @@ main (int argc, char *argv[])
 				nodes[nsd.ifs] = optarg;
 				++nsd.ifs;
 			} else {
-				error("too many interfaces ('-a') specified");
+				error("too many interfaces ('-a') specified.");
 			}
 			break;
 		case 'd':
@@ -454,13 +458,39 @@ main (int argc, char *argv[])
 		case 'i':
 			nsd.identity = optarg;
 			break;
+		case 'I':
+#ifdef NSID
+			if (nsd.nsid_len != 0) {
+				/* can only be given once */
+				break;
+			}
+			if (strlen(optarg) % 2 != 0) {
+				error("the NSID must be a hex string of an even length.");
+			}
+			nsd.nsid = xalloc(strlen(optarg) / 2);
+			nsd.nsid_len = strlen(optarg) / 2;
+			unsigned char *t = nsd.nsid;
+			while(*optarg) {
+				int j;
+				for (j = 16; j >= 1; j -= 15) {
+					if (isxdigit(*optarg)) {
+						*t += hexdigit_to_int(*optarg) * j;
+					} else {
+						error("illegal hex charactor '%c' in NSID.", (int)*optarg);
+					}
+					++optarg;
+				}
+				++t;
+			}
+#endif /* NSID */
+			break;
 		case 'l':
 			log_filename = optarg;
 			break;
 		case 'N':
 			i = atoi(optarg);
 			if (i <= 0) {
-				error("number of child servers must be greather than zero");
+				error("number of child servers must be greather than zero.");
 			} else {
 				nsd.child_count = i;
 			}
@@ -468,7 +498,7 @@ main (int argc, char *argv[])
 		case 'n':
 			i = atoi(optarg);
 			if (i <= 0) {
-				error("number of concurrent TCP connections must greater than zero");
+				error("number of concurrent TCP connections must greater than zero.");
 			} else {
 				nsd.maximum_tcp_count = i;
 			}
@@ -477,6 +507,9 @@ main (int argc, char *argv[])
 			nsd.pidfile = optarg;
 			break;
 		case 'p':
+			if (atoi(optarg) == 0) {
+				error("port argument must be numeric.");
+			}
 			tcp_port = optarg;
 			udp_port = optarg;
 			break;
@@ -537,6 +570,15 @@ main (int argc, char *argv[])
 		error("server identity too long (%u characters)",
 		      (unsigned) strlen(nsd.identity));
 	}
+#ifdef NSID
+	if (nsd.nsid_len > UCHAR_MAX) {
+		error("NSID to long (%u characters)", nsd.nsid_len);
+	}
+	edns_init_nsid(&nsd.edns_ipv4, nsd.nsid_len);
+ #if defined(INET6)
+	edns_init_nsid(&nsd.edns_ipv6, nsd.nsid_len);
+ #endif /* INET6 */
+#endif /* NSID */
 	
 	/* Number of child servers to fork.  */
 	nsd.children = (struct nsd_child *) region_alloc(

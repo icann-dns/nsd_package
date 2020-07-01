@@ -2,7 +2,7 @@
 /*
  * zlexer.lex - lexical analyzer for (DNS) zone files
  * 
- * Copyright (c) 2001-2004, NLnet Labs. All rights reserved
+ * Copyright (c) 2001-2006, NLnet Labs. All rights reserved
  *
  * See LICENSE for the license.
  *
@@ -72,13 +72,13 @@ pop_parser_state(void)
 
 SPACE   [ \t]
 LETTER  [a-zA-Z]
-NEWLINE \n
-ZONESTR [^ \t\n();.\"\$]
+NEWLINE [\n\r]
+ZONESTR [^ \t\n\r();.\"\$]
 DOLLAR  \$
 COMMENT ;
 DOT     \.
 BIT	[^\]\n]|\\.
-ANY     [^\"\n]|\\.
+ANY     [^\"\n\\]|\\.
 
 %x	incl bitlabel quotedstring
 
@@ -243,14 +243,15 @@ ANY     [^\"\n]|\\.
 }
 
 	/* Quoted strings.  Strip leading and ending quotes.  */
-\"			{ BEGIN(quotedstring); }
+\"			{ BEGIN(quotedstring); LEXOUT(("\" ")); }
 <quotedstring><<EOF>> 	{
 	zc_error("EOF inside quoted string");
 	BEGIN(INITIAL);
 }
-<quotedstring>{ANY}*	{ yymore(); }
+<quotedstring>{ANY}*	{ LEXOUT(("STR ")); yymore(); }
 <quotedstring>\n 	{ ++parser->line; yymore(); }
 <quotedstring>\" {
+	LEXOUT(("\" "));
 	BEGIN(INITIAL);
 	yytext[yyleng - 1] = '\0';
 	return parse_token(STR, yytext, &lexer_state);
