@@ -1,0 +1,3 @@
+  * Use 'dpkg-query --control-path nsd3 postrm' instead of hard-coded path
+  * Set urgency to high since we need to push fix for nsd.conf migration
+    to testing (forgot to do so in last upload).
