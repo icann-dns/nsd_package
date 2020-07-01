@@ -1,0 +1,3 @@
+  * Imported Upstream version 4.1.6
+  * Rebase patches on top of 4.1.6 release
+  * Move nsd under pkg-dns umbrella
