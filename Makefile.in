@@ -21,7 +21,7 @@ zonesfile = @zonesfile@
 dbfile = @dbfile@
 configfile = @configfile@
 zonesdir = @zonesdir@
-namedxfer = @namedxfer@
+nsdxfer = @nsdxfer@
 user = @user@
 
 CC		= @CC@
@@ -172,7 +172,7 @@ nsd-xfer:	$(NSD_XFER_OBJECTS) $(LIBOBJS)
 	$(LINK) -o $@ $(NSD_XFER_OBJECTS) $(LIBOBJS) $(LIBWRAP) $(LIBS)
 
 clean:
-	rm -f dname rbtree *.o *.so y.* *.core *.gmon
+	rm -f dname rbtree *.o *.so y.* *.core *.gmon tags TAGS
 	rm -f $(TARGETS)
 
 devclean: clean
@@ -228,6 +228,9 @@ config.h.in:	configure.ac
 
 configure:	configure.ac
 	autoconf
+
+tags: 	
+	ctags *.[ch]
 
 # Dependencies
 answer.o: answer.c config.h answer.h dns.h namedb.h dname.h buffer.h \

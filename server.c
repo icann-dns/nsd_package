@@ -412,6 +412,7 @@ server_main(struct nsd *nsd)
 	int status;
 	pid_t child_pid;
 	pid_t reload_pid = -1;
+	pid_t old_pid;
 	sig_atomic_t mode;
 	
 	assert(nsd->server_kind == NSD_SERVER_MAIN);
@@ -459,6 +460,8 @@ server_main(struct nsd *nsd)
 				break;
 			}
 
+			log_msg(LOG_WARNING, "signal received, reloading...");
+
 			reload_pid = fork();
 			switch (reload_pid) {
 			case -1:
@@ -482,29 +485,33 @@ server_main(struct nsd *nsd)
 				}
 #endif /* PLUGINS */
 
-				/* Send SIGINT to terminate the parent quitely... */
-				if (kill(nsd->pid, SIGINT) != 0) {
-					log_msg(LOG_ERR, "cannot kill %d: %s",
-						(int) nsd->pid, strerror(errno));
-					exit(1);
-				}
-
+				old_pid = nsd->pid;
 				nsd->pid = getpid();
 				reload_pid = -1;
 
-				/* Refork the servers... */
-				server_start_children(nsd);
+#ifdef BIND8_STATS
+				/* Restart dumping stats if required.  */
+				time(&nsd->st.boot);
+				alarm(nsd->st.period);
+#endif
+
+				if (server_start_children(nsd) != 0) {
+					kill(nsd->pid, SIGTERM);
+					exit(1);
+				}
+
+				/* Send SIGINT to terminate the parent quitely... */
+				if (kill(old_pid, SIGINT) != 0) {
+					log_msg(LOG_ERR, "cannot kill %d: %s",
+						(int) old_pid, strerror(errno));
+					exit(1);
+				}
 
 				/* Overwrite pid... */
 				if (writepid(nsd) == -1) {
 					log_msg(LOG_ERR, "cannot overwrite the pidfile %s: %s", nsd->pidfile, strerror(errno));
 				}
 
-#ifdef BIND8_STATS
-				/* Restart dumping stats if required.  */
-				alarm(nsd->st.period);
-#endif
-				
 				break;
 			default:
 				/* PARENT */
@@ -515,6 +522,7 @@ server_main(struct nsd *nsd)
 			server_shutdown(nsd);
 			break;
 		case NSD_SHUTDOWN:
+			log_msg(LOG_WARNING, "signal received, shutting down...");
 			break;
 		default:
 			log_msg(LOG_WARNING, "NSD main server mode invalid: %d", nsd->mode);
