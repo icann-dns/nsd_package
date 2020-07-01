@@ -1,0 +1,10 @@
+  * New upstream version 4.0.0~rc3
+  * Add nsd3 transitional package to finish the move from nsd3 to nsd
+    package
+  * Add nsd.maintscript to move the /etc/nsd3/nsd.conf from nsd3 to
+    /etc/nsd/nsd.conf to nsd package
+  * New upstream version 4.0.0~rc2
+  * Cleanup build rules to debian/compat = 9
+  * Use master/pristine-tar/upstream branches
+  * Add libevent-dev to B-D
+  * Update init.d script, and add upstart and systemd support
