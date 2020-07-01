@@ -1,0 +1,2 @@
+  * Fix "invalid user: nsd" install error by moving auto-generated
+    debhelper code to the end of the postinst script. (LP: #1311886)
