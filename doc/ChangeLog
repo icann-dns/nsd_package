@@ -1,5 +1,170 @@
+4 Sep 2014: Wouter
+	- Tag 4.1.0.
+
+29 Aug 2014: Wouter
+	- Fix install of the nsd-checkconf man page.
+
+28 Aug 2014: Wouter
+	- Tag 4.1.0rc1
+
+25 Aug 2014: Wouter
+	- Increased default --with-max-ips from 8 to 16, this increases the
+	  number of interfaces you can specify in nsd.conf to listen to.
+
+19 Aug 2014: Wouter
+	- Remove .LP after .SH in man pages.
+
+7 Aug 2014: Wouter
+	- Fix for process swap of main and reload, reload failure from the
+	  pipe is acted on, and reload fail not cause nsd to shutdown, also
+	  ignore sigchlds from the servermain in reload, that would cause
+	  EINTR to break file reads.
+	- trunk has version 4.1.
+
+5 Aug 2014: Wouter
+	- Fix #600: document that provide-xfr provides AXFR and not IXFR.
+	- remove program group fix, because it is not needed.
+	- Fix rising-load-average or memory-leaks in OSes (Linux since 2.6),
+	  that keep track of all past process parents, or leak memory
+	  for them.  Fix makes it so there is no very deep string of
+	  process parents.
+	  The reload process is now the process parent of servermain.  That
+	  makes signals for children arrive at the reload, and servermain
+	  has to use closed pipes to detect that children have exited.
+
+1 Aug 2014: Wouter
+	- Set program group on main process and its child processes, and
+	  kill them on a reload.
+
+20 July 2014: Wouter
+	- Fix endian.h include for OpenBSD.
+
+15 July 2014: Wouter
+	- Fix -O3 compile flag to -O2 to avoid miscompilations.
+	- Allow user to override the -g -O2 CFLAGS in ./configure.
+
+11 July 2014: Wouter
+	- fix strptime implicit declaration error on OpenBSD.
+
+9 July 2014: Wouter
+	- removed unnecessary arc4random_uniform.
+
+8 July 2014: Matthijs
+	- fake-rfc2553 patch (thanks Benjamin Baier).
+
+8 July 2014: Wouter
+	- wait and reap processes that are not part of the process group.
+
+7 July 2014: Wouter
+	- Code review fixup from NSD3.
+
+30 Jun 2014: Wouter
+	- Fix #590: rrl log does not print wildcard as a star but escaped.
+	- Fix #591: rrl log messages at verbosity level 1.
+	  (If that does not work for everyone, we need rrl-log: yesno option).
+
+27 Jun 2014: Wouter
+	- Fixup rr-test test so that it does not fail on the #553 string.
+
+17 Jun 2014: Matthijs
+	- Fix #587: Default value for statistics is 0.
+	- Remove the shift-reduce conflicts from the bug#553 fix.
+
+5 Jun 2014: Wouter
+	- Fix roundrobin cornercase for truncated packets.
+	- round-robin: yesno in nsd.conf enabled round robin rotation.
+
+28 May 2014: Wouter
+	- Fix #585: yylex_destroy missing, cannot compile on RHEL 5.x.
+	- Fix #583: Round-robin for records in the Answer section.
+
+22 May 2014: Wouter
+	- Fix zonefile parse with no whitespace before semicolon comments.
+
+16 May 2014: Wouter
+	- xfrd reaps children on a timer as well, similar to server_parent.
+
+8 May 2014: Wouter
+	- Fix #564: nsd-checkzone tool to check zonefile correctness.
+
+7 May 2014: Wouter
+	- Fix #577: makefile incorrectly installed manpages from srcdir.
+
+30 April 2014: Wouter
+	- Fix that xfrd reaps all children on every eventloop, because some
+	  exited reloads may attach here and need reaping, also if the signal
+	  is lost.
+
+23 April 2014: Wouter
+	- Fix progress printout for very large zones (numeric overflow).
+
+10 April 2014: Wouter
+	- Fix write_socket return value check in server.c (Thanks Brad Smith,
+	  Mark Kettenis).
+
+8 April 2014: Wouter
+	- nsd-control addzone reports if zone already exists.
+
+7 April 2014: Wouter
+	- Fix #571: unused variable and incompatible pointer warnings when
+	  compiled on a system without INET6.
+
+27 March 2014: Wouter
+	- Fix delete or rename of a lot of zones and make it take a
+	  non-enormous time.  Database compaction is deferred.
+	- Speed up deletion of zone contents a lot, (56s to 1s), speeds up
+	  delete, rename and AXFR for zones.  Defer emptynonterminal checks.
+	- Better example config in nsd.conf manual page.
+	- log-time-ascii option, default yes, with readable timestamp in log.
+
+25 March 2014: Wouter
+	- nsd shuts down during init process if given signal.
+	- shorter logging for zone transfer fail rcodes.
+
+24 March 2014: Wouter
+	- include: "foo/nsd.d/*.conf" works, wildcard glob on includes.
+	- Fix print filename of encompassing config file on read failure.
+
+21 March 2014: Wouter
+	- Fix bug in nodatabase mode with ixfrs that change nsec3param
+	  (Thanks Anand Buddhdev).
+	- Changed maxbackoff for no-content secondary zones from 4h to 24h.
+	- nocontent zones are checked on startup, but continue backoff
+	  from stored xfrd.state values.
+
+19 March 2014: Wouter
+	- made database: "" set the 3600 default for zonefileswrite only
+	  if it is also at its default, so that user settings override.
+	- Unit test for zonefiles-write.
+	- Write xfrd.state for nodb mode again.  Disable xfrd.state with
+	  xfrdfile: "" in config.  Does not check slave zone if state is
+	  same as last time on startup.
+	- Fixed shutdown message sporadically not printed on exit.
+	- Documented zonefile %s syntax in nsd.conf man page.
+	- Fix manpage to put colon after zonefiles check and write.
+	- Change from 'Zone" to "zone" with ".. serial .. is updated" log
+	  message.
+
+18 March 2014: Wouter
+	- unit test for nodb mode.
+	- Speed up zone write (.nl zonefile 30% faster).
+	  The memory alloc-dealloc in print_rr has been moved to print_rrs.
+	- (from 3.2), fix for #553 and for other TXT string syntax.
+	- in nodb mode, xfrd.state is not written out, because the zones
+	  are refreshed upon next startup anyway, so keeping timers and state
+	  is unnecessary.
+	- zonefiles-write option in nsd.conf, enabled when database is "".
+	  The server writes changed zonefiles to disk every hour.
+
+17 March 2014: Wouter
+	- Speed up zone parsing (.nl reads 40% faster).
+	  The rrtype_from_string routine is called often, optimised it.
+
 14 March 2014: Wouter
 	- tag 4.0.3
+	- trunk has 4.0.4 in development.
+	- database: "" starts without mmap of database.  Less memory is used,
+	  zones are read from text zonefile.
 
 13 March 2014: Wouter
 	- Fix nsd.db unclean close check.  Previous databases are considered
