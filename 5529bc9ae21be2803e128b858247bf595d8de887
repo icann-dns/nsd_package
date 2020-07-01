@@ -1,0 +1,3 @@
+  * New upstream version.
+  * Add dependency on adduser (Closes: #350408)
+  * Changes in IPv6 binding (I hope it closes: #279277)
