@@ -1,5 +1,68 @@
 NSD RELEASE NOTES
 
+4.1.2
+================
+FEATURES:
+	- Incoming notifies have serial number logged (at verbosity 1).
+BUG FIXES:
+	- Remove some duplicate header includes (from Brad Smith).
+	- Fix tcp waiting list for zone transfers where the bind and connect
+	  calls fail.
+	- Fix segfault in zone reader on invalid input. (thanks John Van de
+	  Meulebrouck Brendgard)
+	- Fix segfault on double origin in zone reader (thanks John Van de
+	  Meulebrouck Brendgard).
+	- Fix b64pton out of bounds error on invalid zonefile input.
+	  (thanks John Van de Meulebrouck Brendgard)
+	- Fix origin directive from unused old value and subdomain parser
+	  failure, reported by John Van de Meulebrouck Brendgard.
+	- Fix use after free after zonefile syntax error followed by ttl
+	  or origin directive, reported by John Van de Meulebrouck Brendgard.
+	- Fix syntax error followed by too many TXT elements parse crash
+	  reported by John Van de Meulebrouck Brendgard.
+	- Fix buffer overflow in config parse of domain name,
+	  reported by John Van de Meulebrouck Brendgard.
+	- Use reallocarray for integer overflow protection, patch submitted
+	  by Loganaden Velvindron.
+	- Fix allocation integer overflow checks.
+	- Fix #654: Fix contradiction in notify logging verbosity level.
+	- Fix #655: Fix contradiction in verbosity for zone transfers.
+	- Made log message more consistent, changed 'axfr refused' log message
+	  to be more consistent with other messages.  Also notify refused.
+	- verbosity 2 logs axfr refused and notify refused.
+	  verbosity 1 contains less log messages.
+
+
+4.1.1
+================
+FEATURES:
+	- RFC 7344: CDS and CDNSKEY (read record types).
+	- per zone statistics with --enable-zone-stats, config zone with
+	  zonestats: "name", zones configured with the same string are added.
+	- Disabled use of SSLv3 in nsd-control.
+	- nsd-checkconf -f prints out full name of pidfile (with dir).
+	- Synthesize CNAMEs with same TTL as DNAME.
+BUG FIXES:
+	- Fix that expired zones stay expired after a server restart.
+	- Fix "xfrd_handle_ipc: bad mode" log errors when compiled 
+	  with --disable-bind8-stats.
+	- Fix #616: retry xfer for zones with no content after command.
+	- Fix char used as array index warnings on NetBSD.
+	- Fix that queries for noname CH TXT are REFUSED instead of nodata.
+	- Fixes for wildcard addition and deletion, speedup for some cases.
+	- Fix that failure to add tcp to tcp base does not leak the socket.
+	- Patch nsd_munin_ from Philip Paeps to use type ABSOLUTE.
+	- Fix spinning NSD with lots of failing transfers, due to pointer
+	  comparison using void pointer subtraction (from Otto Moerbeek).
+	- Fix bug#637: fix that nsd.db grows limitlessly, an off by one
+	  on one megabyte free chunks, created during AXFRs of large zones,
+	  that caused the one megabyte chunk to be leaked.
+	- Fix casts for ctype functions (from Todd Miller).
+	- correct some hyphen-used-as-minus-sign (from Andreas Schulze) in
+	  man pages.
+	- Fix zonesdir chroot error message.
+
+
 4.1.0
 ================
 FEATURES:

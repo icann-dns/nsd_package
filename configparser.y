@@ -67,7 +67,7 @@ extern config_parser_state_t* cfg_parser;
 %token VAR_RRL_IPV4_PREFIX_LENGTH VAR_RRL_IPV6_PREFIX_LENGTH
 %token VAR_RRL_WHITELIST_RATELIMIT VAR_RRL_WHITELIST
 %token VAR_ZONEFILES_CHECK VAR_ZONEFILES_WRITE VAR_LOG_TIME_ASCII
-%token VAR_ROUND_ROBIN
+%token VAR_ROUND_ROBIN VAR_ZONESTATS
 
 %%
 toplevelvars: /* empty */ | toplevelvars toplevelvar ;
@@ -209,24 +209,30 @@ server_identity: VAR_IDENTITY STRING
 server_nsid: VAR_NSID STRING
 	{ 
 		unsigned char* nsid = 0;
-		uint16_t nsid_len = 0;
+		size_t nsid_len = 0;
 
 		OUTYY(("P(server_nsid:%s)\n", $2));
 
 		if (strncasecmp($2, "ascii_", 6) == 0) {
 			nsid_len = strlen($2+6);
-			cfg_parser->opt->nsid = region_alloc(cfg_parser->opt->region, nsid_len*2+1);
-			hex_ntop((uint8_t*)$2+6, nsid_len, (char*)cfg_parser->opt->nsid, nsid_len*2+1);
+			if(nsid_len < 65535) {
+				cfg_parser->opt->nsid = region_alloc(cfg_parser->opt->region, nsid_len*2+1);
+				hex_ntop((uint8_t*)$2+6, nsid_len, (char*)cfg_parser->opt->nsid, nsid_len*2+1);
+			} else
+				yyerror("NSID too long");
 		} else if (strlen($2) % 2 != 0) {
 			yyerror("the NSID must be a hex string of an even length.");
 		} else {
 			nsid_len = strlen($2) / 2;
-			nsid = xalloc(nsid_len);
-			if (hex_pton($2, nsid, nsid_len) == -1)
-				yyerror("hex string cannot be parsed in NSID.");
-			else
-				cfg_parser->opt->nsid = region_strdup(cfg_parser->opt->region, $2);
-			free(nsid);
+			if(nsid_len < 65535) {
+				nsid = xalloc(nsid_len);
+				if (hex_pton($2, nsid, nsid_len) == -1)
+					yyerror("hex string cannot be parsed in NSID.");
+				else
+					cfg_parser->opt->nsid = region_strdup(cfg_parser->opt->region, $2);
+				free(nsid);
+			} else
+				yyerror("NSID too long");
 		}
 	}
 	;
@@ -551,7 +557,7 @@ content_pattern: pattern_name | zone_config_item;
 zone_config_item: zone_zonefile | zone_allow_notify | zone_request_xfr |
 	zone_notify | zone_notify_retry | zone_provide_xfr | 
 	zone_outgoing_interface | zone_allow_axfr_fallback | include_pattern |
-	zone_rrl_whitelist;
+	zone_rrl_whitelist | zone_zonestats;
 pattern_name: VAR_NAME STRING
 	{ 
 		OUTYY(("P(pattern_name:%s)\n", $2)); 
@@ -641,6 +647,15 @@ zone_zonefile: VAR_ZONEFILE STRING
 		assert(cfg_parser->current_pattern);
 #endif
 		cfg_parser->current_pattern->zonefile = region_strdup(cfg_parser->opt->region, $2);
+	}
+	;
+zone_zonestats: VAR_ZONESTATS STRING
+	{ 
+		OUTYY(("P(zonestats:%s)\n", $2)); 
+#ifndef NDEBUG
+		assert(cfg_parser->current_pattern);
+#endif
+		cfg_parser->current_pattern->zonestats = region_strdup(cfg_parser->opt->region, $2);
 	}
 	;
 zone_allow_notify: VAR_ALLOW_NOTIFY STRING STRING

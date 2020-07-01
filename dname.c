@@ -63,7 +63,7 @@ dname_make(region_type *region, const uint8_t *name, int normalize)
 	result = (dname_type *) region_alloc(
 		region,
 		(sizeof(dname_type)
-		 + (label_count + name_size) * sizeof(uint8_t)));
+		 + (((size_t)label_count) + ((size_t)name_size)) * sizeof(uint8_t)));
 	result->name_size = name_size;
 	result->label_count = label_count;
 	memcpy((uint8_t *) dname_label_offsets(result),
@@ -76,7 +76,7 @@ dname_make(region_type *region, const uint8_t *name, int normalize)
 			ssize_t len = label_length(src);
 			*dst++ = *src++;
 			for (i = 0; i < len; ++i) {
-				*dst++ = DNAME_NORMALIZE(*src++);
+				*dst++ = DNAME_NORMALIZE((unsigned char)*src++);
 			}
 		}
 		*dst = *src;
@@ -213,7 +213,7 @@ int dname_parse_wire(uint8_t* dname, const char* name)
 			break;
 		case '\\':
 			/* Handle escaped characters (RFC1035 5.1) */
-			if (isdigit(s[1]) && isdigit(s[2]) && isdigit(s[3])) {
+			if (isdigit((unsigned char)s[1]) && isdigit((unsigned char)s[2]) && isdigit((unsigned char)s[3])) {
 				int val = (hexdigit_to_int(s[1]) * 100 +
 					   hexdigit_to_int(s[2]) * 10 +
 					   hexdigit_to_int(s[3]));
@@ -244,6 +244,9 @@ int dname_parse_wire(uint8_t* dname, const char* name)
 	}
 
 	/* Add root label.  */
+	if (h - dname >= MAXDOMAINLEN) {
+		return 0;
+	}
 	*h = 0;
 
 	return p-dname;
@@ -328,6 +331,8 @@ dname_compare(const dname_type *left, const dname_type *right)
 	}
 
 	/* Dname with the fewest labels is "first".  */
+	/* the subtraction works because the size of int is much larger than
+	 * the label count and the values won't wrap around */
 	return (int) left->label_count - (int) right->label_count;
 }
 
@@ -354,6 +359,8 @@ label_compare(const uint8_t *left, const uint8_t *right)
 	if (result) {
 		return result;
 	} else {
+		/* the subtraction works because the size of int is much
+		 * larger than the lengths and the values won't wrap around */
 		return (int) left_length - (int) right_length;
 	}
 }
@@ -407,7 +414,7 @@ dname_to_string(const dname_type *dname, const dname_type *origin)
 		++src;
 		for (j = 0; j < len; ++j) {
 			uint8_t ch = *src++;
-			if (isalnum(ch) || ch == '-' || ch == '_') {
+			if (isalnum((unsigned char)ch) || ch == '-' || ch == '_') {
 				*dst++ = ch;
 			} else if (ch == '.' || ch == '\\') {
 				*dst++ = '\\';
@@ -478,7 +485,7 @@ dname_replace(region_type* region,
 		return NULL;
 
 	res = (dname_type*)region_alloc(region, sizeof(dname_type) +
-		(x_labels+dest->label_count + x_len+dest->name_size)
+		(x_labels+((int)dest->label_count) + x_len+((int)dest->name_size))
 		*sizeof(uint8_t));
 	res->name_size = x_len+dest->name_size;
 	res->label_count = x_labels+dest->label_count;
@@ -503,7 +510,7 @@ char* wirelabel2str(const uint8_t* label)
 	lablen = *label++;
 	while(lablen--) {
 		uint8_t ch = *label++;
-		if (isalnum(ch) || ch == '-' || ch == '_') {
+		if (isalnum((unsigned char)ch) || ch == '-' || ch == '_') {
 			*p++ = ch;
 		} else if (ch == '.' || ch == '\\') {
 			*p++ = '\\';
@@ -530,7 +537,7 @@ char* wiredname2str(const uint8_t* dname)
 	while(lablen) {
 		while(lablen--) {
 			uint8_t ch = *dname++;
-			if (isalnum(ch) || ch == '-' || ch == '_' || ch == '*') {
+			if (isalnum((unsigned char)ch) || ch == '-' || ch == '_' || ch == '*') {
 				*p++ = ch;
 			} else if (ch == '.' || ch == '\\') {
 				*p++ = '\\';
@@ -562,7 +569,7 @@ int dname_equal_nocase(uint8_t* a, uint8_t* b, uint16_t len)
 			return (memcmp(a, b, len) == 0);
 		/* check the label, lowercased */
 		for(i=0; i<lablen; i++) {
-			if(DNAME_NORMALIZE(*a++) != DNAME_NORMALIZE(*b++))
+			if(DNAME_NORMALIZE((unsigned char)*a++) != DNAME_NORMALIZE((unsigned char)*b++))
 				return 0;
 		}
 		len -= lablen;

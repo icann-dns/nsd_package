@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 36
+#define YY_FLEX_SUBMINOR_VERSION 37
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -1938,7 +1938,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len 
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -2209,7 +2209,7 @@ zoctet(char *text)
 		if (s[0] != '\\') {
 			/* Ordinary character.  */
 			*p = *s;
-		} else if (isdigit((int)s[1]) && isdigit((int)s[2]) && isdigit((int)s[3])) {
+		} else if (isdigit((unsigned char)s[1]) && isdigit((unsigned char)s[2]) && isdigit((unsigned char)s[3])) {
 			/* \DDD escape.  */
 			int val = (hexdigit_to_int(s[1]) * 100 +
 				   hexdigit_to_int(s[2]) * 10 +

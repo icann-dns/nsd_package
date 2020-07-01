@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.1.  */
+/* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison interface for Yacc-like parsers in C
    
@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_ZPARSER_H
-# define YY_ZPARSER_H
+#ifndef YY_YY_ZPARSER_H_INCLUDED
+# define YY_YY_ZPARSER_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -117,17 +117,19 @@ extern int yydebug;
      T_EUI48 = 326,
      T_EUI64 = 327,
      T_CAA = 328,
-     DOLLAR_TTL = 329,
-     DOLLAR_ORIGIN = 330,
-     NL = 331,
-     SP = 332,
-     STR = 333,
-     PREV = 334,
-     BITLAB = 335,
-     T_TTL = 336,
-     T_RRCLASS = 337,
-     URR = 338,
-     T_UTYPE = 339
+     T_CDS = 329,
+     T_CDNSKEY = 330,
+     DOLLAR_TTL = 331,
+     DOLLAR_ORIGIN = 332,
+     NL = 333,
+     SP = 334,
+     STR = 335,
+     PREV = 336,
+     BITLAB = 337,
+     T_TTL = 338,
+     T_RRCLASS = 339,
+     URR = 340,
+     T_UTYPE = 341
    };
 #endif
 /* Tokens.  */
@@ -202,24 +204,26 @@ extern int yydebug;
 #define T_EUI48 326
 #define T_EUI64 327
 #define T_CAA 328
-#define DOLLAR_TTL 329
-#define DOLLAR_ORIGIN 330
-#define NL 331
-#define SP 332
-#define STR 333
-#define PREV 334
-#define BITLAB 335
-#define T_TTL 336
-#define T_RRCLASS 337
-#define URR 338
-#define T_UTYPE 339
+#define T_CDS 329
+#define T_CDNSKEY 330
+#define DOLLAR_TTL 331
+#define DOLLAR_ORIGIN 332
+#define NL 333
+#define SP 334
+#define STR 335
+#define PREV 336
+#define BITLAB 337
+#define T_TTL 338
+#define T_RRCLASS 339
+#define URR 340
+#define T_UTYPE 341
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2049 of yacc.c  */
+/* Line 2058 of yacc.c  */
 #line 50 "zparser.y"
 
 	domain_type	 *domain;
@@ -231,8 +235,8 @@ typedef union YYSTYPE
 	uint16_t	 *unknown;
 
 
-/* Line 2049 of yacc.c  */
-#line 236 "zparser.h"
+/* Line 2058 of yacc.c  */
+#line 240 "zparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -255,4 +259,4 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_ZPARSER_H  */
+#endif /* !YY_YY_ZPARSER_H_INCLUDED  */

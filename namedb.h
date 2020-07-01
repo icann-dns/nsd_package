@@ -128,6 +128,7 @@ struct zone
 	char*        filename; /* set if read from file, which file */
 	char*        logstr; /* set for zone xfer, the log string */
 	time_t       mtime; /* time of last modification */
+	unsigned     zonestatid; /* array index for zone stats */
 	unsigned     is_secure : 1; /* zone uses DNSSEC */
 	unsigned     is_ok : 1; /* zone has not expired. */
 	unsigned     is_changed : 1; /* zone was changed by AXFR */
@@ -222,16 +223,6 @@ void prehash_del(domain_table_type* table, domain_type* domain);
 int domain_is_prehash(domain_table_type* table, domain_type* domain);
 
 /*
- * Iterate over all the domain names in the domain tree.
- */
-typedef int (*domain_table_iterator_type)(domain_type *node,
-					   void *user_data);
-
-int domain_table_iterate(domain_table_type* table,
-			  domain_table_iterator_type iterator,
-			  void* user_data);
-
-/*
  * Add an RRset to the specified domain.  Updates the is_existing flag
  * as required.
  */
@@ -250,6 +241,7 @@ int domain_is_glue(domain_type* domain, zone_type* zone);
 rrset_type* domain_find_non_cname_rrset(domain_type* domain, zone_type* zone);
 
 domain_type* domain_wildcard_child(domain_type* domain);
+domain_type *domain_previous_existing_child(domain_type* domain);
 
 int zone_is_secure(zone_type* zone);
 
