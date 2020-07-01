@@ -1,11 +1,103 @@
+18 September 2018: Wouter
+	- tag for NSD 4.1.25rc1.
+
+17 September 2018: Wouter
+	- Fix #4156: Fix systemd service manager state change notification
+
+14 September 2018: Wouter
+	- Remove unused if clause during server service startup.
+
+13 September 2018: Wouter
+	- Fix typo in clang analysis test.
+	- Annotate exit functions with noreturn.
+	- nsd-control prints neater errors for file failures.
+
+12 September 2018: Wouter
+	- clang analysis test.
+
+11 September 2018: Wouter
+	- Fix to combine the same error function into one, from Xiaobo Liu.
+	- Fix initialisation in remote.c.
+	- please clang analyzer and fix parse of IPSECKEY with bad gateway.
+	- Fix unit test code for clang analyzer.
+	- Fix nsd-checkconf fail on bad zone name.
+
+10 September 2018: Wouter
+	- Fix coding style in nsd.c
+
+7 September 2018: Wouter
+	- append_trailing_slash has one implementation and is not repeated
+	  differently.
+
+4 September 2018: Wouter
+	- Fix codingstyle in nsd-checkconf.c in patch from Sharp Liu.
+
+15 August 2018: Wouter
+	- Fix use_systemd typo/leftover in remote.c.
+
+13 August 2018: Wouter
+	- tag for 4.1.24 release.
+	- trunk is 4.1.25 in development.
+	- Fix that nsec3 precompile deletion happens before the RRs of
+	  the zone are deleted.
+	- Fix printout of accepted remote control connection for unix sockets.
+
+6 August 2018: Wouter
+	- tag for 4.1.24rc1 release.
+
+30 July 2018: Wouter
+	- Tag for NSD 4.1.23 release, trunk is 4.1.24, includes
+	  fix NSD time sensitive TSIG compare vulnerability.
+	- Fix checkconf test for use-systemd option.
+
+25 July 2018: Wouter
+	- #4133: Fix that when IXFR contains a zone with broken NSEC3PARAM
+	  chain, NSD leniently attempts to find a working NSEC3PARAM.
+
+23 July 2018: Wouter
+	- Remove socket activation from systemd code, it was reported as
+	  not useful to enable.  The readiness signalling is still there,
+	  and can be enabled with use-systemd: yes.
+	- Only call sd_notify from systemd when use-systemd is yes.
+
+6 July 2018: Wouter
+	- RFC8162 support, for record type SMIMEA.
+	- Fix that type CAA (and URI) in the zone file can contain
+	  dots when not in quotes.
+
+26 June 2018: Wouter
+	- configure --enable-systemd (needs pkg-config and libsystemd) can
+	  be used to then use-systemd: yes in nsd.conf and use socket
+	  activation and readiness signalling with systemd.
+
+19 June 2018: Wouter
+	- #4106: Fix that stats printed from nsd-control are recast from
+	  unsigned long to unsigned (remote.c).
+
+14 June 2018: Wouter
+	- Fix that first control-interface determines if TLS is used.  Warn
+	  when IP address interfaces are used without TLS.
+
+12 June 2018: Wouter
+	- #4102: control interface via local socket.
+	  configure it with control-interface: "/path/nsd.ctl"  The path
+	  has to start with a / to separate it from an IP address.
+	  The local socket does not use SSL, but unencrypted traffic, use
+	  file and containing directory permissions to restrict access.
+
+6 June 2018: Wouter
+	- Patch to fix openwrt for mac os build darwin detection in configure.
+
 4 June 2018: Wouter
-	- tag for 4.1.22rc1.
+	- tag for 4.1.22rc1.  Became 4.1.22 on 11 June, trunk is 4.1.23 in
+	  development from this point.
 
 31 May 2018: Wouter
 	- Fix to use same condition for nsec3 hash allocation and free.
 
 23 May 2018: Wouter
-	- Use accept4 to speed up answer of TCP queries, on Linux and FreeBSD.
+	- Use accept4 to speed up answer of TCP queries, on Linux and FreeBSD
+	  and OpenBSD.
 
 22 May 2018: Wouter
 	- Fix nsec3 hash of parent and child co-hosted nsec3 enabled zones.

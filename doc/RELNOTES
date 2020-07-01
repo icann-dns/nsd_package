@@ -1,5 +1,59 @@
 NSD RELEASE NOTES
 
+4.1.25
+================
+FEATURES:
+	- nsd-control prints neater errors for file failures.
+BUG FIXES:
+	- Fix that nsec3 precompile deletion happens before the RRs of
+	  the zone are deleted.
+	- Fix printout of accepted remote control connection for unix sockets.
+	- Fix use_systemd typo/leftover in remote.c.
+	- Fix codingstyle in nsd-checkconf.c in patch from Sharp Liu.
+	- append_trailing_slash has one implementation and is not repeated
+	  differently.
+	- Fix coding style in nsd.c
+	- Fix to combine the same error function into one, from Xiaobo Liu.
+	- Fix initialisation in remote.c.
+	- please clang analyzer and fix parse of IPSECKEY with bad gateway.
+	- Fix nsd-checkconf fail on bad zone name.
+	- Annotate exit functions with noreturn.
+	- Remove unused if clause during server service startup.
+	- Fix #4156: Fix systemd service manager state change notification
+	  When it is compiled, systemd readiness signalling is enabled.
+	  The option in nsd.conf is not used, it is ignored when read.
+
+
+4.1.24
+================
+FEATURES:
+	- #4102: control interface via local socket.
+	  configure it with control-interface: "/path/nsd.ctl"  The path
+	  has to start with a / to separate it from an IP address.
+	  The local socket does not use SSL, but unencrypted traffic, use
+	  file and containing directory permissions to restrict access.
+	- configure --enable-systemd (needs pkg-config and libsystemd) can
+	  be used to then use-systemd: yes in nsd.conf and have readiness
+	  signalling with systemd.
+	- RFC8162 support, for record type SMIMEA.
+BUG FIXES:
+	- Patch to fix openwrt for mac os build darwin detection in configure.
+	- Fix that first control-interface determines if TLS is used.  Warn
+	  when IP address interfaces are used without TLS.
+	- #4106: Fix that stats printed from nsd-control are recast from
+	  unsigned long to unsigned (remote.c).
+	- Fix that type CAA (and URI) in the zone file can contain
+	  dots when not in quotes.
+	- #4133: Fix that when IXFR contains a zone with broken NSEC3PARAM
+	  chain, NSD leniently attempts to find a working NSEC3PARAM.
+
+
+4.1.23
+================
+BUG FIXES:
+	- Fix NSD time sensitive TSIG compare vulnerability.
+
+
 4.1.22
 ================
 FEATURES:
