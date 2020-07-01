@@ -1,0 +1,9 @@
+  [ Jonathan Dupart ]
+  * Fix "invalid user: 'nsd'" move the debhelper tag at the end of the
+    postinst script (Closes: #743396)
+  [ Julien Cristau ]
+  * Stop using dh_installdocs --link-doc, as that makes nsd binNMU-unsafe.
+    Deal with the symlink-to-dir migration.
+  [ Ondřej Surý ]
+  * Add ${misc:Pre-Depends} to pull new dpkg before calling symlink_to_dir
+  * Call wrap-and-sort -a on d/control and d/copyright
