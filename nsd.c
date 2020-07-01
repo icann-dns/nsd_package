@@ -7,7 +7,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -17,6 +17,12 @@
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#ifdef HAVE_GRP_H
+#include <grp.h>
+#endif /* HAVE_GRP_H */
+#ifdef HAVE_SETUSERCONTEXT
+#include <login_cap.h>
+#endif /* HAVE_SETUSERCONTEXT */
 
 #include <assert.h>
 #include <ctype.h>
@@ -35,15 +41,21 @@
 #include <unistd.h>
 
 #include "nsd.h"
-#include "plugins.h"
-
+#include "options.h"
+#include "tsig.h"
+#include "remote.h"
 
 /* The server handler... */
 static struct nsd nsd;
 static char hostname[MAXHOSTNAMELEN];
+extern config_parser_state_t* cfg_parser;
 
 static void error(const char *format, ...) ATTR_FORMAT(printf, 1, 2);
 
+/*
+ * Print the help text.
+ *
+ */
 static void
 usage (void)
 {
@@ -51,36 +63,45 @@ usage (void)
 	fprintf(stderr, "Name Server Daemon.\n\n");
 	fprintf(stderr,
 		"Supported options:\n"
-		"  -4              Only listen to IPv4 connections.\n"
-		"  -6              Only listen to IPv6 connections.\n"
-		"  -a ip-address   Listen to the specified incoming IP address (may be\n"
-		"                  specified multiple times).\n"
-		"  -d              Enable debug mode (do not fork as a daemon process).\n"
-		"  -f database     Specify the database to load.\n"
-		"  -h              Print this help information.\n"
+		"  -4                   Only listen to IPv4 connections.\n"
+		"  -6                   Only listen to IPv6 connections.\n"
+		"  -a ip-address[@port] Listen to the specified incoming IP address (and port)\n"
+		"                       May be specified multiple times).\n"
+		"  -c configfile        Read specified configfile instead of %s.\n"
+		"  -d                   Enable debug mode (do not fork as a daemon process).\n"
+#ifndef NDEBUG
+		"  -F facilities        Specify the debug facilities.\n"
+#endif /* NDEBUG */
+		"  -f database          Specify the database to load.\n"
+		"  -h                   Print this help information.\n"
+		, CONFIGFILE);
+	fprintf(stderr,
+		"  -i identity          Specify the identity when queried for id.server CHAOS TXT.\n"
+		"  -I nsid              Specify the NSID. This must be a hex string.\n"
+#ifndef NDEBUG
+		"  -L level             Specify the debug level.\n"
+#endif /* NDEBUG */
+		"  -l filename          Specify the log file.\n"
+		"  -N server-count      The number of servers to start.\n"
+		"  -n tcp-count         The maximum number of TCP connections per server.\n"
+		"  -P pidfile           Specify the PID file to write.\n"
+		"  -p port              Specify the port to listen to.\n"
+		"  -s seconds           Dump statistics every SECONDS seconds.\n"
+		"  -t chrootdir         Change root to specified directory on startup.\n"
 		);
 	fprintf(stderr,
-		"  -i identity     Specify the identity when queried for id.server CHAOS TXT.\n"
-#ifdef NSID
-		"  -I nsid         Specify the NSID. This must be a hex string.\n"
-#endif /* NSID */
-		"  -l filename     Specify the log file.\n"
-		"  -N server-count The number of servers to start.\n"
-		"  -n tcp-count    The maximum number of TCP connections per server.\n"
-		"  -P pidfile      Specify the PID file to write.\n"
-		"  -p port         Specify the port to listen to.\n"
-		"  -s seconds      Dump statistics every SECONDS seconds.\n"
-		"  -t chrootdir    Change root to specified directory on startup.\n"
+		"  -u user              Change effective uid to the specified user.\n"
+		"  -V level             Specify verbosity level.\n"
+		"  -v                   Print version information.\n"
 		);
-	fprintf(stderr,
-		"  -u user         Change effective uid to the specified user.\n"
-		"  -v              Print version information.\n"
-		"  -X plugin       Load a plugin (may be specified multiple times).\n\n"
-		);
-	fprintf(stderr, "Report bugs to <%s>.\n", PACKAGE_BUGREPORT);
-	exit(1);
+	fprintf(stderr, "Version %s. Report bugs to <%s>.\n",
+		PACKAGE_VERSION, PACKAGE_BUGREPORT);
 }
 
+/*
+ * Print the version exit.
+ *
+ */
 static void
 version(void)
 {
@@ -93,6 +114,10 @@ version(void)
 	exit(0);
 }
 
+/*
+ * Something went wrong, give error messages and exit.
+ *
+ */
 static void
 error(const char *format, ...)
 {
@@ -103,8 +128,51 @@ error(const char *format, ...)
 	exit(1);
 }
 
-pid_t 
-readpid (const char *file)
+static void
+append_trailing_slash(const char** dirname, region_type* region)
+{
+	int l = strlen(*dirname);
+	if (l>0 && (*dirname)[l-1] != '/') {
+		char *dirname_slash = region_alloc(region, l+2);
+		memcpy(dirname_slash, *dirname, l+1);
+		strlcat(dirname_slash, "/", l+2);
+		/* old dirname is leaked, this is only used for chroot, once */
+		*dirname = dirname_slash;
+	}
+}
+
+static int
+file_inside_chroot(const char* fname, const char* chr)
+{
+	/* true if filename starts with chroot or is not absolute */
+	return ((fname && fname[0] && strncmp(fname, chr, strlen(chr)) == 0) ||
+		(fname && fname[0] != '/'));
+}
+
+void
+get_ip_port_frm_str(const char* arg, const char** hostname,
+        const char** port)
+{
+        /* parse src[@port] option */
+        char* delim = NULL;
+	if (arg) {
+		delim = strchr(arg, '@');
+	}
+
+        if (delim) {
+                *delim = '\0';
+                *port = delim+1;
+        }
+        *hostname = arg;
+}
+
+
+/*
+ * Fetch the nsd parent process id from the nsd pidfile
+ *
+ */
+pid_t
+readpid(const char *file)
 {
 	int fd;
 	pid_t pid;
@@ -129,7 +197,7 @@ readpid (const char *file)
 		return -1;
 	}
 
-	pid = strtol(pidbuf, &t, 10);
+	pid = (pid_t) strtol(pidbuf, &t, 10);
 
 	if (*t && *t != '\n') {
 		return -1;
@@ -137,19 +205,27 @@ readpid (const char *file)
 	return pid;
 }
 
-int 
-writepid (struct nsd *nsd)
+/*
+ * Store the nsd parent process id in the nsd pidfile
+ *
+ */
+int
+writepid(struct nsd *nsd)
 {
 	FILE * fd;
-	char pidbuf[16];
+	char pidbuf[32];
 
 	snprintf(pidbuf, sizeof(pidbuf), "%lu\n", (unsigned long) nsd->pid);
 
 	if ((fd = fopen(nsd->pidfile, "w")) ==  NULL ) {
+		log_msg(LOG_ERR, "cannot open pidfile %s: %s",
+			nsd->pidfile, strerror(errno));
 		return -1;
 	}
 
 	if (!write_data(fd, pidbuf, strlen(pidbuf))) {
+		log_msg(LOG_ERR, "cannot write pidfile %s: %s",
+			nsd->pidfile, strerror(errno));
 		fclose(fd);
 		return -1;
 	}
@@ -164,32 +240,52 @@ writepid (struct nsd *nsd)
 
 	return 0;
 }
-	
 
-void 
-sig_handler (int sig)
+void
+unlinkpid(const char* file)
 {
-	size_t i;
+	int fd = -1;
+
+	if (file) {
+		/* truncate pidfile */
+		fd = open(file, O_WRONLY | O_TRUNC, 0644);
+		if (fd == -1) {
+			/* Truncate the pid file.  */
+			log_msg(LOG_ERR, "can not truncate the pid file %s: %s", file, strerror(errno));
+		} else 
+			close(fd);
+
+		/* unlink pidfile */
+		if (unlink(file) == -1)
+			log_msg(LOG_WARNING, "failed to unlink pidfile %s: %s",
+				file, strerror(errno));
+	}
+}
+
+/*
+ * Incoming signals, set appropriate actions.
+ *
+ */
+void
+sig_handler(int sig)
+{
 	/* To avoid race cond. We really don't want to use log_msg() in this handler */
-	
+
 	/* Are we a child server? */
 	if (nsd.server_kind != NSD_SERVER_MAIN) {
 		switch (sig) {
 		case SIGCHLD:
-			/* Plugins may fork, reap all terminated children.  */
-			while (waitpid(0, NULL, WNOHANG) > 0)
-				;
+			nsd.signal_hint_child = 1;
 			break;
 		case SIGALRM:
 			break;
-		case SIGHUP:
 		case SIGINT:
 		case SIGTERM:
-			nsd.mode = NSD_QUIT;
+			nsd.signal_hint_quit = 1;
 			break;
 		case SIGILL:
 		case SIGUSR1:	/* Dump stats on SIGUSR1.  */
-			nsd.mode = NSD_STATS;
+			nsd.signal_hint_statsusr = 1;
 			break;
 		default:
 			break;
@@ -197,48 +293,33 @@ sig_handler (int sig)
 		return;
 	}
 
+	/* We are the main process */
 	switch (sig) {
 	case SIGCHLD:
+		nsd.signal_hint_child = 1;
 		return;
 	case SIGHUP:
-		nsd.mode = NSD_RELOAD;
+		nsd.signal_hint_reload_hup = 1;
 		return;
 	case SIGALRM:
-#ifdef BIND8_STATS
-		/* resync to the next whole minute */
-		if(nsd.st.period > 0)
-			alarm(nsd.st.period - (time(NULL) % nsd.st.period));
-#endif
-		sig = SIGUSR1;
+		nsd.signal_hint_stats = 1;
 		break;
 	case SIGILL:
 		/*
 		 * For backwards compatibility with BIND 8 and older
 		 * versions of NSD.
 		 */
-		sig = SIGUSR1;
+		nsd.signal_hint_statsusr = 1;
 		break;
 	case SIGUSR1:
 		/* Dump statistics.  */
+		nsd.signal_hint_statsusr = 1;
 		break;
 	case SIGINT:
-		/* Silent shutdown... */
-		nsd.mode = NSD_QUIT;
-		break;
 	case SIGTERM:
 	default:
-		nsd.mode = NSD_SHUTDOWN;
-		sig = SIGTERM;
+		nsd.signal_hint_shutdown = 1;
 		break;
-	}
-
-	/* Distribute the signal to the servers... */
-	for (i = 0; i < nsd.child_count; ++i) {
-		if (nsd.children[i].pid > 0 && kill(nsd.children[i].pid, sig) == -1) {
-			/* we're so in trouble here, so do log this! */
-			log_msg(LOG_ERR, "problems killing %d: %s",
-				(int) nsd.children[i].pid, strerror(errno));
-		}
 	}
 }
 
@@ -247,52 +328,17 @@ sig_handler (int sig)
  *
  */
 #ifdef BIND8_STATS
-void 
+void
 bind8_stats (struct nsd *nsd)
 {
 	char buf[MAXSYSLOGMSGLEN];
 	char *msg, *t;
 	int i, len;
 
-	/* XXX A bit ugly but efficient. Should be somewhere else. */
-	static const char *types[] = {
-		NULL, "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG",		/* 8 */
-		"MR", "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT",		/* 16 */
-		"RP", "AFSDB", "X25", "ISDN", "RT", "NSAP", "NSAP_PTR", "SIG",		/* 24 */
-		"KEY", "PX", "GPOS", "AAAA", "LOC", "NXT", "EID", "NIMLOC",		/* 32 */
-		"SRV", "ATMA", "NAPTR", "KX", "CERT", "A6", "DNAME", "SINK",		/* 40 */
-		"OPT", "APL", "DS", "SSHFP", NULL, "RRSIG", "NSEC", "DNSKEY",		/* 48 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 56 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 64 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 72 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 80 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 88 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 96 */
-		NULL, NULL, "SPF", NULL, NULL, NULL, NULL, NULL,			/* 104 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 112 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 120 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 128 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 136 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 144 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 152 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 160 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 168 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 176 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 184 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 192 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 200 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 208 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 216 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 224 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 232 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 240 */
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,				/* 248 */
-		"TKEY", "TSIG", "IXFR", "AXFR", "MAILB", "MAILA", "ANY"			/* 255 */
-	};
-
-
 	/* Current time... */
 	time_t now;
+	if(!nsd->st.period)
+		return;
 	time(&now);
 
 	/* NSTATS */
@@ -307,11 +353,7 @@ bind8_stats (struct nsd *nsd)
 		}
 
 		if (nsd->st.qtype[i] != 0) {
-			if (types[i] == NULL) {
-				t += snprintf(t, len, " TYPE%d=%lu", i, nsd->st.qtype[i]);
-			} else {
-				t += snprintf(t, len, " %s=%lu", types[i], nsd->st.qtype[i]);
-			}
+			t += snprintf(t, len, " %s=%lu", rrtype_to_string(i), nsd->st.qtype[i]);
 		}
 	}
 	if (t > msg)
@@ -349,41 +391,37 @@ bind8_stats (struct nsd *nsd)
 extern char *optarg;
 extern int optind;
 
-int 
-main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	/* Scratch variables... */
 	int c;
 	pid_t	oldpid;
 	size_t i;
 	struct sigaction action;
-	
+#ifdef HAVE_GETPWNAM
+	struct passwd *pwd = NULL;
+#endif /* HAVE_GETPWNAM */
+
 	/* For initialising the address info structures */
-	struct addrinfo hints[MAX_INTERFACES];
-	const char *nodes[MAX_INTERFACES];
-	const char *udp_port;
-	const char *tcp_port;
+	/* static so it can get very big without overflowing the stack */
+	static struct addrinfo hints[MAX_INTERFACES];
+	static const char *nodes[MAX_INTERFACES];
+	const char *udp_port = 0;
+	const char *tcp_port = 0;
 
-	const char *log_filename = NULL;
-	
-#ifdef PLUGINS
-	nsd_plugin_id_type plugin_count = 0;
-	char **plugins = (char **) xalloc(sizeof(char *));
-	maximum_plugin_count = 1;
-#endif /* PLUGINS */
+	const char *configfile = CONFIGFILE;
 
-	log_init("nsd");
+	char* argv0 = (argv0 = strrchr(argv[0], '/')) ? argv0 + 1 : argv[0];
+
+	log_init(argv0);
 
 	/* Initialize the server handler... */
 	memset(&nsd, 0, sizeof(struct nsd));
 	nsd.region      = region_create(xalloc, free);
-	nsd.dbfile	= DBFILE;
-	nsd.pidfile	= PIDFILE;
+	nsd.dbfile	= 0;
+	nsd.pidfile	= 0;
 	nsd.server_kind = NSD_SERVER_MAIN;
-	
-	/* Initialise the ports */
-	udp_port = UDP_PORT;
-	tcp_port = TCP_PORT;
 
 	for (i = 0; i < MAX_INTERFACES; i++) {
 		memset(&hints[i], 0, sizeof(hints[i]));
@@ -392,27 +430,18 @@ main (int argc, char *argv[])
 		nodes[i] = NULL;
 	}
 
-	nsd.identity	= IDENTITY;
-	nsd.nsid        = NULL;
-	nsd.nsid_len  	= 0;
+	nsd.identity	= 0;
 	nsd.version	= VERSION;
-	nsd.username	= USER;
-	nsd.chrootdir	= NULL;
+	nsd.username	= 0;
+	nsd.chrootdir	= 0;
+	nsd.nsid 	= NULL;
+	nsd.nsid_len 	= 0;
 
-	nsd.child_count = 1;
-	nsd.maximum_tcp_count = 10;
+	nsd.child_count = 0;
+	nsd.maximum_tcp_count = 0;
 	nsd.current_tcp_count = 0;
 	nsd.grab_ip6_optional = 0;
-	
-	/* EDNS0 */
-	edns_init_data(&nsd.edns_ipv4, EDNS_MAX_MESSAGE_LEN);
-#if defined(INET6)
-# if defined(IPV6_USE_MIN_MTU)
-	edns_init_data(&nsd.edns_ipv6, EDNS_MAX_MESSAGE_LEN);
-# else /* !defined(IPV6_USE_MIN_MTU) */
-	edns_init_data(&nsd.edns_ipv6, IPV6_MIN_MTU);
-# endif
-#endif
+	nsd.file_rotation_ok = 0;
 
 	/* Set up our default identity to gethostname(2) */
 	if (gethostname(hostname, MAXHOSTNAMELEN) == 0) {
@@ -421,11 +450,16 @@ main (int argc, char *argv[])
 		log_msg(LOG_ERR,
 			"failed to get the host name: %s - using default identity",
 			strerror(errno));
+		nsd.identity = IDENTITY;
 	}
 
 
 	/* Parse the command line... */
-	while ((c = getopt(argc, argv, "46a:df:hi:I:l:N:n:P:p:s:u:t:X:vF:L:")) != -1) {
+	while ((c = getopt(argc, argv, "46a:c:df:hi:I:l:N:n:P:p:s:u:t:X:V:v"
+#ifndef NDEBUG /* <mattthijs> only when configured with --enable-checking */
+		"F:L:"
+#endif /* NDEBUG */
+		)) != -1) {
 		switch (c) {
 		case '4':
 			for (i = 0; i < MAX_INTERFACES; ++i) {
@@ -439,7 +473,7 @@ main (int argc, char *argv[])
 			}
 #else /* !INET6 */
 			error("IPv6 support not enabled.");
-#endif /* !INET6 */
+#endif /* INET6 */
 			break;
 		case 'a':
 			if (nsd.ifs < MAX_INTERFACES) {
@@ -449,6 +483,9 @@ main (int argc, char *argv[])
 				error("too many interfaces ('-a') specified.");
 			}
 			break;
+		case 'c':
+			configfile = optarg;
+			break;
 		case 'd':
 			nsd.debug = 1;
 			break;
@@ -457,12 +494,11 @@ main (int argc, char *argv[])
 			break;
 		case 'h':
 			usage();
-			break;
+			exit(0);
 		case 'i':
 			nsd.identity = optarg;
 			break;
 		case 'I':
-#ifdef NSID
 			if (nsd.nsid_len != 0) {
 				/* can only be given once */
 				break;
@@ -472,28 +508,17 @@ main (int argc, char *argv[])
 			}
 			nsd.nsid = xalloc(strlen(optarg) / 2);
 			nsd.nsid_len = strlen(optarg) / 2;
-			unsigned char *t = nsd.nsid;
-			while(*optarg) {
-				int j;
-				for (j = 16; j >= 1; j -= 15) {
-					if (isxdigit(*optarg)) {
-						*t += hexdigit_to_int(*optarg) * j;
-					} else {
-						error("illegal hex charactor '%c' in NSID.", (int)*optarg);
-					}
-					++optarg;
-				}
-				++t;
+			if (hex_pton(optarg, nsd.nsid, nsd.nsid_len) == -1) {
+				error("hex string cannot be parsed '%s' in NSID.", optarg);
 			}
-#endif /* NSID */
 			break;
 		case 'l':
-			log_filename = optarg;
+			nsd.log_filename = optarg;
 			break;
 		case 'N':
 			i = atoi(optarg);
 			if (i <= 0) {
-				error("number of child servers must be greather than zero.");
+				error("number of child servers must be greater than zero.");
 			} else {
 				nsd.child_count = i;
 			}
@@ -521,35 +546,24 @@ main (int argc, char *argv[])
 			nsd.st.period = atoi(optarg);
 #else /* !BIND8_STATS */
 			error("BIND 8 statistics not enabled.");
-#endif /* !BIND8_STATS */
+#endif /* BIND8_STATS */
 			break;
 		case 't':
 #ifdef HAVE_CHROOT
 			nsd.chrootdir = optarg;
 #else /* !HAVE_CHROOT */
 			error("chroot not supported on this platform.");
-#endif /* !HAVE_CHROOT */
+#endif /* HAVE_CHROOT */
 			break;
 		case 'u':
 			nsd.username = optarg;
 			break;
-		case 'X':
-#ifdef PLUGINS
-			if (plugin_count == maximum_plugin_count) {
-				maximum_plugin_count *= 2;
-				plugins = (char **) xrealloc(
-					plugins,
-					maximum_plugin_count * sizeof(char *));
-			}
-			plugins[plugin_count] = optarg;
-			++plugin_count;
-#else /* !PLUGINS */
-			error("plugin support not enabled.");
-#endif /* !PLUGINS */
+		case 'V':
+			verbosity = atoi(optarg);
 			break;
 		case 'v':
 			version();
-			break;
+			/* version exits */
 #ifndef NDEBUG
 		case 'F':
 			sscanf(optarg, "%x", &nsd_debug_facilities);
@@ -561,35 +575,183 @@ main (int argc, char *argv[])
 		case '?':
 		default:
 			usage();
+			exit(1);
 		}
 	}
 	argc -= optind;
 	argv += optind;
 
-	if (argc != 0)
+	/* Commandline parse error */
+	if (argc != 0) {
 		usage();
+		exit(1);
+	}
 
 	if (strlen(nsd.identity) > UCHAR_MAX) {
 		error("server identity too long (%u characters)",
 		      (unsigned) strlen(nsd.identity));
 	}
-#ifdef NSID
-	if (nsd.nsid_len > UCHAR_MAX) {
-		error("NSID to long (%u characters)", nsd.nsid_len);
+	if(!tsig_init(nsd.region))
+		error("init tsig failed");
+
+	/* Read options */
+	nsd.options = nsd_options_create(region_create_custom(xalloc, free,
+		DEFAULT_CHUNK_SIZE, DEFAULT_LARGE_OBJECT_SIZE,
+		DEFAULT_INITIAL_CLEANUP_SIZE, 1));
+	if(!parse_options_file(nsd.options, configfile, NULL, NULL)) {
+		error("could not read config: %s\n", configfile);
+	}
+	if(!parse_zone_list_file(nsd.options)) {
+		error("could not read zonelist file %s\n",
+			nsd.options->zonelistfile);
+	}
+	if(nsd.options->do_ip4 && !nsd.options->do_ip6) {
+		for (i = 0; i < MAX_INTERFACES; ++i) {
+			hints[i].ai_family = AF_INET;
+		}
+	}
+#ifdef INET6
+	if(nsd.options->do_ip6 && !nsd.options->do_ip4) {
+		for (i = 0; i < MAX_INTERFACES; ++i) {
+			hints[i].ai_family = AF_INET6;
+		}
+	}
+#endif /* INET6 */
+	if(nsd.options->ip_addresses)
+	{
+		ip_address_option_t* ip = nsd.options->ip_addresses;
+		while(ip) {
+			if (nsd.ifs < MAX_INTERFACES) {
+				nodes[nsd.ifs] = ip->address;
+				++nsd.ifs;
+			} else {
+				error("too many interfaces ('-a' + "
+				      "'ip-address:') specified.");
+				break;
+			}
+			ip = ip->next;
+		}
+	}
+	if (verbosity == 0)
+		verbosity = nsd.options->verbosity;
+#ifndef NDEBUG
+	if (nsd_debug_level > 0 && verbosity == 0)
+		verbosity = nsd_debug_level;
+#endif /* NDEBUG */
+	if(nsd.options->debug_mode) nsd.debug=1;
+	if(!nsd.dbfile)
+	{
+		if(nsd.options->database)
+			nsd.dbfile = nsd.options->database;
+		else
+			nsd.dbfile = DBFILE;
+	}
+	if(!nsd.pidfile)
+	{
+		if(nsd.options->pidfile)
+			nsd.pidfile = nsd.options->pidfile;
+		else
+			nsd.pidfile = PIDFILE;
+	}
+	if(strcmp(nsd.identity, hostname)==0 || strcmp(nsd.identity,IDENTITY)==0)
+	{
+		if(nsd.options->identity)
+			nsd.identity = nsd.options->identity;
+	}
+	if (nsd.options->logfile && !nsd.log_filename) {
+		nsd.log_filename = nsd.options->logfile;
+	}
+	if(nsd.child_count == 0) {
+		nsd.child_count = nsd.options->server_count;
+	}
+	if(nsd.maximum_tcp_count == 0) {
+		nsd.maximum_tcp_count = nsd.options->tcp_count;
+	}
+	nsd.tcp_timeout = nsd.options->tcp_timeout;
+	nsd.tcp_query_count = nsd.options->tcp_query_count;
+	nsd.ipv4_edns_size = nsd.options->ipv4_edns_size;
+	nsd.ipv6_edns_size = nsd.options->ipv6_edns_size;
+
+	if(udp_port == 0)
+	{
+		if(nsd.options->port != 0) {
+			udp_port = nsd.options->port;
+			tcp_port = nsd.options->port;
+		} else {
+			udp_port = UDP_PORT;
+			tcp_port = TCP_PORT;
+		}
+	}
+#ifdef BIND8_STATS
+	if(nsd.st.period == 0) {
+		nsd.st.period = nsd.options->statistics;
+	}
+#endif /* BIND8_STATS */
+#ifdef HAVE_CHROOT
+	if(nsd.chrootdir == 0) nsd.chrootdir = nsd.options->chroot;
+#ifdef CHROOTDIR
+	/* if still no chrootdir, fallback to default */
+	if(nsd.chrootdir == 0) nsd.chrootdir = CHROOTDIR;
+#endif /* CHROOTDIR */
+#endif /* HAVE_CHROOT */
+	if(nsd.username == 0) {
+		if(nsd.options->username) nsd.username = nsd.options->username;
+		else nsd.username = USER;
+	}
+	if(nsd.options->zonesdir && nsd.options->zonesdir[0]) {
+		if(chdir(nsd.options->zonesdir)) {
+			error("cannot chdir to '%s': %s",
+				nsd.options->zonesdir, strerror(errno));
+		}
+		DEBUG(DEBUG_IPC,1, (LOG_INFO, "changed directory to %s",
+			nsd.options->zonesdir));
+	}
+
+	/* EDNS0 */
+	edns_init_data(&nsd.edns_ipv4, nsd.options->ipv4_edns_size);
+#if defined(INET6)
+#if defined(IPV6_USE_MIN_MTU) || defined(IPV6_MTU)
+	edns_init_data(&nsd.edns_ipv6, nsd.options->ipv6_edns_size);
+#else /* no way to set IPV6 MTU, send no bigger than that. */
+	if (nsd.options->ipv6_edns_size < IPV6_MIN_MTU)
+		edns_init_data(&nsd.edns_ipv6, nsd.options->ipv6_edns_size);
+	else
+		edns_init_data(&nsd.edns_ipv6, IPV6_MIN_MTU);
+#endif /* IPV6 MTU) */
+#endif /* defined(INET6) */
+
+	if (nsd.nsid_len == 0 && nsd.options->nsid) {
+		if (strlen(nsd.options->nsid) % 2 != 0) {
+			error("the NSID must be a hex string of an even length.");
+		}
+		nsd.nsid = xalloc(strlen(nsd.options->nsid) / 2);
+		nsd.nsid_len = strlen(nsd.options->nsid) / 2;
+		if (hex_pton(nsd.options->nsid, nsd.nsid, nsd.nsid_len) == -1) {
+			error("hex string cannot be parsed '%s' in NSID.", nsd.options->nsid);
+		}
 	}
 	edns_init_nsid(&nsd.edns_ipv4, nsd.nsid_len);
- #if defined(INET6)
+#if defined(INET6)
 	edns_init_nsid(&nsd.edns_ipv6, nsd.nsid_len);
- #endif /* INET6 */
-#endif /* NSID */
-	
+#endif /* defined(INET6) */
+
 	/* Number of child servers to fork.  */
 	nsd.children = (struct nsd_child *) region_alloc(
 		nsd.region, nsd.child_count * sizeof(struct nsd_child));
 	for (i = 0; i < nsd.child_count; ++i) {
 		nsd.children[i].kind = NSD_SERVER_BOTH;
+		nsd.children[i].pid = -1;
+		nsd.children[i].child_fd = -1;
+		nsd.children[i].parent_fd = -1;
+		nsd.children[i].handler = NULL;
+		nsd.children[i].need_to_send_STATS = 0;
+		nsd.children[i].need_to_send_QUIT = 0;
+		nsd.children[i].need_to_exit = 0;
+		nsd.children[i].has_exited = 0;
 	}
-	
+
+	nsd.this_child = NULL;
+
 	/* We need at least one active interface */
 	if (nsd.ifs == 0) {
 		nsd.ifs = 1;
@@ -608,14 +770,14 @@ main (int argc, char *argv[])
 		 */
 #ifdef INET6
 		if (hints[0].ai_family == AF_UNSPEC) {
-# ifdef IPV6_V6ONLY
+#ifdef IPV6_V6ONLY
 			hints[0].ai_family = AF_INET6;
 			hints[1].ai_family = AF_INET;
 			nsd.ifs = 2;
 			nsd.grab_ip6_optional = 1;
-# else /* !IPV6_V6ONLY */
+#else /* !IPV6_V6ONLY */
 			hints[0].ai_family = AF_INET6;
-# endif	/* !IPV6_V6ONLY */
+#endif	/* IPV6_V6ONLY */
 		}
 #endif /* INET6 */
 	}
@@ -623,26 +785,31 @@ main (int argc, char *argv[])
 	/* Set up the address info structures with real interface/port data */
 	for (i = 0; i < nsd.ifs; ++i) {
 		int r;
+		const char* node = NULL;
+		const char* service = NULL;
 
 		/* We don't perform name-lookups */
 		if (nodes[i] != NULL)
 			hints[i].ai_flags |= AI_NUMERICHOST;
-		
+		get_ip_port_frm_str(nodes[i], &node, &service);
+
 		hints[i].ai_socktype = SOCK_DGRAM;
-		if ((r=getaddrinfo(nodes[i], udp_port, &hints[i], &nsd.udp[i].addr)) != 0) {
+		if ((r=getaddrinfo(node, (service?service:udp_port), &hints[i], &nsd.udp[i].addr)) != 0) {
 #ifdef INET6
-			if(nsd.grab_ip6_optional && hints[0].ai_family == AF_INET6
-				&& r == EAI_FAMILY)
+			if(nsd.grab_ip6_optional && hints[0].ai_family == AF_INET6) {
+				log_msg(LOG_WARNING, "No IPv6, fallback to IPv4. getaddrinfo: %s",
+				r==EAI_SYSTEM?strerror(errno):gai_strerror(r));
 				continue;
+			}
 #endif
 			error("cannot parse address '%s': getaddrinfo: %s %s",
 				nodes[i]?nodes[i]:"(null)",
 				gai_strerror(r),
 				r==EAI_SYSTEM?strerror(errno):"");
 		}
-		
+
 		hints[i].ai_socktype = SOCK_STREAM;
-		if ((r=getaddrinfo(nodes[i], tcp_port, &hints[i], &nsd.tcp[i].addr)) != 0) {
+		if ((r=getaddrinfo(node, (service?service:tcp_port), &hints[i], &nsd.tcp[i].addr)) != 0) {
 			error("cannot parse address '%s': getaddrinfo: %s %s",
 				nodes[i]?nodes[i]:"(null)",
 				gai_strerror(r),
@@ -653,13 +820,14 @@ main (int argc, char *argv[])
 	/* Parse the username into uid and gid */
 	nsd.gid = getgid();
 	nsd.uid = getuid();
+#ifdef HAVE_GETPWNAM
+	/* Parse the username into uid and gid */
 	if (*nsd.username) {
-		struct passwd *pwd;
-		if (isdigit(*nsd.username)) {
+		if (isdigit((int)*nsd.username)) {
 			char *t;
 			nsd.uid = strtol(nsd.username, &t, 10);
 			if (*t != 0) {
-				if (*t != '.' || !isdigit(*++t)) {
+				if (*t != '.' || !isdigit((int)*++t)) {
 					error("-u user or -u uid or -u uid.gid");
 				}
 				nsd.gid = strtol(t, &t, 10);
@@ -670,7 +838,6 @@ main (int argc, char *argv[])
 				} else {
 					nsd.gid = pwd->pw_gid;
 				}
-				endpwent();
 			}
 		} else {
 			/* Lookup the user id in /etc/passwd */
@@ -680,29 +847,53 @@ main (int argc, char *argv[])
 				nsd.uid = pwd->pw_uid;
 				nsd.gid = pwd->pw_gid;
 			}
-			endpwent();
 		}
 	}
+	/* endpwent(); */
+#endif /* HAVE_GETPWNAM */
 
-	/* Set up the logging... */
-	log_open(LOG_PID, FACILITY, log_filename);
-	if (!log_filename) {
-		log_set_log_function(log_syslog);
-	}
-	
-	/* Relativize the pathnames for chroot... */
-	if (nsd.chrootdir) {
-		int l = strlen(nsd.chrootdir);
+#if defined(HAVE_SSL)
+	key_options_tsig_add(nsd.options);
+#endif
 
-		if (strncmp(nsd.chrootdir, nsd.pidfile, l) != 0) {
-			log_msg(LOG_ERR, "%s is not relative to %s: will not chroot",
+	append_trailing_slash(&nsd.options->xfrdir, nsd.options->region);
+	/* Check relativity of pathnames to chroot */
+	if (nsd.chrootdir && nsd.chrootdir[0]) {
+		/* existing chrootdir: append trailing slash for strncmp checking */
+		append_trailing_slash(&nsd.chrootdir, nsd.region);
+		append_trailing_slash(&nsd.options->zonesdir, nsd.options->region);
+
+		/* zonesdir must be absolute and within chroot,
+		 * all other pathnames may be relative to zonesdir */
+		if (strncmp(nsd.options->zonesdir, nsd.chrootdir, strlen(nsd.chrootdir)) != 0) {
+			error("zonesdir %s is not relative to %s: chroot not possible",
+				nsd.options->zonesdir, nsd.chrootdir);
+		} else if (!file_inside_chroot(nsd.pidfile, nsd.chrootdir)) {
+			error("pidfile %s is not relative to %s: chroot not possible",
 				nsd.pidfile, nsd.chrootdir);
-			nsd.chrootdir = NULL;
-		} else if (strncmp(nsd.chrootdir, nsd.dbfile, l) != 0) {
-			log_msg(LOG_ERR, "%s is not relative to %s: will not chroot",
+		} else if (!file_inside_chroot(nsd.dbfile, nsd.chrootdir)) {
+			error("database %s is not relative to %s: chroot not possible",
 				nsd.dbfile, nsd.chrootdir);
-			nsd.chrootdir = NULL;
+		} else if (!file_inside_chroot(nsd.options->xfrdfile, nsd.chrootdir)) {
+			error("xfrdfile %s is not relative to %s: chroot not possible",
+				nsd.options->xfrdfile, nsd.chrootdir);
+		} else if (!file_inside_chroot(nsd.options->zonelistfile, nsd.chrootdir)) {
+			error("zonelistfile %s is not relative to %s: chroot not possible",
+				nsd.options->zonelistfile, nsd.chrootdir);
+		} else if (!file_inside_chroot(nsd.options->xfrdir, nsd.chrootdir)) {
+			error("xfrdir %s is not relative to %s: chroot not possible",
+				nsd.options->xfrdir, nsd.chrootdir);
 		}
+	}
+
+	/* Set up the logging */
+	log_open(LOG_PID, FACILITY, nsd.log_filename);
+	if (!nsd.log_filename)
+		log_set_log_function(log_syslog);
+	else if (nsd.uid && nsd.gid) {
+		if(chown(nsd.log_filename, nsd.uid, nsd.gid) != 0)
+			VERBOSITY(2, (LOG_WARNING, "chown %s failed: %s",
+				nsd.log_filename, strerror(errno)));
 	}
 
 	/* Do we have a running nsd? */
@@ -714,45 +905,12 @@ main (int argc, char *argv[])
 	} else {
 		if (kill(oldpid, 0) == 0 || errno == EPERM) {
 			log_msg(LOG_WARNING,
-				"nsd is already running as %u, continuing",
-				(unsigned) oldpid);
+				"%s is already running as %u, continuing",
+				argv0, (unsigned) oldpid);
 		} else {
 			log_msg(LOG_ERR,
 				"...stale pid file from process %u",
 				(unsigned) oldpid);
-		}
-	}
-
-	/* Unless we're debugging, fork... */
-	if (nsd.debug) {
-		nsd.server_kind = NSD_SERVER_BOTH;
-	} else {
-		int fd;
-		
-		/* Take off... */
-		switch ((nsd.pid = fork())) {
-		case 0:
-			break;
-		case -1:
-			log_msg(LOG_ERR, "fork failed: %s", strerror(errno));
-			unlink(nsd.pidfile);
-			exit(1);
-		default:
-			exit(0);
-		}
-
-		/* Detach ourselves... */
-		if (setsid() == -1) {
-			log_msg(LOG_ERR, "setsid() failed: %s", strerror(errno));
-			exit(1);
-		}
-
-		if ((fd = open("/dev/null", O_RDWR, 0)) != -1) {
-			(void)dup2(fd, STDIN_FILENO);
-			(void)dup2(fd, STDOUT_FILENO);
-			(void)dup2(fd, STDERR_FILENO);
-			if (fd > 2)
-				(void)close(fd);
 		}
 	}
 
@@ -770,45 +928,195 @@ main (int argc, char *argv[])
 	action.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &action, NULL);
 
+	/* Initialize... */
+	nsd.mode = NSD_RUN;
+	nsd.signal_hint_child = 0;
+	nsd.signal_hint_reload = 0;
+	nsd.signal_hint_reload_hup = 0;
+	nsd.signal_hint_quit = 0;
+	nsd.signal_hint_shutdown = 0;
+	nsd.signal_hint_stats = 0;
+	nsd.signal_hint_statsusr = 0;
+	nsd.quit_sync_done = 0;
+
+	/* Initialize the server... */
+	if (server_init(&nsd) != 0) {
+		error("server initialization failed, %s could "
+			"not be started", argv0);
+	}
+#if defined(HAVE_SSL)
+	if(nsd.options->control_enable) {
+		/* read ssl keys while superuser and outside chroot */
+		if(!(nsd.rc = daemon_remote_create(nsd.options)))
+			error("could not perform remote control setup");
+	}
+#endif /* HAVE_SSL */
+
+	/* Unless we're debugging, fork... */
+	if (!nsd.debug) {
+		int fd;
+
+		/* Take off... */
+		switch ((nsd.pid = fork())) {
+		case 0:
+			/* Child */
+			break;
+		case -1:
+			error("fork() failed: %s", strerror(errno));
+		default:
+			/* Parent is done */
+			server_close_all_sockets(nsd.udp, nsd.ifs);
+			server_close_all_sockets(nsd.tcp, nsd.ifs);
+			exit(0);
+		}
+
+		/* Detach ourselves... */
+		if (setsid() == -1) {
+			error("setsid() failed: %s", strerror(errno));
+		}
+
+		if ((fd = open("/dev/null", O_RDWR, 0)) != -1) {
+			(void)dup2(fd, STDIN_FILENO);
+			(void)dup2(fd, STDOUT_FILENO);
+			(void)dup2(fd, STDERR_FILENO);
+			if (fd > 2)
+				(void)close(fd);
+		}
+	}
 
 	/* Get our process id */
 	nsd.pid = getpid();
 
-	/* Overwrite pid... */
+	/* Set user context */
+#ifdef HAVE_GETPWNAM
+	if (*nsd.username) {
+#ifdef HAVE_SETUSERCONTEXT
+		/* setusercontext does initgroups, setuid, setgid, and
+		 * also resource limits from login config, but we
+		 * still call setresuid, setresgid to be sure to set all uid */
+		if (setusercontext(NULL, pwd, nsd.uid,
+			LOGIN_SETALL & ~LOGIN_SETUSER & ~LOGIN_SETGROUP) != 0)
+			log_msg(LOG_WARNING, "unable to setusercontext %s: %s",
+				nsd.username, strerror(errno));
+#endif /* HAVE_SETUSERCONTEXT */
+	}
+#endif /* HAVE_GETPWNAM */
+
+	/* Chroot */
+#ifdef HAVE_CHROOT
+	if (nsd.chrootdir && nsd.chrootdir[0]) {
+		int l = strlen(nsd.chrootdir)-1; /* ends in trailing slash */
+
+		if (file_inside_chroot(nsd.log_filename, nsd.chrootdir))
+			nsd.file_rotation_ok = 1;
+
+		/* strip chroot from pathnames if they're absolute */
+		nsd.options->zonesdir += l;
+		if (nsd.log_filename[0] == '/')
+			nsd.log_filename += l;
+		if (nsd.pidfile[0] == '/')
+			nsd.pidfile += l;
+		if (nsd.dbfile[0] == '/')
+			nsd.dbfile += l;
+		if (nsd.options->xfrdfile[0] == '/')
+			nsd.options->xfrdfile += l;
+		if (nsd.options->zonelistfile[0] == '/')
+			nsd.options->zonelistfile += l;
+		if (nsd.options->xfrdir[0] == '/')
+			nsd.options->xfrdir += l;
+
+		/* strip chroot from pathnames of "include:" statements
+		 * on subsequent repattern commands */
+		cfg_parser->chroot = nsd.chrootdir;
+
+#ifdef HAVE_TZSET
+		/* set timezone whilst not yet in chroot */
+		tzset();
+#endif
+		if (chroot(nsd.chrootdir)) {
+			error("unable to chroot: %s", strerror(errno));
+		}
+		if (chdir("/")) {
+			error("unable to chdir to chroot: %s", strerror(errno));
+		}
+		DEBUG(DEBUG_IPC,1, (LOG_INFO, "changed root directory to %s",
+			nsd.chrootdir));
+		/* chdir to zonesdir again after chroot */
+		if(nsd.options->zonesdir && nsd.options->zonesdir[0]) {
+			if(chdir(nsd.options->zonesdir)) {
+				error("unable to chdir to '%s': %s",
+					nsd.options->zonesdir, strerror(errno));
+			}
+			DEBUG(DEBUG_IPC,1, (LOG_INFO, "changed directory to %s",
+				nsd.options->zonesdir));
+		}
+	}
+	else
+#endif /* HAVE_CHROOT */
+		nsd.file_rotation_ok = 1;
+
+	DEBUG(DEBUG_IPC,1, (LOG_INFO, "file rotation on %s %sabled",
+		nsd.log_filename, nsd.file_rotation_ok?"en":"dis"));
+
+	/* Write pidfile */
 	if (writepid(&nsd) == -1) {
 		log_msg(LOG_ERR, "cannot overwrite the pidfile %s: %s",
 			nsd.pidfile, strerror(errno));
 	}
 
-	/* Initialize... */
-	nsd.mode = NSD_RUN;
+	/* Drop the permissions */
+#ifdef HAVE_GETPWNAM
+	if (*nsd.username) {
+#ifdef HAVE_INITGROUPS
+		if(initgroups(nsd.username, nsd.gid) != 0)
+			log_msg(LOG_WARNING, "unable to initgroups %s: %s",
+				nsd.username, strerror(errno));
+#endif /* HAVE_INITGROUPS */
+		endpwent();
 
-	/* Run the server... */
-	if (server_init(&nsd) != 0) {
-		unlink(nsd.pidfile);
-		exit(1);
+#ifdef HAVE_SETRESGID
+		if(setresgid(nsd.gid,nsd.gid,nsd.gid) != 0)
+#elif defined(HAVE_SETREGID) && !defined(DARWIN_BROKEN_SETREUID)
+			if(setregid(nsd.gid,nsd.gid) != 0)
+#else /* use setgid */
+				if(setgid(nsd.gid) != 0)
+#endif /* HAVE_SETRESGID */
+					error("unable to set group id of %s: %s",
+						nsd.username, strerror(errno));
+
+#ifdef HAVE_SETRESUID
+		if(setresuid(nsd.uid,nsd.uid,nsd.uid) != 0)
+#elif defined(HAVE_SETREUID) && !defined(DARWIN_BROKEN_SETREUID)
+			if(setreuid(nsd.uid,nsd.uid) != 0)
+#else /* use setuid */
+				if(setuid(nsd.uid) != 0)
+#endif /* HAVE_SETRESUID */
+					error("unable to set user id of %s: %s",
+						nsd.username, strerror(errno));
+
+		DEBUG(DEBUG_IPC,1, (LOG_INFO, "dropped user privileges, run as %s",
+			nsd.username));
+	}
+#endif /* HAVE_GETPWNAM */
+
+	if(nsd.server_kind == NSD_SERVER_MAIN) {
+		server_prepare_xfrd(&nsd);
+		/* xfrd forks this before reading database, so it does not get
+		 * the memory size of the database */
+		server_start_xfrd(&nsd, 0, 0);
+	}
+	if (server_prepare(&nsd) != 0) {
+		unlinkpid(nsd.pidfile);
+		error("server preparation failed, %s could "
+			"not be started", argv0);
+	}
+	if(nsd.server_kind == NSD_SERVER_MAIN) {
+		server_send_soa_xfrd(&nsd, 0);
 	}
 
-#ifdef PLUGINS
-	maximum_plugin_count = plugin_count;
-	plugin_init(&nsd);
-	for (i = 0; i < plugin_count; ++i) {
-		const char *arg = "";
-		char *eq = strchr(plugins[i], '=');
-		if (eq) {
-			*eq = '\0';
-			arg = eq + 1;
-		}
-		if (!plugin_load(&nsd, plugins[i], arg)) {
-			plugin_finalize_all();
-			unlink(nsd.pidfile);
-			exit(1);
-		}
-	}
-	free(plugins);
-#endif /* PLUGINS */
-	
-	log_msg(LOG_NOTICE, "nsd started, pid %d", (int) nsd.pid);
+	/* Really take off */
+	log_msg(LOG_NOTICE, "%s started (%s), pid %d",
+		argv0, PACKAGE_STRING, (int) nsd.pid);
 
 	if (nsd.server_kind == NSD_SERVER_MAIN) {
 		server_main(&nsd);

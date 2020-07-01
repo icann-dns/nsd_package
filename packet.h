@@ -140,6 +140,8 @@ struct query;
 #define	MAXRRSPP		10240    /* Maximum number of rr's per packet */
 #define MAX_COMPRESSED_DNAMES	MAXRRSPP /* Maximum number of compressed domains. */
 #define MAX_COMPRESSION_OFFSET  16383	 /* Compression pointers are 14 bit. */
+#define IPV4_MINIMAL_RESPONSE_SIZE 1480	 /* Recommended minimal edns size for IPv4 */
+#define IPV6_MINIMAL_RESPONSE_SIZE 1220	 /* Recommended minimal edns size for IPv6 */
 
 /*
  * Encode RR with OWNER as owner name into QUERY.  Returns the number
@@ -156,12 +158,19 @@ int packet_encode_rr(struct query *query, domain_type *owner, rr_type *rr);
 int packet_encode_rrset(struct query *query,
 			domain_type *owner,
 			rrset_type *rrset,
-			int truncate_rrset);
+			int truncate_rrset,
+			size_t minimal_respsize,
+			int* done);
 
 /*
  * Skip the RR at the current position in PACKET.
  */
 int packet_skip_rr(buffer_type *packet, int question_section);
+
+/*
+ * Skip the dname at the current position in PACKET.
+ */
+int packet_skip_dname(buffer_type *packet);
 
 /*
  * Read the RR at the current position in PACKET.
@@ -170,5 +179,15 @@ rr_type *packet_read_rr(region_type *region,
 			domain_table_type *owners,
 			buffer_type *packet,
 			int question_section);
+
+/*
+ * read a query entry from network packet given in buffer.
+ * does not follow compression ptrs, checks for errors (returns 0).
+ * Dest must be at least MAXDOMAINLEN long.
+ */
+int packet_read_query_section(buffer_type *packet,
+			uint8_t* dest,
+			uint16_t* qtype,
+			uint16_t* qclass);
 
 #endif /* _PACKET_H_ */

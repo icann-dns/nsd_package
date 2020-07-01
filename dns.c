@@ -7,7 +7,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -33,7 +33,7 @@ static lookup_table_type dns_rrclasses[] = {
 	{ 0, NULL }
 };
 
-rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
+static rrtype_descriptor_type rrtype_descriptors[(RRTYPE_DESCRIPTORS_LENGTH+1)] = {
 	/* 0 */
 	{ 0, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
 	/* 1 */
@@ -68,7 +68,7 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	  { RDATA_WF_COMPRESSED_DNAME }, { RDATA_ZF_DNAME } },
 	/* 10 */
 	{ TYPE_NULL, "NULL", T_UTYPE, 1, 1,
-	  { RDATA_WF_BINARY }, { RDATA_ZF_DNAME } },
+	  { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
 	/* 11 */
 	{ TYPE_WKS, "WKS", T_WKS, 2, 2,
 	  { RDATA_WF_A, RDATA_WF_BINARY },
@@ -88,46 +88,16 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	  { RDATA_WF_SHORT, RDATA_WF_COMPRESSED_DNAME },
 	  { RDATA_ZF_SHORT, RDATA_ZF_DNAME } },
 	/* 16 */
-	{ TYPE_TXT, "TXT", T_TXT, 1, MAXRDATALEN,
-	  { RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT,
-	    RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT, RDATA_WF_TEXT },
-	  { RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT } },
+	{ TYPE_TXT, "TXT", T_TXT, 1, 1,
+	  { RDATA_WF_TEXTS },
+	  { RDATA_ZF_TEXTS } },
 	/* 17 */
 	{ TYPE_RP, "RP", T_RP, 2, 2,
-	  { RDATA_WF_COMPRESSED_DNAME, RDATA_WF_COMPRESSED_DNAME },
+	  { RDATA_WF_UNCOMPRESSED_DNAME, RDATA_WF_UNCOMPRESSED_DNAME },
 	  { RDATA_ZF_DNAME, RDATA_ZF_DNAME } },
 	/* 18 */
 	{ TYPE_AFSDB, "AFSDB", T_AFSDB, 2, 2,
-	  { RDATA_WF_SHORT, RDATA_WF_COMPRESSED_DNAME },
+	  { RDATA_WF_SHORT, RDATA_WF_UNCOMPRESSED_DNAME },
 	  { RDATA_ZF_SHORT, RDATA_ZF_DNAME } },
 	/* 19 */
 	{ TYPE_X25, "X25", T_X25, 1, 1,
@@ -139,7 +109,7 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	  { RDATA_ZF_TEXT, RDATA_ZF_TEXT } },
 	/* 21 */
 	{ TYPE_RT, "RT", T_RT, 2, 2,
-	  { RDATA_WF_SHORT, RDATA_WF_COMPRESSED_DNAME },
+	  { RDATA_WF_SHORT, RDATA_WF_UNCOMPRESSED_DNAME },
 	  { RDATA_ZF_SHORT, RDATA_ZF_DNAME } },
 	/* 22 */
 	{ TYPE_NSAP, "NSAP", T_NSAP, 1, 1,
@@ -206,7 +176,7 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	  { RDATA_ZF_CERTIFICATE_TYPE, RDATA_ZF_SHORT, RDATA_ZF_ALGORITHM,
 	    RDATA_ZF_BASE64 } },
 	/* 38 */
-	{ 38, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_A6, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
 	/* 39 */
 	{ TYPE_DNAME, "DNAME", T_DNAME, 1, 1,
 	  { RDATA_WF_UNCOMPRESSED_DNAME }, { RDATA_ZF_DNAME } },
@@ -258,32 +228,54 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	  { RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_BINARY },
 	  { RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_HEX } },
 	/* 45 */
-	{ 45, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_IPSECKEY, "IPSECKEY", T_IPSECKEY, 4, 5,
+	  { RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_IPSECGATEWAY,
+	    RDATA_WF_BINARY },
+	  { RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_IPSECGATEWAY,
+	    RDATA_ZF_BASE64 } },
 	/* 46 */
 	{ TYPE_RRSIG, "RRSIG", T_RRSIG, 9, 9,
 	  { RDATA_WF_SHORT, RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_LONG,
 	    RDATA_WF_LONG, RDATA_WF_LONG, RDATA_WF_SHORT,
-	    RDATA_WF_UNCOMPRESSED_DNAME, RDATA_WF_BINARY },
+	    RDATA_WF_LITERAL_DNAME, RDATA_WF_BINARY },
 	  { RDATA_ZF_RRTYPE, RDATA_ZF_ALGORITHM, RDATA_ZF_BYTE, RDATA_ZF_PERIOD,
-	    RDATA_ZF_TIME, RDATA_ZF_TIME, RDATA_ZF_SHORT, RDATA_ZF_DNAME,
-	    RDATA_ZF_BASE64 } },
+	    RDATA_ZF_TIME, RDATA_ZF_TIME, RDATA_ZF_SHORT,
+		RDATA_ZF_LITERAL_DNAME, RDATA_ZF_BASE64 } },
 	/* 47 */
 	{ TYPE_NSEC, "NSEC", T_NSEC, 2, 2,
-	  { RDATA_WF_UNCOMPRESSED_DNAME, RDATA_WF_BINARY },
-	  { RDATA_ZF_DNAME, RDATA_ZF_NSEC } },
+	  { RDATA_WF_LITERAL_DNAME, RDATA_WF_BINARY },
+	  { RDATA_ZF_LITERAL_DNAME, RDATA_ZF_NSEC } },
 	/* 48 */
 	{ TYPE_DNSKEY, "DNSKEY", T_DNSKEY, 4, 4,
 	  { RDATA_WF_SHORT, RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_BINARY },
 	  { RDATA_ZF_SHORT, RDATA_ZF_BYTE, RDATA_ZF_ALGORITHM,
 	    RDATA_ZF_BASE64 } },
 	/* 49 */
-	{ 49, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_DHCID, "DHCID", T_DHCID, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_BASE64 } },
 	/* 50 */
-	{ 50, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_NSEC3, "NSEC3", T_NSEC3, 6, 6,
+	  { RDATA_WF_BYTE, /* hash type */
+	    RDATA_WF_BYTE, /* flags */
+	    RDATA_WF_SHORT, /* iterations */
+	    RDATA_WF_BINARYWITHLENGTH, /* salt */
+	    RDATA_WF_BINARYWITHLENGTH, /* next hashed name */
+	    RDATA_WF_BINARY /* type bitmap */ },
+	  { RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_SHORT, RDATA_ZF_HEX_LEN,
+	    RDATA_ZF_BASE32, RDATA_ZF_NSEC } },
 	/* 51 */
-	{ 51, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_NSEC3PARAM, "NSEC3PARAM", T_NSEC3PARAM, 4, 4,
+	  { RDATA_WF_BYTE, /* hash type */
+	    RDATA_WF_BYTE, /* flags */
+	    RDATA_WF_SHORT, /* iterations */
+	    RDATA_WF_BINARYWITHLENGTH /* salt */ },
+	  { RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_SHORT, RDATA_ZF_HEX_LEN } },
 	/* 52 */
-	{ 52, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	{ TYPE_TLSA, "TLSA", T_TLSA, 4, 4,
+	  { RDATA_WF_BYTE, /* usage */
+	    RDATA_WF_BYTE, /* selector */
+	    RDATA_WF_BYTE, /* matching type */
+	    RDATA_WF_BINARY }, /* certificate association data */
+	  { RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_BYTE, RDATA_ZF_HEX } },
 	/* 53 */
 	{ 53, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
 	/* 54 */
@@ -409,8 +401,55 @@ rrtype_descriptor_type rrtype_descriptors[RRTYPE_DESCRIPTORS_LENGTH] = {
 	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
 	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
 	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT,
-	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT } }
+	    RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT, RDATA_ZF_TEXT } },
+	/* 100 */
+	{ 100, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	/* 101 */
+	{ 101, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	/* 102 */
+	{ 102, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	/* 103 */
+	{ 103, NULL, T_UTYPE, 1, 1, { RDATA_WF_BINARY }, { RDATA_ZF_UNKNOWN } },
+	/* 104 */
+	{ TYPE_NID, "NID", T_NID, 2, 2,
+	  { RDATA_WF_SHORT, RDATA_WF_ILNP64 },
+	  { RDATA_ZF_SHORT, RDATA_ZF_ILNP64 } },
+	/* 105 */
+	{ TYPE_L32, "L32", T_L32, 2, 2,
+	  { RDATA_WF_SHORT, RDATA_WF_A },
+	  { RDATA_ZF_SHORT, RDATA_ZF_A } },
+	/* 106 */
+	{ TYPE_L64, "L64", T_L64, 2, 2,
+	  { RDATA_WF_SHORT, RDATA_WF_ILNP64 },
+	  { RDATA_ZF_SHORT, RDATA_ZF_ILNP64 } },
+	/* 107 */
+	{ TYPE_LP, "LP", T_LP, 2, 2,
+	  { RDATA_WF_SHORT, RDATA_WF_UNCOMPRESSED_DNAME },
+	  { RDATA_ZF_SHORT, RDATA_ZF_DNAME } },
+#ifdef DRAFT_RRTYPES
+	/* 108 */
+	{ TYPE_EUI48, "EUI48", T_EUI48, 1, 1,
+	  { RDATA_WF_EUI48 }, { RDATA_ZF_EUI48 } },
+	/* 109 */
+	{ TYPE_EUI64, "EUI64", T_EUI64, 1, 1,
+	  { RDATA_WF_EUI64 }, { RDATA_ZF_EUI64 } },
+#endif
+
+	/* 32769 */
+	{ TYPE_DLV, "DLV", T_DLV, 4, 4,
+	  { RDATA_WF_SHORT, RDATA_WF_BYTE, RDATA_WF_BYTE, RDATA_WF_BINARY },
+	  { RDATA_ZF_SHORT, RDATA_ZF_ALGORITHM, RDATA_ZF_BYTE, RDATA_ZF_HEX } },
 };
+
+rrtype_descriptor_type *
+rrtype_descriptor_by_type(uint16_t type)
+{
+	if (type < RRTYPE_DESCRIPTORS_LENGTH)
+		return &rrtype_descriptors[type];
+	else if (type == TYPE_DLV)
+		return &rrtype_descriptors[PSEUDO_TYPE_DLV];
+	return &rrtype_descriptors[0];
+}
 
 rrtype_descriptor_type *
 rrtype_descriptor_by_name(const char *name)
@@ -423,6 +462,12 @@ rrtype_descriptor_by_name(const char *name)
 		{
 			return &rrtype_descriptors[i];
 		}
+	}
+
+	if (rrtype_descriptors[PSEUDO_TYPE_DLV].name
+	    && strcasecmp(rrtype_descriptors[PSEUDO_TYPE_DLV].name, name) == 0)
+	{
+		return &rrtype_descriptors[PSEUDO_TYPE_DLV];
 	}
 
 	return NULL;
@@ -461,20 +506,20 @@ rrtype_from_string(const char *name)
 
 	if (strlen(name) < 5)
 		return 0;
-	
+
 	if (strncasecmp(name, "TYPE", 4) != 0)
 		return 0;
 
-	if (!isdigit(name[4]))
+	if (!isdigit((int)name[4]))
 		return 0;
-	
+
 	/* The rest from the string must be a number.  */
 	rrtype = strtol(name + 4, &end, 10);
 	if (*end != '\0')
 		return 0;
 	if (rrtype < 0 || rrtype > 65535L)
 		return 0;
-	
+
         return (uint16_t) rrtype;
 }
 
@@ -485,7 +530,7 @@ rrclass_to_string(uint16_t rrclass)
 	lookup_table_type *entry = lookup_by_id(dns_rrclasses, rrclass);
 	if (entry) {
 		assert(strlen(entry->name) < sizeof(buf));
-		strcpy(buf, entry->name);
+		strlcpy(buf, entry->name, sizeof(buf));
 	} else {
 		snprintf(buf, sizeof(buf), "CLASS%d", (int) rrclass);
 	}
@@ -506,20 +551,19 @@ rrclass_from_string(const char *name)
 
 	if (strlen(name) < 6)
 		return 0;
-	
+
 	if (strncasecmp(name, "CLASS", 5) != 0)
 		return 0;
 
-	if (!isdigit(name[5]))
+	if (!isdigit((int)name[5]))
 		return 0;
-	
+
 	/* The rest from the string must be a number.  */
 	rrclass = strtol(name + 5, &end, 10);
 	if (*end != '\0')
 		return 0;
 	if (rrclass < 0 || rrclass > 65535L)
 		return 0;
-	
-        return (uint16_t) rrclass;
-	
+
+	return (uint16_t) rrclass;
 }

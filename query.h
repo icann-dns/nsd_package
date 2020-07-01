@@ -16,6 +16,7 @@
 #include "namedb.h"
 #include "nsd.h"
 #include "packet.h"
+#include "tsig.h"
 
 enum query_state {
 	QUERY_PROCESSED,
@@ -55,6 +56,11 @@ struct query {
 	/* EDNS information provided by the client.  */
 	edns_record_type edns;
 
+	/* TSIG record information and running hash for query-response */
+	tsig_record_type tsig;
+	/* tsig actions can be overridden, for axfr transfer. */
+	int tsig_prepare_it, tsig_update_it, tsig_sign_it;
+
 	int tcp;
 	uint16_t tcplen;
 
@@ -69,9 +75,6 @@ struct query {
 
 	/* The zone used to answer the query.  */
 	zone_type *zone;
-	
-	/* The domain used to answer the query.  */
-	domain_type *domain;
 
 	/* The delegation domain, if any.  */
 	domain_type *delegation_domain;
@@ -81,15 +84,16 @@ struct query {
 
 	/* Original opcode.  */
 	uint8_t opcode;
-	
+
 	/*
 	 * The number of CNAMES followed.  After a CNAME is followed
 	 * we no longer change the RCODE to NXDOMAIN and no longer add
 	 * SOA records to the authority section in case of NXDOMAIN
 	 * and NODATA.
+	 * Also includes number of DNAMES followed.
 	 */
 	int cname_count;
-	
+
 	/* Used for dname compression.  */
 	uint16_t     compressed_dname_count;
 	domain_type *compressed_dnames[MAXRRSPP];
@@ -99,6 +103,10 @@ struct query {
 	  * query name when generated from a wildcard record.
 	  */
 	uint16_t    *compressed_dname_offsets;
+	size_t compressed_dname_offsets_size;
+
+	/* number of temporary domains used for the query */
+	size_t number_temporary_domains;
 
 	/*
 	 * Used for AXFR processing.
@@ -108,6 +116,11 @@ struct query {
 	domain_type *axfr_current_domain;
 	rrset_type  *axfr_current_rrset;
 	uint16_t     axfr_current_rr;
+
+#ifdef RATELIMIT
+	/* if we encountered a wildcard, its domain */
+	domain_type *wildcard_domain;
+#endif
 };
 
 
@@ -144,7 +157,7 @@ void query_clear_dname_offsets(struct query *query, size_t max_offset);
  * Clear the compression tables.
  */
 void query_clear_compression_tables(struct query *query);
-	
+
 /*
  * Enter the specified domain into the compression table starting at
  * the specified offset.
@@ -158,7 +171,8 @@ void query_add_compression_domain(struct query *query,
  * Create a new query structure.
  */
 query_type *query_create(region_type *region,
-			 uint16_t *compressed_dname_offsets);
+			 uint16_t *compressed_dname_offsets,
+			 size_t compressed_dname_size);
 
 /*
  * Reset a query structure so it is ready for receiving and processing
@@ -195,7 +209,6 @@ query_overflow(query_type *q)
 {
 	return buffer_position(q->packet) > (q->maxlen - q->reserved_space);
 }
-
 static inline int
 query_overflow_nsid(query_type *q, uint16_t nsid_len)
 {

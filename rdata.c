@@ -7,7 +7,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <netdb.h>
+#include <stdlib.h>
 #include <string.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -23,13 +24,23 @@
 #include "rdata.h"
 #include "zonec.h"
 
-/* Taken from RFC 2538, section 2.1.  */
+/* Taken from RFC 4398, section 2.1.  */
 lookup_table_type dns_certificate_types[] = {
+/*	0		Reserved */
 	{ 1, "PKIX" },	/* X.509 as per PKIX */
 	{ 2, "SPKI" },	/* SPKI cert */
-        { 3, "PGP" },	/* PGP cert */
-        { 253, "URI" },	/* URI private */
+	{ 3, "PGP" },	/* OpenPGP packet */
+	{ 4, "IPKIX" },	/* The URL of an X.509 data object */
+	{ 5, "ISPKI" },	/* The URL of an SPKI certificate */
+	{ 6, "IPGP" },	/* The fingerprint and URL of an OpenPGP packet */
+	{ 7, "ACPKIX" },	/* Attribute Certificate */
+	{ 8, "IACPKIX" },	/* The URL of an Attribute Certificate */
+	{ 253, "URI" },	/* URI private */
 	{ 254, "OID" },	/* OID private */
+/*	255 		Reserved */
+/* 	256-65279	Available for IANA assignment */
+/*	65280-65534	Experimental */
+/*	65535		Reserved */
 	{ 0, NULL }
 };
 
@@ -40,6 +51,13 @@ lookup_table_type dns_algorithms[] = {
 	{ 3, "DSA" },		/* RFC 2536 */
 	{ 4, "ECC" },
 	{ 5, "RSASHA1" },	/* RFC 3110 */
+	{ 6, "DSA-NSEC3-SHA1" },	/* RFC 5155 */
+	{ 7, "RSASHA1-NSEC3-SHA1" },	/* RFC 5155 */
+	{ 8, "RSASHA256" },		/* RFC 5702 */
+	{ 10, "RSASHA512" },		/* RFC 5702 */
+	{ 12, "ECC-GOST" },		/* RFC 5933 */
+	{ 13, "ECDSAP256SHA256" },	/* RFC 6605 */
+	{ 14, "ECDSAP384SHA384" },	/* RFC 6605 */
 	{ 252, "INDIRECT" },
 	{ 253, "PRIVATEDNS" },
 	{ 254, "PRIVATEOID" },
@@ -47,10 +65,12 @@ lookup_table_type dns_algorithms[] = {
 };
 
 typedef int (*rdata_to_string_type)(buffer_type *output,
-				    rdata_atom_type rdata);
+				    rdata_atom_type rdata,
+				    rr_type *rr);
 
 static int
-rdata_dname_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_dname_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	buffer_printf(output,
 		      "%s",
@@ -60,7 +80,45 @@ rdata_dname_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_text_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_dns_name_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	const uint8_t *data = rdata_atom_data(rdata);
+	size_t offset = 0;
+	uint8_t length = data[offset];
+	size_t i;
+
+	while (length > 0)
+	{
+		if (offset) /* concat label */
+			buffer_printf(output, ".");
+
+		for (i = 1; i <= length; ++i) {
+			uint8_t ch = data[i+offset];
+
+			if (ch=='.' || ch==';' || ch=='(' || ch==')' || ch=='\\') {
+				buffer_printf(output, "\\%c", (char) ch);
+			} else if (!isgraph((int) ch)) {
+				buffer_printf(output, "\\%03u", (unsigned int) ch);
+			} else if (isprint((int) ch)) {
+				buffer_printf(output, "%c", (char) ch);
+			} else {
+				buffer_printf(output, "\\%03u", (unsigned int) ch);
+			}
+		}
+		/* next label */
+		offset = offset+length+1;
+		length = data[offset];
+	}
+
+	/* root label */
+	buffer_printf(output, ".");
+	return 1;
+}
+
+static int
+rdata_text_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	const uint8_t *data = rdata_atom_data(rdata);
 	uint8_t length = data[0];
@@ -69,13 +127,13 @@ rdata_text_to_string(buffer_type *output, rdata_atom_type rdata)
 	buffer_printf(output, "\"");
 	for (i = 1; i <= length; ++i) {
 		char ch = (char) data[i];
-		if (isprint(ch)) {
+		if (isprint((int)ch)) {
 			if (ch == '"' || ch == '\\') {
 				buffer_printf(output, "\\");
 			}
 			buffer_printf(output, "%c", ch);
 		} else {
-			buffer_printf(output, "\\%03u", (unsigned) ch);
+			buffer_printf(output, "\\%03u", (unsigned) data[i]);
 		}
 	}
 	buffer_printf(output, "\"");
@@ -83,7 +141,36 @@ rdata_text_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_byte_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_texts_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	uint16_t pos = 0;
+	const uint8_t *data = rdata_atom_data(rdata);
+	uint16_t length = rdata_atom_size(rdata);
+	size_t i;
+
+	while (pos < length && pos + data[pos] < length) {
+		buffer_printf(output, "\"");
+		for (i = 1; i <= data[pos]; ++i) {
+			char ch = (char) data[pos + i];
+			if (isprint((int)ch)) {
+				if (ch == '"' || ch == '\\') {
+					buffer_printf(output, "\\");
+				}
+				buffer_printf(output, "%c", ch);
+			} else {
+				buffer_printf(output, "\\%03u", (unsigned) data[pos+i]);
+			}
+		}
+		pos += data[pos]+1;
+		buffer_printf(output, pos < length?"\" ":"\"");
+	}
+	return 1;
+}
+
+static int
+rdata_byte_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint8_t data = *rdata_atom_data(rdata);
 	buffer_printf(output, "%lu", (unsigned long) data);
@@ -91,7 +178,8 @@ rdata_byte_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_short_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_short_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint16_t data = read_uint16(rdata_atom_data(rdata));
 	buffer_printf(output, "%lu", (unsigned long) data);
@@ -99,7 +187,8 @@ rdata_short_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_long_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_long_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint32_t data = read_uint32(rdata_atom_data(rdata));
 	buffer_printf(output, "%lu", (unsigned long) data);
@@ -107,7 +196,8 @@ rdata_long_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_a_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_a_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int result = 0;
 	char str[200];
@@ -119,7 +209,8 @@ rdata_a_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_aaaa_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_aaaa_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int result = 0;
 	char str[200];
@@ -131,7 +222,60 @@ rdata_aaaa_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_rrtype_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_ilnp64_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	uint8_t* data = rdata_atom_data(rdata);
+	uint16_t a1 = read_uint16(data);
+	uint16_t a2 = read_uint16(data+2);
+	uint16_t a3 = read_uint16(data+4);
+	uint16_t a4 = read_uint16(data+6);
+
+	buffer_printf(output, "%.4x:%.4x:%.4x:%.4x", a1, a2, a3, a4);
+	return 1;
+}
+
+#ifdef DRAFT_RRTYPES
+static int
+rdata_eui48_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	uint8_t* data = rdata_atom_data(rdata);
+	uint8_t a1 = data[0];
+	uint8_t a2 = data[1];
+	uint8_t a3 = data[2];
+	uint8_t a4 = data[3];
+	uint8_t a5 = data[4];
+	uint8_t a6 = data[5];
+
+	buffer_printf(output, "%.2x-%.2x-%.2x-%.2x-%.2x-%.2x",
+		a1, a2, a3, a4, a5, a6);
+	return 1;
+}
+
+static int
+rdata_eui64_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	uint8_t* data = rdata_atom_data(rdata);
+	uint8_t a1 = data[0];
+	uint8_t a2 = data[1];
+	uint8_t a3 = data[2];
+	uint8_t a4 = data[3];
+	uint8_t a5 = data[4];
+	uint8_t a6 = data[5];
+	uint8_t a7 = data[6];
+	uint8_t a8 = data[7];
+
+	buffer_printf(output, "%.2x-%.2x-%.2x-%.2x-%.2x-%.2x-%.2x-%.2x",
+		a1, a2, a3, a4, a5, a6, a7, a8);
+	return 1;
+}
+#endif
+
+static int
+rdata_rrtype_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint16_t type = read_uint16(rdata_atom_data(rdata));
 	buffer_printf(output, "%s", rrtype_to_string(type));
@@ -139,21 +283,17 @@ rdata_rrtype_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_algorithm_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_algorithm_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint8_t id = *rdata_atom_data(rdata);
-	lookup_table_type *alg
-		= lookup_by_id(dns_algorithms, id);
-	if (alg) {
-		buffer_printf(output, "%s", alg->name);
-	} else {
-		buffer_printf(output, "%u", (unsigned) id);
-	}
+	buffer_printf(output, "%u", (unsigned) id);
 	return 1;
 }
 
 static int
-rdata_certificate_type_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_certificate_type_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint16_t id = read_uint16(rdata_atom_data(rdata));
 	lookup_table_type *type
@@ -167,7 +307,8 @@ rdata_certificate_type_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_period_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_period_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	uint32_t period = read_uint32(rdata_atom_data(rdata));
 	buffer_printf(output, "%lu", (unsigned long) period);
@@ -175,7 +316,8 @@ rdata_period_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_time_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_time_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int result = 0;
 	time_t time = (time_t) read_uint32(rdata_atom_data(rdata));
@@ -189,10 +331,33 @@ rdata_time_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_base64_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_base32_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int length;
 	size_t size = rdata_atom_size(rdata);
+	if(size == 0) {
+		buffer_write(output, "-", 1);
+		return 1;
+	}
+	size -= 1; /* remove length byte from count */
+	buffer_reserve(output, size * 2 + 1);
+	length = b32_ntop(rdata_atom_data(rdata)+1, size,
+			  (char *) buffer_current(output), size * 2);
+	if (length > 0) {
+		buffer_skip(output, length);
+	}
+	return length != -1;
+}
+
+static int
+rdata_base64_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	int length;
+	size_t size = rdata_atom_size(rdata);
+	if(size == 0)
+		return 1;
 	buffer_reserve(output, size * 2 + 1);
 	length = b64_ntop(rdata_atom_data(rdata), size,
 			  (char *) buffer_current(output), size * 2);
@@ -220,14 +385,29 @@ hex_to_string(buffer_type *output, const uint8_t *data, size_t size)
 }
 
 static int
-rdata_hex_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_hex_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	hex_to_string(output, rdata_atom_data(rdata), rdata_atom_size(rdata));
 	return 1;
 }
 
 static int
-rdata_nsap_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_hexlen_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	if(rdata_atom_size(rdata) <= 1) {
+		/* NSEC3 salt hex can be empty */
+		buffer_printf(output, "-");
+		return 1;
+	}
+	hex_to_string(output, rdata_atom_data(rdata)+1, rdata_atom_size(rdata)-1);
+	return 1;
+}
+
+static int
+rdata_nsap_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	buffer_printf(output, "0x");
 	hex_to_string(output, rdata_atom_data(rdata), rdata_atom_size(rdata));
@@ -235,21 +415,22 @@ rdata_nsap_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_apl_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_apl_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int result = 0;
 	buffer_type packet;
 
 	buffer_create_from(
 		&packet, rdata_atom_data(rdata), rdata_atom_size(rdata));
-	
+
 	if (buffer_available(&packet, 4)) {
 		uint16_t address_family = buffer_read_u16(&packet);
 		uint8_t prefix = buffer_read_u8(&packet);
 		uint8_t length = buffer_read_u8(&packet);
 		int negated = length & APL_NEGATION_MASK;
 		int af = -1;
-		
+
 		length &= APL_LENGTH_MASK;
 		switch (address_family) {
 		case 1: af = AF_INET; break;
@@ -274,20 +455,21 @@ rdata_apl_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_services_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_services_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	int result = 0;
 	buffer_type packet;
 
 	buffer_create_from(
 		&packet, rdata_atom_data(rdata), rdata_atom_size(rdata));
-	
+
 	if (buffer_available(&packet, 1)) {
 		uint8_t protocol_number = buffer_read_u8(&packet);
 		ssize_t bitmap_size = buffer_remaining(&packet);
 		uint8_t *bitmap = buffer_current(&packet);
 		struct protoent *proto = getprotobynumber(protocol_number);
-		
+
 		if (proto) {
 			int i;
 
@@ -295,7 +477,7 @@ rdata_services_to_string(buffer_type *output, rdata_atom_type rdata)
 
 			for (i = 0; i < bitmap_size * 8; ++i) {
 				if (get_bit(bitmap, i)) {
-					struct servent *service = getservbyport((int) htons(i), proto->p_name);
+					struct servent *service = getservbyport((int)htons(i), proto->p_name);
 					if (service) {
 						buffer_printf(output, " %s", service->s_name);
 					} else {
@@ -311,12 +493,46 @@ rdata_services_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_nxt_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_ipsecgateway_to_string(buffer_type *output, rdata_atom_type rdata, rr_type* rr)
+{
+	int gateway_type = rdata_atom_data(rr->rdatas[1])[0];
+	switch(gateway_type) {
+	case IPSECKEY_NOGATEWAY:
+		buffer_printf(output, ".");
+		break;
+	case IPSECKEY_IP4:
+		rdata_a_to_string(output, rdata, rr);
+		break;
+	case IPSECKEY_IP6:
+		rdata_aaaa_to_string(output, rdata, rr);
+		break;
+	case IPSECKEY_DNAME:
+		{
+			region_type* temp = region_create(xalloc, free);
+			const dname_type* d = dname_make(temp,
+				rdata_atom_data(rdata), 0);
+			if(!d) {
+				region_destroy(temp);
+				return 0;
+			}
+			buffer_printf(output, "%s", dname_to_string(d, NULL));
+			region_destroy(temp);
+		}
+		break;
+	default:
+		return 0;
+	}
+	return 1;
+}
+
+static int
+rdata_nxt_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	size_t i;
 	uint8_t *bitmap = rdata_atom_data(rdata);
 	size_t bitmap_size = rdata_atom_size(rdata);
-	
+
 	for (i = 0; i < bitmap_size * 8; ++i) {
 		if (get_bit(bitmap, i)) {
 			buffer_printf(output, "%s ", rrtype_to_string(i));
@@ -329,12 +545,13 @@ rdata_nxt_to_string(buffer_type *output, rdata_atom_type rdata)
 }
 
 static int
-rdata_nsec_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_nsec_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
 	size_t saved_position = buffer_position(output);
 	buffer_type packet;
 	int insert_space = 0;
-	
+
 	buffer_create_from(
 		&packet, rdata_atom_data(rdata), rdata_atom_size(rdata));
 
@@ -343,7 +560,7 @@ rdata_nsec_to_string(buffer_type *output, rdata_atom_type rdata)
 		uint8_t bitmap_size = buffer_read_u8(&packet);
 		uint8_t *bitmap = buffer_current(&packet);
 		int i;
-		
+
 		if (!buffer_available(&packet, bitmap_size)) {
 			buffer_set_position(output, saved_position);
 			return 0;
@@ -367,7 +584,8 @@ rdata_nsec_to_string(buffer_type *output, rdata_atom_type rdata)
 
 static int
 rdata_loc_to_string(buffer_type *ATTR_UNUSED(output),
-		    rdata_atom_type ATTR_UNUSED(rdata))
+		    rdata_atom_type ATTR_UNUSED(rdata),
+		    rr_type* ATTR_UNUSED(rr))
 {
 	/*
 	 * Returning 0 forces the record to be printed in unknown
@@ -377,7 +595,8 @@ rdata_loc_to_string(buffer_type *ATTR_UNUSED(output),
 }
 
 static int
-rdata_unknown_to_string(buffer_type *output, rdata_atom_type rdata)
+rdata_unknown_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
 {
  	uint16_t size = rdata_atom_size(rdata);
  	buffer_printf(output, "\\# %lu ", (unsigned long) size);
@@ -387,7 +606,9 @@ rdata_unknown_to_string(buffer_type *output, rdata_atom_type rdata)
 
 static rdata_to_string_type rdata_to_string_table[RDATA_ZF_UNKNOWN + 1] = {
 	rdata_dname_to_string,
+	rdata_dns_name_to_string,
 	rdata_text_to_string,
+	rdata_texts_to_string,
 	rdata_byte_to_string,
 	rdata_short_to_string,
 	rdata_long_to_string,
@@ -399,21 +620,29 @@ static rdata_to_string_type rdata_to_string_table[RDATA_ZF_UNKNOWN + 1] = {
 	rdata_period_to_string,
 	rdata_time_to_string,
 	rdata_base64_to_string,
+	rdata_base32_to_string,
 	rdata_hex_to_string,
+	rdata_hexlen_to_string,
 	rdata_nsap_to_string,
 	rdata_apl_to_string,
+	rdata_ipsecgateway_to_string,
 	rdata_services_to_string,
 	rdata_nxt_to_string,
 	rdata_nsec_to_string,
 	rdata_loc_to_string,
+	rdata_ilnp64_to_string,
+#ifdef DRAFT_RRTYPES
+	rdata_eui48_to_string,
+	rdata_eui64_to_string,
+#endif
 	rdata_unknown_to_string
 };
 
 int
 rdata_atom_to_string(buffer_type *output, rdata_zoneformat_type type,
-		     rdata_atom_type rdata)
+		     rdata_atom_type rdata, rr_type* record)
 {
-	return rdata_to_string_table[type](output, rdata);
+	return rdata_to_string_table[type](output, rdata, record);
 }
 
 ssize_t
@@ -425,28 +654,35 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 				rdata_atom_type **rdatas)
 {
 	size_t end = buffer_position(packet) + data_size;
-	ssize_t i;
+	size_t i;
 	rdata_atom_type temp_rdatas[MAXRDATALEN];
 	rrtype_descriptor_type *descriptor = rrtype_descriptor_by_type(rrtype);
 	region_type *temp_region;
-	
+
 	assert(descriptor->maximum <= MAXRDATALEN);
 
 	if (!buffer_available(packet, data_size)) {
 		return -1;
 	}
-	
+
 	temp_region = region_create(xalloc, free);
-	
+
 	for (i = 0; i < descriptor->maximum; ++i) {
 		int is_domain = 0;
+		int is_normalized = 0;
+		int is_wirestore = 0;
 		size_t length = 0;
 		int required = i < descriptor->minimum;
-		
+
 		switch (rdata_atom_wireformat_type(rrtype, i)) {
 		case RDATA_WF_COMPRESSED_DNAME:
 		case RDATA_WF_UNCOMPRESSED_DNAME:
 			is_domain = 1;
+			is_normalized = 1;
+			break;
+		case RDATA_WF_LITERAL_DNAME:
+			is_domain = 1;
+			is_wirestore = 1;
 			break;
 		case RDATA_WF_BYTE:
 			length = sizeof(uint8_t);
@@ -457,7 +693,11 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 		case RDATA_WF_LONG:
 			length = sizeof(uint32_t);
 			break;
+		case RDATA_WF_TEXTS:
+			length = data_size;
+			break;
 		case RDATA_WF_TEXT:
+		case RDATA_WF_BINARYWITHLENGTH:
 			/* Length is stored in the first byte.  */
 			length = 1;
 			if (buffer_position(packet) + length <= end) {
@@ -470,6 +710,16 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 		case RDATA_WF_AAAA:
 			length = IP6ADDRLEN;
 			break;
+		case RDATA_WF_ILNP64:
+			length = IP6ADDRLEN/2;
+			break;
+#ifdef DRAFT_RRTYPES
+		case RDATA_WF_EUI48:
+			length = EUI48ADDRLEN;
+		case RDATA_WF_EUI64:
+			length = EUI64ADDRLEN;
+			break;
+#endif
 		case RDATA_WF_BINARY:
 			/* Remaining RDATA is binary.  */
 			length = end - buffer_position(packet);
@@ -484,24 +734,52 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 					   & APL_LENGTH_MASK);
 			}
 			break;
+		case RDATA_WF_IPSECGATEWAY:
+			switch(rdata_atom_data(temp_rdatas[1])[0]) /* gateway type */ {
+			default:
+			case IPSECKEY_NOGATEWAY:
+				length = 0;
+				break;
+			case IPSECKEY_IP4:
+				length = IP4ADDRLEN;
+				break;
+			case IPSECKEY_IP6:
+				length = IP6ADDRLEN;
+				break;
+			case IPSECKEY_DNAME:
+				is_domain = 1;
+				is_normalized = 1;
+				is_wirestore = 1;
+				break;
+			}
+			break;
 		}
 
 		if (is_domain) {
 			const dname_type *dname;
-			
+
 			if (!required && buffer_position(packet) == end) {
 				break;
 			}
-			
+
 			dname = dname_make_from_packet(
-				temp_region, packet, 1, 1);
+				temp_region, packet, 1, is_normalized);
 			if (!dname || buffer_position(packet) > end) {
 				/* Error in domain name.  */
 				region_destroy(temp_region);
 				return -1;
 			}
-			temp_rdatas[i].domain
-				= domain_table_insert(owners, dname);
+			if(is_wirestore) {
+				temp_rdatas[i].data = (uint16_t *) region_alloc(
+                                	region, sizeof(uint16_t) + dname->name_size);
+				temp_rdatas[i].data[0] = dname->name_size;
+				memcpy(temp_rdatas[i].data+1, dname_name(dname),
+					dname->name_size);
+			} else {
+				temp_rdatas[i].domain
+					= domain_table_insert(owners, dname);
+				temp_rdatas[i].domain->usage ++;
+			}
 		} else {
 			if (buffer_position(packet) + length > end) {
 				if (required) {
@@ -512,7 +790,10 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 					break;
 				}
 			}
-			
+			if (!required && buffer_position(packet) == end) {
+				break;
+			}
+
 			temp_rdatas[i].data = (uint16_t *) region_alloc(
 				region, sizeof(uint16_t) + length);
 			temp_rdatas[i].data[0] = length;
@@ -529,7 +810,7 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 	*rdatas = (rdata_atom_type *) region_alloc_init(
 		region, temp_rdatas, i * sizeof(rdata_atom_type));
 	region_destroy(temp_region);
-	return i;
+	return (ssize_t)i;
 }
 
 size_t
@@ -566,8 +847,42 @@ rdata_atoms_to_unknown_string(buffer_type *output,
 			hex_to_string(
 				output, dname_name(dname), dname->name_size);
 		} else {
-			rdata_hex_to_string(output, rdatas[i]);
+			hex_to_string(output, rdata_atom_data(rdatas[i]),
+				rdata_atom_size(rdatas[i]));
 		}
 	}
 	return 1;
 }
+
+int
+print_rdata(buffer_type *output, rrtype_descriptor_type *descriptor,
+	    rr_type *record)
+{
+	size_t i;
+	size_t saved_position = buffer_position(output);
+
+	for (i = 0; i < record->rdata_count; ++i) {
+		if (i == 0) {
+			buffer_printf(output, "\t");
+		} else if (descriptor->type == TYPE_SOA && i == 2) {
+			buffer_printf(output, " (\n\t\t");
+		} else {
+			buffer_printf(output, " ");
+		}
+		if (!rdata_atom_to_string(
+			    output,
+			    (rdata_zoneformat_type) descriptor->zoneformat[i],
+			    record->rdatas[i], record))
+		{
+			buffer_set_position(output, saved_position);
+			return 0;
+		}
+	}
+	if (descriptor->type == TYPE_SOA) {
+		buffer_printf(output, " )");
+	}
+
+	return 1;
+}
+
+

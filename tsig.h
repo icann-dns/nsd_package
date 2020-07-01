@@ -22,6 +22,10 @@
 #define TSIG_ERROR_BADKEY   17
 #define TSIG_ERROR_BADTIME  18
 
+#define TSIG_HMAC_MD5       157
+#define TSIG_HMAC_SHA1      158
+#define TSIG_HMAC_SHA256    159
+
 typedef struct tsig_algorithm tsig_algorithm_type;
 typedef struct tsig_key tsig_key_type;
 typedef struct tsig_record tsig_record_type;
@@ -33,6 +37,13 @@ enum tsig_status
 	TSIG_ERROR
 };
 typedef enum tsig_status tsig_status_type;
+
+struct tsig_lookup_struct_table
+{
+	uint8_t id;
+	const char* short_name;
+};
+typedef struct tsig_lookup_struct_table tsig_lookup_algorithm_table;
 
 /*
  * A TSIG HMAC algorithm, such as hmac-md5.
@@ -90,15 +101,13 @@ struct tsig_algorithm
  */
 struct tsig_key
 {
-	struct addrinfo  *server;
 	const dname_type *name;
 	size_t            size;
-	const uint8_t    *data;
+	uint8_t		 *data;
 };
 
 struct tsig_record
 {
-	region_type         *region;
 	tsig_status_type     status;
 	size_t               position;
 	size_t               response_count;
@@ -111,6 +120,7 @@ struct tsig_record
 
 	/* TSIG RR data is allocated in the rr_region.  */
 	region_type      *rr_region;
+	region_type	 *context_region;
 	const dname_type *key_name;
 	const dname_type *algorithm_name;
 	uint16_t          signed_time_high;
@@ -134,6 +144,7 @@ int tsig_init(region_type *region);
  * Add the specified key to the TSIG key table.
  */
 void tsig_add_key(tsig_key_type *key);
+void tsig_del_key(tsig_key_type *key);
 
 /*
  * Add the specified algorithm to the TSIG algorithm table.
@@ -151,9 +162,34 @@ tsig_algorithm_type *tsig_get_algorithm_by_name(const char *name);
 const char *tsig_error(int error_code);
 
 /*
+ * Create the tsig record internal structure. Allocs it.
+ * Call init_record afterwards before doing more with it.
+ *
+ * The region is used to attach a cleanup function that destroys the tsig.
+ */
+void tsig_create_record(tsig_record_type* tsig,
+			region_type* region);
+
+/*
+ * Like tsig_create_record, with custom region settings.
+ * The size params are used to customise the rr_region and context_region.
+ * If region is NULL, no cleanup is attached to it.
+ */
+void tsig_create_record_custom(tsig_record_type* tsig,
+			region_type* region,
+			size_t chunk_size,
+			size_t large_object_size,
+			size_t initial_cleanup_size);
+
+/*
+ * Destroy tsig record internals (the main ptr is user alloced).
+ * if region is nonNULL, removes cleanup.
+ */
+void tsig_delete_record(tsig_record_type* tsig, region_type* region);
+
+/*
  * Call this before starting to analyze or signing a sequence of
- * packets. If the region is free'd than tsig_init_record must be
- * called again.
+ * packets.
  *
  * ALGORITHM and KEY are optional and are only needed if you want to
  * sign the initial query.  Otherwise the key and algorithm are looked
@@ -161,7 +197,6 @@ const char *tsig_error(int error_code);
  * processed.
  */
 void tsig_init_record(tsig_record_type *data,
-		      region_type *region,
 		      tsig_algorithm_type *algorithm,
 		      tsig_key_type *key);
 
@@ -220,7 +255,7 @@ int tsig_verify(tsig_record_type *tsig);
  * field to find out if the TSIG record was present.
  */
 int tsig_find_rr(tsig_record_type *tsig, buffer_type *packet);
-	
+
 /*
  * Call this to analyze the TSIG RR starting at the current location
  * of PACKET. On success true is returned and the results are stored
@@ -241,5 +276,21 @@ void tsig_append_rr(tsig_record_type *tsig, buffer_type *packet);
  * (if required).
  */
 size_t tsig_reserved_space(tsig_record_type *tsig);
+
+/*
+ * status or error_code must already be in error.
+ * prepares content for error packet.
+ */
+void tsig_error_reply(tsig_record_type *tsig);
+
+/*
+ * compare tsig algorithm names case insensitive.
+ */
+int tsig_strlowercmp(const char* str1, const char* str2);
+
+/*
+ * cleanup tsig openssl stuff.
+ */
+void tsig_finalize(void);
 
 #endif /* _TSIG_H_ */

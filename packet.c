@@ -7,7 +7,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -20,9 +20,9 @@ encode_dname(query_type *q, domain_type *domain)
 {
 	while (domain->parent && query_get_dname_offset(q, domain) == 0) {
 		query_put_dname_offset(q, domain, buffer_position(q->packet));
-		DEBUG(DEBUG_NAME_COMPRESSION, 1,
-		      (stderr, "dname: %s, number: %lu, offset: %u\n",
-		       dname_to_string(domain_dname(domain), NULL),
+		DEBUG(DEBUG_NAME_COMPRESSION, 2,
+		      (LOG_INFO, "dname: %s, number: %lu, offset: %u\n",
+		       domain_to_string(domain),
 		       (unsigned long) domain->number,
 		       query_get_dname_offset(q, domain)));
 		buffer_write(q->packet, dname_name(domain_dname(domain)),
@@ -30,9 +30,9 @@ encode_dname(query_type *q, domain_type *domain)
 		domain = domain->parent;
 	}
 	if (domain->parent) {
-		DEBUG(DEBUG_NAME_COMPRESSION, 1,
-		      (stderr, "dname: %s, number: %lu, pointer: %u\n",
-		       dname_to_string(domain_dname(domain), NULL),
+		DEBUG(DEBUG_NAME_COMPRESSION, 2,
+		      (LOG_INFO, "dname: %s, number: %lu, pointer: %u\n",
+		       domain_to_string(domain),
 		       (unsigned long) domain->number,
 		       query_get_dname_offset(q, domain)));
 		assert(query_get_dname_offset(q, domain) <= MAX_COMPRESSION_OFFSET);
@@ -50,17 +50,17 @@ packet_encode_rr(query_type *q, domain_type *owner, rr_type *rr)
 	uint16_t rdlength = 0;
 	size_t rdlength_pos;
 	uint16_t j;
-	
+
 	assert(q);
 	assert(owner);
 	assert(rr);
-	
+
 	/*
 	 * If the record does not in fit in the packet the packet size
 	 * will be restored to the mark.
 	 */
 	truncation_mark = buffer_position(q->packet);
-	
+
 	encode_dname(q, owner);
 	buffer_write_u16(q->packet, rr->type);
 	buffer_write_u16(q->packet, rr->klass);
@@ -108,18 +108,34 @@ int
 packet_encode_rrset(query_type *query,
 		    domain_type *owner,
 		    rrset_type *rrset,
-		    int truncate_rrset)
+		    int section,
+#ifdef MINIMAL_RESPONSES
+		    size_t minimal_respsize,
+		    int* done)
+#else
+		    size_t ATTR_UNUSED(minimal_respsize),
+		    int* ATTR_UNUSED(done))
+#endif
 {
 	uint16_t i;
 	size_t truncation_mark;
 	uint16_t added = 0;
 	int all_added = 1;
+#ifdef MINIMAL_RESPONSES
+	int minimize_response = (section >= OPTIONAL_AUTHORITY_SECTION);
+	int truncate_rrset = (section == ANSWER_SECTION ||
+				section == AUTHORITY_SECTION);
+#else
+	int truncate_rrset = (section == ANSWER_SECTION ||
+				section == AUTHORITY_SECTION ||
+				section == OPTIONAL_AUTHORITY_SECTION);
+#endif
 	rrset_type *rrsig;
-	
+
 	assert(rrset->rr_count > 0);
 
 	truncation_mark = buffer_position(query->packet);
-	
+
 	for (i = 0; i < rrset->rr_count; ++i) {
 		if (packet_encode_rr(query, owner, &rrset->rrs[i])) {
 			++added;
@@ -150,26 +166,37 @@ packet_encode_rrset(query_type *query,
 			}
 		}
 	}
-	
+
+#ifdef MINIMAL_RESPONSES
+	if ((!all_added || buffer_position(query->packet) > minimal_respsize)
+	    && !query->tcp && minimize_response) {
+		/* Truncate entire RRset. */
+		buffer_set_position(query->packet, truncation_mark);
+		query_clear_dname_offsets(query, truncation_mark);
+		added = 0;
+		*done = 1;
+	}
+#endif
+
 	if (!all_added && truncate_rrset) {
-		/* Truncate entire RRset and set truncate flag.  */
+		/* Truncate entire RRset and set truncate flag. */
 		buffer_set_position(query->packet, truncation_mark);
 		query_clear_dname_offsets(query, truncation_mark);
 		TC_SET(query->packet);
 		added = 0;
 	}
-	
+
 	return added;
 }
 
-static int
-skip_dname(buffer_type *packet)
+int
+packet_skip_dname(buffer_type *packet)
 {
 	while (1) {
 		uint8_t label_size;
 		if (!buffer_available(packet, 1))
 			return 0;
-		
+
 		label_size = buffer_read_u8(packet);
 		if (label_size == 0) {
 			return 1;
@@ -189,7 +216,7 @@ skip_dname(buffer_type *packet)
 int
 packet_skip_rr(buffer_type *packet, int question_section)
 {
-	if (!skip_dname(packet))
+	if (!packet_skip_dname(packet))
 		return 0;
 
 	if (question_section) {
@@ -219,7 +246,7 @@ packet_read_rr(region_type *region, domain_table_type *owners,
 	ssize_t rdata_count;
 	rdata_atom_type *rdatas;
 	rr_type *result = (rr_type *) region_alloc(region, sizeof(rr_type));
-	
+
 	owner = dname_make_from_packet(region, packet, 1, 1);
 	if (!owner || !buffer_available(packet, 2*sizeof(uint16_t))) {
 		return NULL;
@@ -237,10 +264,10 @@ packet_read_rr(region_type *region, domain_table_type *owners,
 	} else if (!buffer_available(packet, sizeof(uint32_t) + sizeof(uint16_t))) {
 		return NULL;
 	}
-	
+
 	result->ttl = buffer_read_u32(packet);
 	rdlength = buffer_read_u16(packet);
-	
+
 	if (!buffer_available(packet, rdlength)) {
 		return NULL;
 	}
@@ -252,6 +279,45 @@ packet_read_rr(region_type *region, domain_table_type *owners,
 	}
 	result->rdata_count = rdata_count;
 	result->rdatas = rdatas;
-	
+
 	return result;
+}
+
+int packet_read_query_section(buffer_type *packet,
+	uint8_t* dst, uint16_t* qtype, uint16_t* qclass)
+{
+	uint8_t *query_name = buffer_current(packet);
+	uint8_t *src = query_name;
+	size_t len;
+
+	while (*src) {
+		/*
+		 * If we are out of buffer limits or we have a pointer
+		 * in question dname or the domain name is longer than
+		 * MAXDOMAINLEN ...
+		 */
+		if ((*src & 0xc0) ||
+		    (src + *src + 2 > buffer_end(packet)) ||
+		    (src + *src + 2 > query_name + MAXDOMAINLEN))
+		{
+			return 0;
+		}
+		memcpy(dst, src, *src + 1);
+		dst += *src + 1;
+		src += *src + 1;
+	}
+	*dst++ = *src++;
+
+	/* Make sure name is not too long or we have stripped packet... */
+	len = src - query_name;
+	if (len > MAXDOMAINLEN ||
+	    (src + 2*sizeof(uint16_t) > buffer_end(packet)))
+	{
+		return 0;
+	}
+	buffer_set_position(packet, src - buffer_begin(packet));
+
+	*qtype = buffer_read_u16(packet);
+	*qclass = buffer_read_u16(packet);
+	return 1;
 }

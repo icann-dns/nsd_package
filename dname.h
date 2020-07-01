@@ -34,7 +34,7 @@ struct dname
 	 * The size (in bytes) of the domain name in wire format.
 	 */
 	uint8_t name_size;
-	
+
 	/*
 	 * The number of labels in this domain name (including the
 	 * root label).
@@ -57,7 +57,6 @@ struct dname
 const dname_type *dname_make(region_type *region, const uint8_t *name,
 			     int normalize);
 
-
 /*
  * Construct a new domain name based on wire format dname stored at
  * PACKET's current position.  Compression pointers are followed.  The
@@ -69,6 +68,14 @@ const dname_type *dname_make_from_packet(region_type *region,
 					 int allow_pointers,
 					 int normalize);
 
+/*
+ * parse wireformat from packet (following pointers) into the
+ * given buffer. Returns length in buffer or 0 on error.
+ * buffer must be MAXDOMAINLEN+1 long.
+ */
+int dname_make_wire_from_packet(uint8_t *buf,
+				buffer_type *packet,
+				int allow_pointers);
 
 /*
  * Construct a new domain name based on the ASCII representation NAME.
@@ -83,6 +90,13 @@ const dname_type *dname_make_from_packet(region_type *region,
  */
 const dname_type *dname_parse(region_type *region, const char *name);
 
+/*
+ * parse ascii string to wireformat domain name (without compression ptrs)
+ * returns 0 on failure, the length of the wireformat on success.
+ * the result is stored in the wirefmt which must be at least MAXDOMAINLEN
+ * in size. On failure, the wirefmt can be altered.
+ */
+int dname_parse_wire(uint8_t* wirefmt, const char* name);
 
 /*
  * Return NULL if DNAME is NULL or a copy of DNAME otherwise.
@@ -146,13 +160,13 @@ static inline const uint8_t *
 dname_label(const dname_type *dname, uint8_t label)
 {
 	uint8_t label_index;
-	
+
 	assert(dname != NULL);
 	assert(label < dname->label_count);
 
 	label_index = dname_label_offsets(dname)[label];
 	assert(label_index < dname->name_size);
-		
+
 	return dname_name(dname) + label_index;
 }
 
@@ -163,7 +177,7 @@ dname_label(const dname_type *dname, uint8_t label)
  * significant label.
  *
  * Return < 0 if LEFT < RIGHT, 0 if LEFT == RIGHT, and > 0 if LEFT >
- * RIGHT.  The comparison is case insensitive.
+ * RIGHT.  The comparison is case sensitive.
  *
  * Pre: left != NULL && right != NULL
  */
@@ -348,5 +362,21 @@ const dname_type *dname_make_from_label(region_type *region,
 const dname_type *dname_concatenate(region_type *region,
 				    const dname_type *left,
 				    const dname_type *right);
+
+
+/*
+ * Perform DNAME substitution on a name, replace src with dest.
+ * Name must be a subdomain of src. The returned name is a subdomain of dest.
+ * Returns NULL if the result domain name is too long.
+ */
+const dname_type *dname_replace(region_type* region,
+				const dname_type* name,
+				const dname_type* src,
+				const dname_type* dest);
+
+/** Convert uncompressed wireformat dname to a string */
+char* wiredname2str(const uint8_t* dname);
+/** convert uncompressed label to string */
+char* wirelabel2str(const uint8_t* label);
 
 #endif /* _DNAME_H_ */
