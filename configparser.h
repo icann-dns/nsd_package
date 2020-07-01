@@ -121,7 +121,8 @@ extern int yydebug;
      VAR_ZONEFILES_WRITE = 330,
      VAR_LOG_TIME_ASCII = 331,
      VAR_ROUND_ROBIN = 332,
-     VAR_ZONESTATS = 333
+     VAR_ZONESTATS = 333,
+     VAR_REUSEPORT = 334
    };
 #endif
 /* Tokens.  */
@@ -201,6 +202,7 @@ extern int yydebug;
 #define VAR_LOG_TIME_ASCII 331
 #define VAR_ROUND_ROBIN 332
 #define VAR_ZONESTATS 333
+#define VAR_REUSEPORT 334
 
 
 
@@ -214,7 +216,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 218 "configparser.h"
+#line 220 "configparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

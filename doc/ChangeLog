@@ -1,3 +1,124 @@
+20 October 2015: Wouter
+	- 4.1.6rc2 tag created.
+
+19 October 2015: Wouter
+	- Fix compile of zonec error message on FreeBSD.
+
+15 October 2015: Wouter
+	- 4.1.6rc1 tag created.
+
+13 October 2015: Wouter
+	- nsd-checkconf warns for master zones with no zonefile statement.
+	- Fix start failure when many file descriptors are in use.
+	- The servfail rcode is not printed with a space in the middle.
+	- fixup file descriptor fixup nicer.
+	- print failed token for config syntax error or parse error.
+
+12 October 2015: Wouter
+	- Fix #711: Document that debug-mode yes is used for staying
+	  attached to the supervisor console.
+	- Document verbosity 3 prints more information.
+
+30 September 2015: Wouter
+	- makedist.sh print on pgp signature creation.
+
+28 September 2015: Wouter
+	- Fix typo in zonec.c inside error message.
+
+24 September 2015: Wouter
+	- Fix #701: Fix that AD=1 set in a BADVERS response.
+
+21 September 2015: Wouter
+	- Fix #706: default port 53 not opened on ip4 because of getaddrinfo
+	  hints initialisation failure.
+	- 4.1.5 release tag
+	- trunk contains 4.1.6 in development.
+
+9 September 2015: Wouter
+	- 4.1.4 release tag created.
+	- trunk contains 4.1.5 in development.
+
+31 August 2015: Wouter
+	- 4.1.4rc1 tag created.
+
+28 August 2015: Wouter
+	- Fix #698 formatting errors and typos in nsd.8.in.
+	- Add --enable-pie and --enable-relro-now options.
+
+18 August 2015: Wouter
+	- Admitted axfrs are logged at verbosity 1.  Refused at verbosity 2.
+
+17 August 2015: Wouter
+	- Fixed checkconf test for reuseport setting.
+
+14 August 2015: Wouter
+	- SO_REUSEPORT does not work on FreeBSD.  Enabled by default on Linux,
+	  not enabled by default on other OSes.
+
+5 August 2015: Wouter
+	- Fix that notify from nsd-control contains soa serial.
+
+3 August 2015: Wouter
+	- squelch SO_REUSEPORT failure on verbosity less than 3.
+
+31 July 2015: Wouter
+	- removed hardcoded interface limit, --with-max-ips removed.
+	- SO_REUSEPORT support.
+
+16 July 2015: Wouter
+	- Fix #618: documented need to list ip-addresses seperately in
+	  nsd.conf if there are multiple, because the source address of
+	  replies can otherwise go wrong.
+
+10 July 2015: Wouter
+	- Fix that for expired zones NSD performs an AXFR and accepts newer
+	  and older serial numbers.
+	- Document that minimal responses only minimizes responses to fit
+	  in one datagram.  It does not minimize smaller responses.
+
+2 July 2015: Wouter
+	- Fix NSID response for short edns sizes.
+
+23 June 2015: Wouter
+	- Trunk contains 4.1.4 in development.
+
+4 June 2015: Wouter
+	- Tag 4.1.3rc1
+	- improve nsd-control usage text. (23 june - added to 4.1.3)
+	- RFC7553 RR Type URI support.
+
+2 June 2015: Wouter
+	- Fix redefined macro lex warning for freebsd flex.
+
+29 May 2015: Wouter
+	- Fix that formerrors are ratelimited.
+
+19 May 2015: Wouter
+	- max-interfaces raised to 32.
+
+18 May 2015: Wouter
+	- removed unused defines for unofficial tsig-hmac algorithm codes.
+	  The TSIG algorithm is identified by name in the config file.
+
+14 May 2015: Wouter
+	- hmac sha224, sha384 and sha512 support, patch from David Gwynne.
+
+23 April 2015: Wouter
+	- Fix crash in zone parser for relative dname after error in origin.
+	- Test for zone parser failures
+
+21 April 2015: Wouter
+	- nsd-control addzones and delzones read list of zones from stdin.
+	- Fix task and zonestat files to be stored in a subdirectory in tmp
+	  to stop privilege elevation.
+	- printout names for successful addition and removal with bulk command.
+
+20 April 2015: Wouter
+	- Fix #665: when removing subdomain, nsd does not reparse parent zone.
+
+14 April 2015: Wouter
+	- trunk contains 4.1.3(upcoming).
+
 7 April 2015: Wouter
 	- Tag 4.1.2rc2.
 
