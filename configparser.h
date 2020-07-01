@@ -1,19 +1,19 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,13 +26,13 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
 #ifndef YY_YY_CONFIGPARSER_H_INCLUDED
 # define YY_YY_CONFIGPARSER_H_INCLUDED
-/* Enabling traces.  */
+/* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
@@ -40,91 +40,92 @@
 extern int yydebug;
 #endif
 
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     SPACE = 258,
-     LETTER = 259,
-     NEWLINE = 260,
-     COMMENT = 261,
-     COLON = 262,
-     ANY = 263,
-     ZONESTR = 264,
-     STRING = 265,
-     VAR_SERVER = 266,
-     VAR_NAME = 267,
-     VAR_IP_ADDRESS = 268,
-     VAR_IP_TRANSPARENT = 269,
-     VAR_DEBUG_MODE = 270,
-     VAR_IP4_ONLY = 271,
-     VAR_IP6_ONLY = 272,
-     VAR_DATABASE = 273,
-     VAR_IDENTITY = 274,
-     VAR_NSID = 275,
-     VAR_LOGFILE = 276,
-     VAR_SERVER_COUNT = 277,
-     VAR_TCP_COUNT = 278,
-     VAR_PIDFILE = 279,
-     VAR_PORT = 280,
-     VAR_STATISTICS = 281,
-     VAR_CHROOT = 282,
-     VAR_USERNAME = 283,
-     VAR_ZONESDIR = 284,
-     VAR_XFRDFILE = 285,
-     VAR_DIFFFILE = 286,
-     VAR_XFRD_RELOAD_TIMEOUT = 287,
-     VAR_TCP_QUERY_COUNT = 288,
-     VAR_TCP_TIMEOUT = 289,
-     VAR_IPV4_EDNS_SIZE = 290,
-     VAR_IPV6_EDNS_SIZE = 291,
-     VAR_DO_IP4 = 292,
-     VAR_DO_IP6 = 293,
-     VAR_ZONEFILE = 294,
-     VAR_ZONE = 295,
-     VAR_ALLOW_NOTIFY = 296,
-     VAR_REQUEST_XFR = 297,
-     VAR_NOTIFY = 298,
-     VAR_PROVIDE_XFR = 299,
-     VAR_NOTIFY_RETRY = 300,
-     VAR_OUTGOING_INTERFACE = 301,
-     VAR_ALLOW_AXFR_FALLBACK = 302,
-     VAR_KEY = 303,
-     VAR_ALGORITHM = 304,
-     VAR_SECRET = 305,
-     VAR_AXFR = 306,
-     VAR_UDP = 307,
-     VAR_VERBOSITY = 308,
-     VAR_HIDE_VERSION = 309,
-     VAR_PATTERN = 310,
-     VAR_INCLUDEPATTERN = 311,
-     VAR_ZONELISTFILE = 312,
-     VAR_REMOTE_CONTROL = 313,
-     VAR_CONTROL_ENABLE = 314,
-     VAR_CONTROL_INTERFACE = 315,
-     VAR_CONTROL_PORT = 316,
-     VAR_SERVER_KEY_FILE = 317,
-     VAR_SERVER_CERT_FILE = 318,
-     VAR_CONTROL_KEY_FILE = 319,
-     VAR_CONTROL_CERT_FILE = 320,
-     VAR_XFRDIR = 321,
-     VAR_RRL_SIZE = 322,
-     VAR_RRL_RATELIMIT = 323,
-     VAR_RRL_SLIP = 324,
-     VAR_RRL_IPV4_PREFIX_LENGTH = 325,
-     VAR_RRL_IPV6_PREFIX_LENGTH = 326,
-     VAR_RRL_WHITELIST_RATELIMIT = 327,
-     VAR_RRL_WHITELIST = 328,
-     VAR_ZONEFILES_CHECK = 329,
-     VAR_ZONEFILES_WRITE = 330,
-     VAR_LOG_TIME_ASCII = 331,
-     VAR_ROUND_ROBIN = 332,
-     VAR_ZONESTATS = 333,
-     VAR_REUSEPORT = 334,
-     VAR_VERSION = 335
-   };
+  enum yytokentype
+  {
+    SPACE = 258,
+    LETTER = 259,
+    NEWLINE = 260,
+    COMMENT = 261,
+    COLON = 262,
+    ANY = 263,
+    ZONESTR = 264,
+    STRING = 265,
+    VAR_SERVER = 266,
+    VAR_NAME = 267,
+    VAR_IP_ADDRESS = 268,
+    VAR_IP_TRANSPARENT = 269,
+    VAR_DEBUG_MODE = 270,
+    VAR_IP4_ONLY = 271,
+    VAR_IP6_ONLY = 272,
+    VAR_DATABASE = 273,
+    VAR_IDENTITY = 274,
+    VAR_NSID = 275,
+    VAR_LOGFILE = 276,
+    VAR_SERVER_COUNT = 277,
+    VAR_TCP_COUNT = 278,
+    VAR_PIDFILE = 279,
+    VAR_PORT = 280,
+    VAR_STATISTICS = 281,
+    VAR_CHROOT = 282,
+    VAR_USERNAME = 283,
+    VAR_ZONESDIR = 284,
+    VAR_XFRDFILE = 285,
+    VAR_DIFFFILE = 286,
+    VAR_XFRD_RELOAD_TIMEOUT = 287,
+    VAR_TCP_QUERY_COUNT = 288,
+    VAR_TCP_TIMEOUT = 289,
+    VAR_IPV4_EDNS_SIZE = 290,
+    VAR_IPV6_EDNS_SIZE = 291,
+    VAR_DO_IP4 = 292,
+    VAR_DO_IP6 = 293,
+    VAR_TCP_MSS = 294,
+    VAR_OUTGOING_TCP_MSS = 295,
+    VAR_ZONEFILE = 296,
+    VAR_ZONE = 297,
+    VAR_ALLOW_NOTIFY = 298,
+    VAR_REQUEST_XFR = 299,
+    VAR_NOTIFY = 300,
+    VAR_PROVIDE_XFR = 301,
+    VAR_NOTIFY_RETRY = 302,
+    VAR_OUTGOING_INTERFACE = 303,
+    VAR_ALLOW_AXFR_FALLBACK = 304,
+    VAR_KEY = 305,
+    VAR_ALGORITHM = 306,
+    VAR_SECRET = 307,
+    VAR_AXFR = 308,
+    VAR_UDP = 309,
+    VAR_VERBOSITY = 310,
+    VAR_HIDE_VERSION = 311,
+    VAR_PATTERN = 312,
+    VAR_INCLUDEPATTERN = 313,
+    VAR_ZONELISTFILE = 314,
+    VAR_REMOTE_CONTROL = 315,
+    VAR_CONTROL_ENABLE = 316,
+    VAR_CONTROL_INTERFACE = 317,
+    VAR_CONTROL_PORT = 318,
+    VAR_SERVER_KEY_FILE = 319,
+    VAR_SERVER_CERT_FILE = 320,
+    VAR_CONTROL_KEY_FILE = 321,
+    VAR_CONTROL_CERT_FILE = 322,
+    VAR_XFRDIR = 323,
+    VAR_RRL_SIZE = 324,
+    VAR_RRL_RATELIMIT = 325,
+    VAR_RRL_SLIP = 326,
+    VAR_RRL_IPV4_PREFIX_LENGTH = 327,
+    VAR_RRL_IPV6_PREFIX_LENGTH = 328,
+    VAR_RRL_WHITELIST_RATELIMIT = 329,
+    VAR_RRL_WHITELIST = 330,
+    VAR_ZONEFILES_CHECK = 331,
+    VAR_ZONEFILES_WRITE = 332,
+    VAR_LOG_TIME_ASCII = 333,
+    VAR_ROUND_ROBIN = 334,
+    VAR_ZONESTATS = 335,
+    VAR_REUSEPORT = 336,
+    VAR_VERSION = 337
+  };
 #endif
 /* Tokens.  */
 #define SPACE 258
@@ -163,82 +164,71 @@ extern int yydebug;
 #define VAR_IPV6_EDNS_SIZE 291
 #define VAR_DO_IP4 292
 #define VAR_DO_IP6 293
-#define VAR_ZONEFILE 294
-#define VAR_ZONE 295
-#define VAR_ALLOW_NOTIFY 296
-#define VAR_REQUEST_XFR 297
-#define VAR_NOTIFY 298
-#define VAR_PROVIDE_XFR 299
-#define VAR_NOTIFY_RETRY 300
-#define VAR_OUTGOING_INTERFACE 301
-#define VAR_ALLOW_AXFR_FALLBACK 302
-#define VAR_KEY 303
-#define VAR_ALGORITHM 304
-#define VAR_SECRET 305
-#define VAR_AXFR 306
-#define VAR_UDP 307
-#define VAR_VERBOSITY 308
-#define VAR_HIDE_VERSION 309
-#define VAR_PATTERN 310
-#define VAR_INCLUDEPATTERN 311
-#define VAR_ZONELISTFILE 312
-#define VAR_REMOTE_CONTROL 313
-#define VAR_CONTROL_ENABLE 314
-#define VAR_CONTROL_INTERFACE 315
-#define VAR_CONTROL_PORT 316
-#define VAR_SERVER_KEY_FILE 317
-#define VAR_SERVER_CERT_FILE 318
-#define VAR_CONTROL_KEY_FILE 319
-#define VAR_CONTROL_CERT_FILE 320
-#define VAR_XFRDIR 321
-#define VAR_RRL_SIZE 322
-#define VAR_RRL_RATELIMIT 323
-#define VAR_RRL_SLIP 324
-#define VAR_RRL_IPV4_PREFIX_LENGTH 325
-#define VAR_RRL_IPV6_PREFIX_LENGTH 326
-#define VAR_RRL_WHITELIST_RATELIMIT 327
-#define VAR_RRL_WHITELIST 328
-#define VAR_ZONEFILES_CHECK 329
-#define VAR_ZONEFILES_WRITE 330
-#define VAR_LOG_TIME_ASCII 331
-#define VAR_ROUND_ROBIN 332
-#define VAR_ZONESTATS 333
-#define VAR_REUSEPORT 334
-#define VAR_VERSION 335
+#define VAR_TCP_MSS 294
+#define VAR_OUTGOING_TCP_MSS 295
+#define VAR_ZONEFILE 296
+#define VAR_ZONE 297
+#define VAR_ALLOW_NOTIFY 298
+#define VAR_REQUEST_XFR 299
+#define VAR_NOTIFY 300
+#define VAR_PROVIDE_XFR 301
+#define VAR_NOTIFY_RETRY 302
+#define VAR_OUTGOING_INTERFACE 303
+#define VAR_ALLOW_AXFR_FALLBACK 304
+#define VAR_KEY 305
+#define VAR_ALGORITHM 306
+#define VAR_SECRET 307
+#define VAR_AXFR 308
+#define VAR_UDP 309
+#define VAR_VERBOSITY 310
+#define VAR_HIDE_VERSION 311
+#define VAR_PATTERN 312
+#define VAR_INCLUDEPATTERN 313
+#define VAR_ZONELISTFILE 314
+#define VAR_REMOTE_CONTROL 315
+#define VAR_CONTROL_ENABLE 316
+#define VAR_CONTROL_INTERFACE 317
+#define VAR_CONTROL_PORT 318
+#define VAR_SERVER_KEY_FILE 319
+#define VAR_SERVER_CERT_FILE 320
+#define VAR_CONTROL_KEY_FILE 321
+#define VAR_CONTROL_CERT_FILE 322
+#define VAR_XFRDIR 323
+#define VAR_RRL_SIZE 324
+#define VAR_RRL_RATELIMIT 325
+#define VAR_RRL_SLIP 326
+#define VAR_RRL_IPV4_PREFIX_LENGTH 327
+#define VAR_RRL_IPV6_PREFIX_LENGTH 328
+#define VAR_RRL_WHITELIST_RATELIMIT 329
+#define VAR_RRL_WHITELIST 330
+#define VAR_ZONEFILES_CHECK 331
+#define VAR_ZONEFILES_WRITE 332
+#define VAR_LOG_TIME_ASCII 333
+#define VAR_ROUND_ROBIN 334
+#define VAR_ZONESTATS 335
+#define VAR_REUSEPORT 336
+#define VAR_VERSION 337
 
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
+
+union YYSTYPE
 {
-/* Line 2058 of yacc.c  */
-#line 42 "configparser.y"
+#line 42 "configparser.y" /* yacc.c:1909  */
 
 	char*	str;
 
+#line 222 "configparser.h" /* yacc.c:1909  */
+};
 
-/* Line 2058 of yacc.c  */
-#line 222 "configparser.h"
-} YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
 int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
 
 #endif /* !YY_YY_CONFIGPARSER_H_INCLUDED  */

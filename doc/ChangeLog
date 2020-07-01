@@ -1,3 +1,39 @@
+2 March 2016: Wouter
+	- Tag 4.1.8rc1
+
+1 March 2016: Wouter
+	- #744: Fix that NSD replies for configured but unloaded zone
+	  with SERVFAIL, not REFUSED.
+
+16 February 2016: Wouter
+	- RR type CSYNC (RFC7477) syntax is supported.
+
+29 January 2016: Wouter
+	- #739: zonefile changes when mtime is small are detected on reload,
+	  if filesystem supports precision mtime values.
+
+19 January 2016: Wouter
+	- Fix #736: segfault during zone transfer.
+
+08 January 2016: Wouter
+	- Define _DEFAULT_SOURCE with _BSD_SOURCE for recent Linuxes.
+
+05 January 2016: Wouter
+	- #732: tcp-mss, outgoing-tcp-mss options for nsd.conf, patch
+	  from Daisuke Higashi.
+
+04 January 2016: Wouter
+	- Updated acx_nlnetlabs to version 32.
+
+11 December 2015: Wouter
+	- Fix flto check for OSX clang.
+
+10 December 2015: Wouter
+	- 4.1.7 release
+	- trunk has 4.1.8 in development.
+	- take advantage of arc4random_uniform if available, patch from
+	  Loganaden Velvindron.
+
 3 December 2015: Wouter
 	- tag for 4.1.7rc1 prerelease.
 
