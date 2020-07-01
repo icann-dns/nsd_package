@@ -1,7 +1,7 @@
 dnl
 dnl Some global settings
 dnl
-AC_INIT(NSD,2.1.0,nsd-bugs@nlnetlabs.nl)
+AC_INIT(NSD,2.1.5,nsd-bugs@nlnetlabs.nl)
 AC_CONFIG_HEADER([config.h])
 
 dnl
@@ -332,11 +332,11 @@ esac
 
 AC_ARG_ENABLE(dnssec, AC_HELP_STRING([--enable-dnssec], [Enable experimental DNSSEC support according to the latest drafts.]))
 case "$enable_dnssec" in
-        no)
-                ;;
-        yes|*)
+        yes)
 		AC_DEFINE_UNQUOTED([DNSSEC], [], [Define this enable experimental DNSSEC support.])
 		;;
+        no|*)
+                ;;
 esac
 
 AC_ARG_ENABLE(axfr, AC_HELP_STRING([--disable-axfr], [Disables AXFR]))
@@ -429,6 +429,12 @@ AH_BOTTOM([
 #else /* !HAVE_ATTR_UNUSED */
 #define ATTR_UNUSED /* empty */
 #endif /* !HAVE_ATTR_UNUSED */
+])
+
+AH_BOTTOM([
+#ifndef IPV6_MIN_MTU
+#define IPV6_MIN_MTU 1280
+#endif
 ])
 
 AC_CONFIG_FILES([Makefile])

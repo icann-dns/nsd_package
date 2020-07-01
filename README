@@ -16,7 +16,7 @@
 
 1.0 Introduction
 
-This is NSD Name Server Daemon (NSD) version 2.1.0.
+This is NSD Name Server Daemon (NSD) version 2.1.5.
 
 NSD is a complete implementation of an authoritative DNS name server.
 For further information about what NSD is and what NSD is not please
@@ -43,7 +43,7 @@ which uses a simple configuration file.
 
 1.2 Quick build and install
 
-Step 1:	Unpack the source with gtar -xzvf nsd-2.1.0.tar.gz
+Step 1:	Unpack the source with gtar -xzvf nsd-2.1.5.tar.gz
 
 Step 2:	Create user nsd or any other unprivileged user of your
 	choice. In case of later make sure to use
@@ -95,9 +95,9 @@ Step 14: If desired add nsdc update to your superuser crontab to
 Use your favorite combination of tar and gnu zip to unpack the source,
 for example
 
-$ gtar -xzvf nsd-2.1.0.tar.gz
+$ gtar -xzvf nsd-2.1.5.tar.gz
 
-will unpack the source into the ./nsd-2.1.0 directory...
+will unpack the source into the ./nsd-2.1.5 directory...
 
 
 2.2 Configuring NSD

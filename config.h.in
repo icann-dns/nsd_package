@@ -381,3 +381,9 @@
 #define ATTR_UNUSED /* empty */
 #endif /* !HAVE_ATTR_UNUSED */
 
+
+
+#ifndef IPV6_MIN_MTU
+#define IPV6_MIN_MTU 1280
+#endif
+
