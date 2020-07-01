@@ -1,5 +1,31 @@
 NSD RELEASE NOTES
 
+4.0.1
+================
+FEATURES:
+	- recognizes ip-address and interface as synonyms for convenience.
+	- Support for EUI48 and EUI64 RR types enabled by default (RFC 7043).
+	- Support for CAA RRtype (RFC 6844).
+	- NSID can be set with "ascii_somestring" in ascii.
+	
+BUG FIXES:
+	- Fix xfrd when zone transfer TCP contains zero length packets.
+	- Fix for NSEC3 zones where parent zone is co-hosted, also NSEC3,
+	  because AXFRs overwrote nsec3 administration in the child zone.
+   	- Fix that bad IXFR updates do not result in double SOA records,
+	  and that an AXFR is started (attempted) when the zone state seems
+	  to be inconsistent with the master's zone state.
+	- Log ip address for sendto and sendmmsg failures.
+	- Fix segfaults after read of zones with rr type WKS from zonefile.
+	- Seed PRNG for openssl at start of daemon, fixes SSL connection issue.
+	- Bugfix #534: IXFR query loop over UDP for zones that are unchanged.
+	- (same as in 3.2.16): fix wildcard cname to nxdomain repeated rrset.
+	- (same as in 3.2.16): Bugfix #542: Match RRSIG TTL with SOA TTL in
+	  negative response.
+	- Check if configure in srcdir collides with outofdir build.
+	- Fix #546:  output format errors in nsd_munin_ (Thanks Tom Hendrikx).
+	- Fix printout of high-chars in TXT on NetBSD.
+
 4.0.0	NSD 4.0
 ===============
 FEATURES:
@@ -25,7 +51,7 @@ FEATURES (incremental from BETA5):
 	- Fix time at 2038, uint32s changed to time_t, support 64bit time_t.
 	- Fix use of 32bit time, for 2038, thanks to Theo de Raadt for patch.
 BUG FIXES (incremental from BETA5):
-	- Bugfix#518 Incorrect RRL prefix length option names in nsd.conf
+	- Bugfix #518 Incorrect RRL prefix length option names in nsd.conf
 	  man page from Ville Mattila.
 	- Fix that xfrd, and nsd-control, does not stop responding when reload
 	  errors out. The pid is sent like it should by server_main.
@@ -33,7 +59,7 @@ BUG FIXES (incremental from BETA5):
 	- Fixup errors from the stack code checker.
 	- Removed use of random when arc4random is available. Thus, random
 	  and srandom are then not linked with the executable.
-	- Fix segfault with no logfile and chroot.
+	- Fix segfault with no logfile and chroot (Thanks Patrik Lundin).
 
 4.0.0b5   BETA 5 release of NSD 4.0
 ==================================
