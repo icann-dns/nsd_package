@@ -1,4 +1,2 @@
 0001-Enable-control-by-default.patch
 0002-Force-dbdir-to-be-var-lib-nsd-by-patching-configure.patch
-0003-Fix_help_return_code_in_nsd-control-setup_script.patch
-0004-Skip-missing-cutest-test.patch
