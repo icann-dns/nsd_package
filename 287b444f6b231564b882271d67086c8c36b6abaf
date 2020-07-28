@@ -1,0 +1,4 @@
+  * New upstream version 4.3.2
+  * Use new log-only-syslog: yes (Closes: #803683)
+  * Drop FTBFS patches included upstream
+  * Update to debhelper 13
