@@ -1,6 +1,7 @@
 From: Debian DNS Packaging <pkg-dns-devel@lists.alioth.debian.org>
 Date: Fri, 4 Dec 2015 14:50:14 +0100
 Subject: Enable control by default
+Forwarded: not-needed
 
 ---
  nsd-control-setup.sh.in | 2 +-
