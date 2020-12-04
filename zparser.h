@@ -125,19 +125,20 @@ extern int yydebug;
     T_CDNSKEY = 331,
     T_OPENPGPKEY = 332,
     T_CSYNC = 333,
-    T_AVC = 334,
-    T_SMIMEA = 335,
-    DOLLAR_TTL = 336,
-    DOLLAR_ORIGIN = 337,
-    NL = 338,
-    SP = 339,
-    STR = 340,
-    PREV = 341,
-    BITLAB = 342,
-    T_TTL = 343,
-    T_RRCLASS = 344,
-    URR = 345,
-    T_UTYPE = 346
+    T_ZONEMD = 334,
+    T_AVC = 335,
+    T_SMIMEA = 336,
+    DOLLAR_TTL = 337,
+    DOLLAR_ORIGIN = 338,
+    NL = 339,
+    SP = 340,
+    STR = 341,
+    PREV = 342,
+    BITLAB = 343,
+    T_TTL = 344,
+    T_RRCLASS = 345,
+    URR = 346,
+    T_UTYPE = 347
   };
 #endif
 /* Tokens.  */
@@ -217,19 +218,20 @@ extern int yydebug;
 #define T_CDNSKEY 331
 #define T_OPENPGPKEY 332
 #define T_CSYNC 333
-#define T_AVC 334
-#define T_SMIMEA 335
-#define DOLLAR_TTL 336
-#define DOLLAR_ORIGIN 337
-#define NL 338
-#define SP 339
-#define STR 340
-#define PREV 341
-#define BITLAB 342
-#define T_TTL 343
-#define T_RRCLASS 344
-#define URR 345
-#define T_UTYPE 346
+#define T_ZONEMD 334
+#define T_AVC 335
+#define T_SMIMEA 336
+#define DOLLAR_TTL 337
+#define DOLLAR_ORIGIN 338
+#define NL 339
+#define SP 340
+#define STR 341
+#define PREV 342
+#define BITLAB 343
+#define T_TTL 344
+#define T_RRCLASS 345
+#define URR 346
+#define T_UTYPE 347
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -245,7 +247,7 @@ union YYSTYPE
 	uint16_t	  type;
 	uint16_t	 *unknown;
 
-#line 249 "zparser.h"
+#line 251 "zparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
