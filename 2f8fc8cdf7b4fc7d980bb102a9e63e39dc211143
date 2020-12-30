@@ -1,0 +1,2 @@
+  * New upstream version 4.3.4
+  * Fixes CVE-2020-28935 (chown of pidfile) on systems with sysvinit
