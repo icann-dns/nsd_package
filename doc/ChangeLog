@@ -1,6 +1,50 @@
+19 January 2021: Wouter
+	- Set branch ready for 4.3.5 release.
+
+15 January 2021: Wouter
+	- Fix #152: '*' in Rdata causes the return code to be NOERROR instead
+	  of NX.
+	- Add config.guess and config.sub to .gitignore for autoconf 2.70.
+	- Fix #150: TXT record validation difference with BIND.
+	- Fixup TXT record validation fix for escaped quotes.
+	- Fixup TXT record validation fix for escaped backslashes.
+	- Fixup escape character parse for quoted strings.
+
+11 January 2021: Wouter
+	- Fix #151: DNAME not applied more than once to resolve the query.
+	- Fix dname test for #148.
+	- For #151: fix to not produce loops in output.
+
+5 January 2021: Wouter
+	- Fix configure.ac for autoconf 2.70.
+
+4 January 2021: Wouter
+	- Fix #148: CNAME need not be followed after a synthesized CNAME
+	  for a CNAME query.
+
+11 December 2020: Wouter
+	- Fix that nsd-control has timeout when connection is down.
+	- remove windows socket ifdefs from nsd-control.
+
+3 December 2020: Wouter
+	- For #145: Fix that service of remaining TCP and TLS connections
+	  does not allow new queries to be made, the connection is closed.
+	  Only existing queries and zone transfers are answered, new ones
+	  are rejected by a close of the channel.
+
+30 November 2020: Wouter
+	- Fix #144: fix better.
+
+27 November 2020: Wouter
+	- Fix #144: Typo fix in nsd.conf.5.in.
+
+26 November 2020: Wouter
+	- Fix #143: xfrd no hysteresis with NOT IMPLEMENTED rcode.
+
 24 November 2020: Wouter
 	- Merge PR #141: ZONEMD RR type.
-	- tag for 4.3.4rc1.
+	- tag for 4.3.4rc1.  This became 4.3.4 release on 1 dec 2020.
+	  The code repo continues for 4.3.5 in development.
 
 23 November 2020: Wouter
 	- Fix #142: NODATA answers missin SOA in authority section after
