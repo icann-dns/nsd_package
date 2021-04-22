@@ -199,6 +199,9 @@
 /* Define to 1 if you have the `HMAC_CTX_reset' function. */
 #undef HAVE_HMAC_CTX_RESET
 
+/* Define to 1 if you have the <ifaddrs.h> header file. */
+#undef HAVE_IFADDRS_H
+
 /* Define to 1 if you have the `inet_aton' function. */
 #undef HAVE_INET_ATON
 
@@ -412,6 +415,9 @@
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H
+
+/* Define to 1 if systemd should be used */
+#undef HAVE_SYSTEMD
 
 /* Define to 1 if you have the <sys/bitypes.h> header file. */
 #undef HAVE_SYS_BITYPES_H

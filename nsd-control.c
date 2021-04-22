@@ -60,6 +60,9 @@
 #include <sys/un.h>
 #endif
 #include <fcntl.h>
+#ifndef AF_LOCAL
+#define AF_LOCAL AF_UNIX
+#endif
 #include "util.h"
 #include "tsig.h"
 #include "options.h"
@@ -492,6 +495,7 @@ go(const char* cfgfile, char* svr, int argc, char* argv[])
 	}
 	if(!opt->control_enable)
 		fprintf(stderr, "warning: control-enable is 'no' in the config file.\n");
+	resolve_interface_names(opt);
 	ctx = setup_ctx(opt);
 
 	/* contact server */
