@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.4.1.  */
+/* A Bison parser, made by GNU Bison 3.6.4.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_ZPARSER_H_INCLUDED
 # define YY_YY_ZPARSER_H_INCLUDED
@@ -44,104 +45,113 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    T_A = 258,
-    T_NS = 259,
-    T_MX = 260,
-    T_TXT = 261,
-    T_CNAME = 262,
-    T_AAAA = 263,
-    T_PTR = 264,
-    T_NXT = 265,
-    T_KEY = 266,
-    T_SOA = 267,
-    T_SIG = 268,
-    T_SRV = 269,
-    T_CERT = 270,
-    T_LOC = 271,
-    T_MD = 272,
-    T_MF = 273,
-    T_MB = 274,
-    T_MG = 275,
-    T_MR = 276,
-    T_NULL = 277,
-    T_WKS = 278,
-    T_HINFO = 279,
-    T_MINFO = 280,
-    T_RP = 281,
-    T_AFSDB = 282,
-    T_X25 = 283,
-    T_ISDN = 284,
-    T_RT = 285,
-    T_NSAP = 286,
-    T_NSAP_PTR = 287,
-    T_PX = 288,
-    T_GPOS = 289,
-    T_EID = 290,
-    T_NIMLOC = 291,
-    T_ATMA = 292,
-    T_NAPTR = 293,
-    T_KX = 294,
-    T_A6 = 295,
-    T_DNAME = 296,
-    T_SINK = 297,
-    T_OPT = 298,
-    T_APL = 299,
-    T_UINFO = 300,
-    T_UID = 301,
-    T_GID = 302,
-    T_UNSPEC = 303,
-    T_TKEY = 304,
-    T_TSIG = 305,
-    T_IXFR = 306,
-    T_AXFR = 307,
-    T_MAILB = 308,
-    T_MAILA = 309,
-    T_DS = 310,
-    T_DLV = 311,
-    T_SSHFP = 312,
-    T_RRSIG = 313,
-    T_NSEC = 314,
-    T_DNSKEY = 315,
-    T_SPF = 316,
-    T_NSEC3 = 317,
-    T_IPSECKEY = 318,
-    T_DHCID = 319,
-    T_NSEC3PARAM = 320,
-    T_TLSA = 321,
-    T_URI = 322,
-    T_NID = 323,
-    T_L32 = 324,
-    T_L64 = 325,
-    T_LP = 326,
-    T_EUI48 = 327,
-    T_EUI64 = 328,
-    T_CAA = 329,
-    T_CDS = 330,
-    T_CDNSKEY = 331,
-    T_OPENPGPKEY = 332,
-    T_CSYNC = 333,
-    T_ZONEMD = 334,
-    T_AVC = 335,
-    T_SMIMEA = 336,
-    DOLLAR_TTL = 337,
-    DOLLAR_ORIGIN = 338,
-    NL = 339,
-    SP = 340,
-    STR = 341,
-    PREV = 342,
-    BITLAB = 343,
-    T_TTL = 344,
-    T_RRCLASS = 345,
-    URR = 346,
-    T_UTYPE = 347
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    T_A = 258,                     /* T_A  */
+    T_NS = 259,                    /* T_NS  */
+    T_MX = 260,                    /* T_MX  */
+    T_TXT = 261,                   /* T_TXT  */
+    T_CNAME = 262,                 /* T_CNAME  */
+    T_AAAA = 263,                  /* T_AAAA  */
+    T_PTR = 264,                   /* T_PTR  */
+    T_NXT = 265,                   /* T_NXT  */
+    T_KEY = 266,                   /* T_KEY  */
+    T_SOA = 267,                   /* T_SOA  */
+    T_SIG = 268,                   /* T_SIG  */
+    T_SRV = 269,                   /* T_SRV  */
+    T_CERT = 270,                  /* T_CERT  */
+    T_LOC = 271,                   /* T_LOC  */
+    T_MD = 272,                    /* T_MD  */
+    T_MF = 273,                    /* T_MF  */
+    T_MB = 274,                    /* T_MB  */
+    T_MG = 275,                    /* T_MG  */
+    T_MR = 276,                    /* T_MR  */
+    T_NULL = 277,                  /* T_NULL  */
+    T_WKS = 278,                   /* T_WKS  */
+    T_HINFO = 279,                 /* T_HINFO  */
+    T_MINFO = 280,                 /* T_MINFO  */
+    T_RP = 281,                    /* T_RP  */
+    T_AFSDB = 282,                 /* T_AFSDB  */
+    T_X25 = 283,                   /* T_X25  */
+    T_ISDN = 284,                  /* T_ISDN  */
+    T_RT = 285,                    /* T_RT  */
+    T_NSAP = 286,                  /* T_NSAP  */
+    T_NSAP_PTR = 287,              /* T_NSAP_PTR  */
+    T_PX = 288,                    /* T_PX  */
+    T_GPOS = 289,                  /* T_GPOS  */
+    T_EID = 290,                   /* T_EID  */
+    T_NIMLOC = 291,                /* T_NIMLOC  */
+    T_ATMA = 292,                  /* T_ATMA  */
+    T_NAPTR = 293,                 /* T_NAPTR  */
+    T_KX = 294,                    /* T_KX  */
+    T_A6 = 295,                    /* T_A6  */
+    T_DNAME = 296,                 /* T_DNAME  */
+    T_SINK = 297,                  /* T_SINK  */
+    T_OPT = 298,                   /* T_OPT  */
+    T_APL = 299,                   /* T_APL  */
+    T_UINFO = 300,                 /* T_UINFO  */
+    T_UID = 301,                   /* T_UID  */
+    T_GID = 302,                   /* T_GID  */
+    T_UNSPEC = 303,                /* T_UNSPEC  */
+    T_TKEY = 304,                  /* T_TKEY  */
+    T_TSIG = 305,                  /* T_TSIG  */
+    T_IXFR = 306,                  /* T_IXFR  */
+    T_AXFR = 307,                  /* T_AXFR  */
+    T_MAILB = 308,                 /* T_MAILB  */
+    T_MAILA = 309,                 /* T_MAILA  */
+    T_DS = 310,                    /* T_DS  */
+    T_DLV = 311,                   /* T_DLV  */
+    T_SSHFP = 312,                 /* T_SSHFP  */
+    T_RRSIG = 313,                 /* T_RRSIG  */
+    T_NSEC = 314,                  /* T_NSEC  */
+    T_DNSKEY = 315,                /* T_DNSKEY  */
+    T_SPF = 316,                   /* T_SPF  */
+    T_NSEC3 = 317,                 /* T_NSEC3  */
+    T_IPSECKEY = 318,              /* T_IPSECKEY  */
+    T_DHCID = 319,                 /* T_DHCID  */
+    T_NSEC3PARAM = 320,            /* T_NSEC3PARAM  */
+    T_TLSA = 321,                  /* T_TLSA  */
+    T_URI = 322,                   /* T_URI  */
+    T_NID = 323,                   /* T_NID  */
+    T_L32 = 324,                   /* T_L32  */
+    T_L64 = 325,                   /* T_L64  */
+    T_LP = 326,                    /* T_LP  */
+    T_EUI48 = 327,                 /* T_EUI48  */
+    T_EUI64 = 328,                 /* T_EUI64  */
+    T_CAA = 329,                   /* T_CAA  */
+    T_CDS = 330,                   /* T_CDS  */
+    T_CDNSKEY = 331,               /* T_CDNSKEY  */
+    T_OPENPGPKEY = 332,            /* T_OPENPGPKEY  */
+    T_CSYNC = 333,                 /* T_CSYNC  */
+    T_ZONEMD = 334,                /* T_ZONEMD  */
+    T_AVC = 335,                   /* T_AVC  */
+    T_SMIMEA = 336,                /* T_SMIMEA  */
+    DOLLAR_TTL = 337,              /* DOLLAR_TTL  */
+    DOLLAR_ORIGIN = 338,           /* DOLLAR_ORIGIN  */
+    NL = 339,                      /* NL  */
+    SP = 340,                      /* SP  */
+    QSTR = 341,                    /* QSTR  */
+    STR = 342,                     /* STR  */
+    PREV = 343,                    /* PREV  */
+    BITLAB = 344,                  /* BITLAB  */
+    T_TTL = 345,                   /* T_TTL  */
+    T_RRCLASS = 346,               /* T_RRCLASS  */
+    URR = 347,                     /* URR  */
+    T_UTYPE = 348                  /* T_UTYPE  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
 #define T_A 258
 #define T_NS 259
 #define T_MX 260
@@ -225,13 +235,14 @@ extern int yydebug;
 #define DOLLAR_ORIGIN 338
 #define NL 339
 #define SP 340
-#define STR 341
-#define PREV 342
-#define BITLAB 343
-#define T_TTL 344
-#define T_RRCLASS 345
-#define URR 346
-#define T_UTYPE 347
+#define QSTR 341
+#define STR 342
+#define PREV 343
+#define BITLAB 344
+#define T_TTL 345
+#define T_RRCLASS 346
+#define URR 347
+#define T_UTYPE 348
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -247,7 +258,7 @@ union YYSTYPE
 	uint16_t	  type;
 	uint16_t	 *unknown;
 
-#line 251 "zparser.h"
+#line 262 "zparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
