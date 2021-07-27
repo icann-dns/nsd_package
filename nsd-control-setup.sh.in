@@ -197,7 +197,7 @@ chmod o-rw \
 
 cleanup
 
-echo "Setup success. Certificates created. Enable in nsd.conf file to use"
+echo "Setup success. Certificates created."
 
 
 # create trusted usage pem
