@@ -133,18 +133,20 @@ extern int yydebug;
     T_ZONEMD = 334,                /* T_ZONEMD  */
     T_AVC = 335,                   /* T_AVC  */
     T_SMIMEA = 336,                /* T_SMIMEA  */
-    DOLLAR_TTL = 337,              /* DOLLAR_TTL  */
-    DOLLAR_ORIGIN = 338,           /* DOLLAR_ORIGIN  */
-    NL = 339,                      /* NL  */
-    SP = 340,                      /* SP  */
-    QSTR = 341,                    /* QSTR  */
-    STR = 342,                     /* STR  */
-    PREV = 343,                    /* PREV  */
-    BITLAB = 344,                  /* BITLAB  */
-    T_TTL = 345,                   /* T_TTL  */
-    T_RRCLASS = 346,               /* T_RRCLASS  */
-    URR = 347,                     /* URR  */
-    T_UTYPE = 348                  /* T_UTYPE  */
+    T_SVCB = 337,                  /* T_SVCB  */
+    T_HTTPS = 338,                 /* T_HTTPS  */
+    DOLLAR_TTL = 339,              /* DOLLAR_TTL  */
+    DOLLAR_ORIGIN = 340,           /* DOLLAR_ORIGIN  */
+    NL = 341,                      /* NL  */
+    SP = 342,                      /* SP  */
+    QSTR = 343,                    /* QSTR  */
+    STR = 344,                     /* STR  */
+    PREV = 345,                    /* PREV  */
+    BITLAB = 346,                  /* BITLAB  */
+    T_TTL = 347,                   /* T_TTL  */
+    T_RRCLASS = 348,               /* T_RRCLASS  */
+    URR = 349,                     /* URR  */
+    T_UTYPE = 350                  /* T_UTYPE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -231,18 +233,20 @@ extern int yydebug;
 #define T_ZONEMD 334
 #define T_AVC 335
 #define T_SMIMEA 336
-#define DOLLAR_TTL 337
-#define DOLLAR_ORIGIN 338
-#define NL 339
-#define SP 340
-#define QSTR 341
-#define STR 342
-#define PREV 343
-#define BITLAB 344
-#define T_TTL 345
-#define T_RRCLASS 346
-#define URR 347
-#define T_UTYPE 348
+#define T_SVCB 337
+#define T_HTTPS 338
+#define DOLLAR_TTL 339
+#define DOLLAR_ORIGIN 340
+#define NL 341
+#define SP 342
+#define QSTR 343
+#define STR 344
+#define PREV 345
+#define BITLAB 346
+#define T_TTL 347
+#define T_RRCLASS 348
+#define URR 349
+#define T_UTYPE 350
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -258,7 +262,7 @@ union YYSTYPE
 	uint16_t	  type;
 	uint16_t	 *unknown;
 
-#line 262 "zparser.h"
+#line 266 "zparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

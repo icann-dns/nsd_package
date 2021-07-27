@@ -13,7 +13,7 @@ diff --git a/configure.ac b/configure.ac
 index d613720..a4fff20 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -65,7 +65,7 @@ AC_SUBST(logfile)
+@@ -79,7 +79,7 @@ AC_SUBST(logfile)
  #
  # Database directory
  #
