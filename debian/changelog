@@ -1,3 +1,11 @@
+nsd (4.3.7-1) unstable; urgency=medium
+
+  * New upstream version 4.3.7
+  * Add upstream patch to fix free on shutdown of XoT SSL context
+  * Change back to unstable
+
+ -- Markus Schade <markus.schade@gmail.com>  Tue, 27 Jul 2021 21:39:48 +0200
+
 nsd (4.3.6-1) experimental; urgency=medium
 
   * New upstream version 4.3.6
