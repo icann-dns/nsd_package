@@ -1,0 +1,3 @@
+  * New upstream version 4.3.7
+  * Add upstream patch to fix free on shutdown of XoT SSL context
+  * Change back to unstable
