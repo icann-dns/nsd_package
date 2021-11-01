@@ -22,7 +22,7 @@ Forwarded: not-needed
  # create trusted usage pem
 --- a/nsd-control.8.in
 +++ b/nsd-control.8.in
-@@ -221,8 +221,6 @@
+@@ -226,8 +226,6 @@
  If you change the access control permissions on the key files you can decide
  who can use nsd\-control, by default owner and group but not all users.
  The script preserves private keys present in the directory.
@@ -34,7 +34,7 @@ Forwarded: not-needed
 --- a/options.c
 +++ b/options.c
 @@ -134,7 +134,7 @@
- 	opt->answer_cookie = 1;
+ 	opt->answer_cookie = 0;
  	opt->cookie_secret = NULL;
  	opt->cookie_secret_file = CONFIGDIR"/nsd_cookiesecrets.txt";
 -	opt->control_enable = 0;
