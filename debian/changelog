@@ -1,3 +1,9 @@
+nsd (4.3.8-1build1) jammy; urgency=medium
+
+  * No-change rebuild against openssl3
+
+ -- Simon Chopin <simon.chopin@canonical.com>  Mon, 29 Nov 2021 16:03:48 +0100
+
 nsd (4.3.8-1) unstable; urgency=medium
 
   * New upstream version 4.3.8
