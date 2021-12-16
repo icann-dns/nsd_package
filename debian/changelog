@@ -1,3 +1,9 @@
+nsd (4.3.9-1) unstable; urgency=medium
+
+  * New upstream version 4.3.9
+
+ -- Markus Schade <markus.schade@gmail.com>  Thu, 16 Dec 2021 08:22:53 +0100
+
 nsd (4.3.8-1) unstable; urgency=medium
 
   * New upstream version 4.3.8
