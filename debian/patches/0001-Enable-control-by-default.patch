@@ -11,15 +11,15 @@ Forwarded: not-needed
 
 --- a/nsd-control-setup.sh.in
 +++ b/nsd-control-setup.sh.in
-@@ -197,7 +197,7 @@
+@@ -206,7 +206,7 @@
  
  cleanup
  
 -echo "Setup success. Certificates created. Enable in nsd.conf file to use"
 +echo "Setup success. Certificates created."
  
- 
  # create trusted usage pem
+ # openssl x509 -in $CTL_BASE.pem -addtrust clientAuth -out $CTL_BASE"_trust.pem"
 --- a/nsd-control.8.in
 +++ b/nsd-control.8.in
 @@ -226,8 +226,6 @@
@@ -33,7 +33,7 @@ Forwarded: not-needed
  .TP
 --- a/options.c
 +++ b/options.c
-@@ -134,7 +134,7 @@
+@@ -136,7 +136,7 @@
  	opt->answer_cookie = 0;
  	opt->cookie_secret = NULL;
  	opt->cookie_secret_file = CONFIGDIR"/nsd_cookiesecrets.txt";

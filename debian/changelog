@@ -1,3 +1,11 @@
+nsd (4.4.0-1) unstable; urgency=medium
+
+  * New upstream version 4.4.0
+  * Update standards version to 4.6.0
+  * Refresh control-enable patch
+
+ -- Markus Schade <markus.schade@gmail.com>  Mon, 07 Mar 2022 14:11:02 +0100
+
 nsd (4.3.9-1) unstable; urgency=medium
 
   * New upstream version 4.3.9
