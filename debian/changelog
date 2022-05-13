@@ -1,3 +1,11 @@
+nsd (4.5.0-1) unstable; urgency=medium
+
+  * New upstream version 4.5.0
+  * Update copyright years
+  * Rename debian/nsd.tmpfile to debian/nsd.tmpfiles
+
+ -- Markus Schade <markus.schade@gmail.com>  Fri, 13 May 2022 11:29:24 +0200
+
 nsd (4.4.0-1) unstable; urgency=medium
 
   * New upstream version 4.4.0
