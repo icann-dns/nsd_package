@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.6.4.  */
+/* A Bison parser, made by GNU Bison 3.7.6.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -45,11 +45,11 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
-/* Identify Bison output.  */
-#define YYBISON 1
+/* Identify Bison output, and Bison version.  */
+#define YYBISON 30706
 
-/* Bison version.  */
-#define YYBISON_VERSION "3.6.4"
+/* Bison version string.  */
+#define YYBISON_VERSION "3.7.6"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -140,249 +140,7 @@ nsec3_add_params(const char* hash_algo_str, const char* flag_str,
 #  endif
 # endif
 
-/* Use api.header.include to #include this header
-   instead of duplicating it here.  */
-#ifndef YY_YY_ZPARSER_H_INCLUDED
-# define YY_YY_ZPARSER_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    T_A = 258,                     /* T_A  */
-    T_NS = 259,                    /* T_NS  */
-    T_MX = 260,                    /* T_MX  */
-    T_TXT = 261,                   /* T_TXT  */
-    T_CNAME = 262,                 /* T_CNAME  */
-    T_AAAA = 263,                  /* T_AAAA  */
-    T_PTR = 264,                   /* T_PTR  */
-    T_NXT = 265,                   /* T_NXT  */
-    T_KEY = 266,                   /* T_KEY  */
-    T_SOA = 267,                   /* T_SOA  */
-    T_SIG = 268,                   /* T_SIG  */
-    T_SRV = 269,                   /* T_SRV  */
-    T_CERT = 270,                  /* T_CERT  */
-    T_LOC = 271,                   /* T_LOC  */
-    T_MD = 272,                    /* T_MD  */
-    T_MF = 273,                    /* T_MF  */
-    T_MB = 274,                    /* T_MB  */
-    T_MG = 275,                    /* T_MG  */
-    T_MR = 276,                    /* T_MR  */
-    T_NULL = 277,                  /* T_NULL  */
-    T_WKS = 278,                   /* T_WKS  */
-    T_HINFO = 279,                 /* T_HINFO  */
-    T_MINFO = 280,                 /* T_MINFO  */
-    T_RP = 281,                    /* T_RP  */
-    T_AFSDB = 282,                 /* T_AFSDB  */
-    T_X25 = 283,                   /* T_X25  */
-    T_ISDN = 284,                  /* T_ISDN  */
-    T_RT = 285,                    /* T_RT  */
-    T_NSAP = 286,                  /* T_NSAP  */
-    T_NSAP_PTR = 287,              /* T_NSAP_PTR  */
-    T_PX = 288,                    /* T_PX  */
-    T_GPOS = 289,                  /* T_GPOS  */
-    T_EID = 290,                   /* T_EID  */
-    T_NIMLOC = 291,                /* T_NIMLOC  */
-    T_ATMA = 292,                  /* T_ATMA  */
-    T_NAPTR = 293,                 /* T_NAPTR  */
-    T_KX = 294,                    /* T_KX  */
-    T_A6 = 295,                    /* T_A6  */
-    T_DNAME = 296,                 /* T_DNAME  */
-    T_SINK = 297,                  /* T_SINK  */
-    T_OPT = 298,                   /* T_OPT  */
-    T_APL = 299,                   /* T_APL  */
-    T_UINFO = 300,                 /* T_UINFO  */
-    T_UID = 301,                   /* T_UID  */
-    T_GID = 302,                   /* T_GID  */
-    T_UNSPEC = 303,                /* T_UNSPEC  */
-    T_TKEY = 304,                  /* T_TKEY  */
-    T_TSIG = 305,                  /* T_TSIG  */
-    T_IXFR = 306,                  /* T_IXFR  */
-    T_AXFR = 307,                  /* T_AXFR  */
-    T_MAILB = 308,                 /* T_MAILB  */
-    T_MAILA = 309,                 /* T_MAILA  */
-    T_DS = 310,                    /* T_DS  */
-    T_DLV = 311,                   /* T_DLV  */
-    T_SSHFP = 312,                 /* T_SSHFP  */
-    T_RRSIG = 313,                 /* T_RRSIG  */
-    T_NSEC = 314,                  /* T_NSEC  */
-    T_DNSKEY = 315,                /* T_DNSKEY  */
-    T_SPF = 316,                   /* T_SPF  */
-    T_NSEC3 = 317,                 /* T_NSEC3  */
-    T_IPSECKEY = 318,              /* T_IPSECKEY  */
-    T_DHCID = 319,                 /* T_DHCID  */
-    T_NSEC3PARAM = 320,            /* T_NSEC3PARAM  */
-    T_TLSA = 321,                  /* T_TLSA  */
-    T_URI = 322,                   /* T_URI  */
-    T_NID = 323,                   /* T_NID  */
-    T_L32 = 324,                   /* T_L32  */
-    T_L64 = 325,                   /* T_L64  */
-    T_LP = 326,                    /* T_LP  */
-    T_EUI48 = 327,                 /* T_EUI48  */
-    T_EUI64 = 328,                 /* T_EUI64  */
-    T_CAA = 329,                   /* T_CAA  */
-    T_CDS = 330,                   /* T_CDS  */
-    T_CDNSKEY = 331,               /* T_CDNSKEY  */
-    T_OPENPGPKEY = 332,            /* T_OPENPGPKEY  */
-    T_CSYNC = 333,                 /* T_CSYNC  */
-    T_ZONEMD = 334,                /* T_ZONEMD  */
-    T_AVC = 335,                   /* T_AVC  */
-    T_SMIMEA = 336,                /* T_SMIMEA  */
-    T_SVCB = 337,                  /* T_SVCB  */
-    T_HTTPS = 338,                 /* T_HTTPS  */
-    DOLLAR_TTL = 339,              /* DOLLAR_TTL  */
-    DOLLAR_ORIGIN = 340,           /* DOLLAR_ORIGIN  */
-    NL = 341,                      /* NL  */
-    SP = 342,                      /* SP  */
-    QSTR = 343,                    /* QSTR  */
-    STR = 344,                     /* STR  */
-    PREV = 345,                    /* PREV  */
-    BITLAB = 346,                  /* BITLAB  */
-    T_TTL = 347,                   /* T_TTL  */
-    T_RRCLASS = 348,               /* T_RRCLASS  */
-    URR = 349,                     /* URR  */
-    T_UTYPE = 350                  /* T_UTYPE  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-/* Token kinds.  */
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define T_A 258
-#define T_NS 259
-#define T_MX 260
-#define T_TXT 261
-#define T_CNAME 262
-#define T_AAAA 263
-#define T_PTR 264
-#define T_NXT 265
-#define T_KEY 266
-#define T_SOA 267
-#define T_SIG 268
-#define T_SRV 269
-#define T_CERT 270
-#define T_LOC 271
-#define T_MD 272
-#define T_MF 273
-#define T_MB 274
-#define T_MG 275
-#define T_MR 276
-#define T_NULL 277
-#define T_WKS 278
-#define T_HINFO 279
-#define T_MINFO 280
-#define T_RP 281
-#define T_AFSDB 282
-#define T_X25 283
-#define T_ISDN 284
-#define T_RT 285
-#define T_NSAP 286
-#define T_NSAP_PTR 287
-#define T_PX 288
-#define T_GPOS 289
-#define T_EID 290
-#define T_NIMLOC 291
-#define T_ATMA 292
-#define T_NAPTR 293
-#define T_KX 294
-#define T_A6 295
-#define T_DNAME 296
-#define T_SINK 297
-#define T_OPT 298
-#define T_APL 299
-#define T_UINFO 300
-#define T_UID 301
-#define T_GID 302
-#define T_UNSPEC 303
-#define T_TKEY 304
-#define T_TSIG 305
-#define T_IXFR 306
-#define T_AXFR 307
-#define T_MAILB 308
-#define T_MAILA 309
-#define T_DS 310
-#define T_DLV 311
-#define T_SSHFP 312
-#define T_RRSIG 313
-#define T_NSEC 314
-#define T_DNSKEY 315
-#define T_SPF 316
-#define T_NSEC3 317
-#define T_IPSECKEY 318
-#define T_DHCID 319
-#define T_NSEC3PARAM 320
-#define T_TLSA 321
-#define T_URI 322
-#define T_NID 323
-#define T_L32 324
-#define T_L64 325
-#define T_LP 326
-#define T_EUI48 327
-#define T_EUI64 328
-#define T_CAA 329
-#define T_CDS 330
-#define T_CDNSKEY 331
-#define T_OPENPGPKEY 332
-#define T_CSYNC 333
-#define T_ZONEMD 334
-#define T_AVC 335
-#define T_SMIMEA 336
-#define T_SVCB 337
-#define T_HTTPS 338
-#define DOLLAR_TTL 339
-#define DOLLAR_ORIGIN 340
-#define NL 341
-#define SP 342
-#define QSTR 343
-#define STR 344
-#define PREV 345
-#define BITLAB 346
-#define T_TTL 347
-#define T_RRCLASS 348
-#define URR 349
-#define T_UTYPE 350
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 50 "zparser.y"
-
-	domain_type	 *domain;
-	const dname_type *dname;
-	struct lex_data	  data;
-	uint32_t	  ttl;
-	uint16_t	  klass;
-	uint16_t	  type;
-	uint16_t	 *unknown;
-
-#line 373 "zparser.c"
-
-};
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-int yyparse (void);
-
-#endif /* !YY_YY_ZPARSER_H_INCLUDED  */
+#include "zparser.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -610,6 +368,18 @@ typedef int_least16_t yytype_int16;
 typedef short yytype_int16;
 #endif
 
+/* Work around bug in HP-UX 11.23, which defines these macros
+   incorrectly for preprocessor constants.  This workaround can likely
+   be removed in 2023, as HPE has promised support for HP-UX 11.23
+   (aka HP-UX 11i v2) only through the end of 2022; see Table 2 of
+   <https://h20195.www2.hpe.com/V2/getpdf.aspx/4AA4-7673ENW.pdf>.  */
+#ifdef __hpux
+# undef UINT_LEAST8_MAX
+# undef UINT_LEAST16_MAX
+# define UINT_LEAST8_MAX 255
+# define UINT_LEAST16_MAX 65535
+#endif
+
 #if defined __UINT_LEAST8_MAX__ && __UINT_LEAST8_MAX__ <= __INT_MAX__
 typedef __UINT_LEAST8_TYPE__ yytype_uint8;
 #elif (!defined __UINT_LEAST8_MAX__ && defined YY_STDINT_H \
@@ -707,9 +477,9 @@ typedef int yy_state_fast_t;
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
 #if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
@@ -887,6 +657,7 @@ union yyalloc
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  630
 
+/* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   350
 
 
@@ -1210,7 +981,7 @@ static const yytype_int16 yypgoto[] =
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     1,    14,   108,    16,   109,    17,    18,    19,    20,
+       0,     1,    14,   108,    16,   109,    17,    18,    19,    20,
       33,   190,    22,    23,    24,   298,   299,   300,   301,   197,
      228,   449,   475,   416,   316,   266,   186,   493,   105,   188,
      191,   215,   242,   245,   248,   194,   199,   251,   254,   257,
@@ -1717,7 +1488,7 @@ yy_symbol_value_print (FILE *yyo,
                        yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep)
 {
   FILE *yyoutput = yyo;
-  YYUSE (yyoutput);
+  YY_USE (yyoutput);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
@@ -1725,7 +1496,7 @@ yy_symbol_value_print (FILE *yyo,
     YYPRINT (yyo, yytoknum[yykind], *yyvaluep);
 # endif
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  YYUSE (yykind);
+  YY_USE (yykind);
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
@@ -1839,18 +1610,18 @@ static void
 yydestruct (const char *yymsg,
             yysymbol_kind_t yykind, YYSTYPE *yyvaluep)
 {
-  YYUSE (yyvaluep);
+  YY_USE (yyvaluep);
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
 
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  YYUSE (yykind);
+  YY_USE (yykind);
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
 
-/* The lookahead symbol.  */
+/* Lookahead token kind.  */
 int yychar;
 
 /* The semantic value of the lookahead symbol.  */
@@ -1868,34 +1639,30 @@ int yynerrs;
 int
 yyparse (void)
 {
-    yy_state_fast_t yystate;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
+    int yyerrstatus = 0;
 
-    /* The stacks and their tools:
-       'yyss': related to states.
-       'yyvs': related to semantic values.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
+    /* Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
     /* Their size.  */
-    YYPTRDIFF_T yystacksize;
+    YYPTRDIFF_T yystacksize = YYINITDEPTH;
 
-    /* The state stack.  */
+    /* The state stack: array, bottom, top.  */
     yy_state_t yyssa[YYINITDEPTH];
-    yy_state_t *yyss;
-    yy_state_t *yyssp;
+    yy_state_t *yyss = yyssa;
+    yy_state_t *yyssp = yyss;
 
-    /* The semantic value stack.  */
+    /* The semantic value stack: array, bottom, top.  */
     YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
+    YYSTYPE *yyvs = yyvsa;
+    YYSTYPE *yyvsp = yyvs;
 
   int yyn;
   /* The return value of yyparse.  */
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
+  /* Lookahead symbol kind.  */
   yysymbol_kind_t yytoken = YYSYMBOL_YYEMPTY;
   /* The variables used to return semantic value and location from the
      action routines.  */
@@ -1908,15 +1675,6 @@ yyparse (void)
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
-
-  yynerrs = 0;
-  yystate = 0;
-  yyerrstatus = 0;
-
-  yystacksize = YYINITDEPTH;
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
@@ -2118,13 +1876,13 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 6:
+  case 6: /* line: PREV NL  */
 #line 99 "zparser.y"
                         {}
-#line 2125 "zparser.c"
+#line 1883 "zparser.c"
     break;
 
-  case 7:
+  case 7: /* line: ttl_directive  */
 #line 101 "zparser.y"
         {
 	    region_free_all(parser->rr_region);
@@ -2133,10 +1891,10 @@ yyreduce:
 	    parser->current_rr.rdatas = parser->temporary_rdatas;
 	    parser->error_occurred = 0;
     }
-#line 2137 "zparser.c"
+#line 1895 "zparser.c"
     break;
 
-  case 8:
+  case 8: /* line: origin_directive  */
 #line 109 "zparser.y"
         {
 	    region_free_all(parser->rr_region);
@@ -2145,10 +1903,10 @@ yyreduce:
 	    parser->current_rr.rdatas = parser->temporary_rdatas;
 	    parser->error_occurred = 0;
     }
-#line 2149 "zparser.c"
+#line 1907 "zparser.c"
     break;
 
-  case 9:
+  case 9: /* line: rr  */
 #line 117 "zparser.y"
     {	/* rr should be fully parsed */
 	    if (!parser->error_occurred) {
@@ -2169,10 +1927,10 @@ yyreduce:
 	    parser->current_rr.rdatas = parser->temporary_rdatas;
 	    parser->error_occurred = 0;
     }
-#line 2173 "zparser.c"
+#line 1931 "zparser.c"
     break;
 
-  case 17:
+  case 17: /* ttl_directive: DOLLAR_TTL sp str trail  */
 #line 151 "zparser.y"
     {
 	    parser->default_ttl = zparser_ttl2int((yyvsp[-1].data).str, &(parser->error_occurred));
@@ -2181,10 +1939,10 @@ yyreduce:
 			parser->error_occurred = 0;
 	    }
     }
-#line 2185 "zparser.c"
+#line 1943 "zparser.c"
     break;
 
-  case 18:
+  case 18: /* origin_directive: DOLLAR_ORIGIN sp abs_dname trail  */
 #line 161 "zparser.y"
     {
 	    /* if previous origin is unused, remove it, do not leak it */
@@ -2196,89 +1954,89 @@ yyreduce:
 	    }
 	    parser->origin = (yyvsp[-1].domain);
     }
-#line 2200 "zparser.c"
+#line 1958 "zparser.c"
     break;
 
-  case 19:
+  case 19: /* origin_directive: DOLLAR_ORIGIN sp rel_dname trail  */
 #line 172 "zparser.y"
     {
 	    zc_error_prev_line("$ORIGIN directive requires absolute domain name");
     }
-#line 2208 "zparser.c"
+#line 1966 "zparser.c"
     break;
 
-  case 20:
+  case 20: /* rr: owner classttl type_and_rdata  */
 #line 178 "zparser.y"
     {
 	    parser->current_rr.owner = (yyvsp[-2].domain);
 	    parser->current_rr.type = (yyvsp[0].type);
     }
-#line 2217 "zparser.c"
+#line 1975 "zparser.c"
     break;
 
-  case 21:
+  case 21: /* owner: dname sp  */
 #line 185 "zparser.y"
     {
 	    parser->prev_dname = (yyvsp[-1].domain);
 	    (yyval.domain) = (yyvsp[-1].domain);
     }
-#line 2226 "zparser.c"
+#line 1984 "zparser.c"
     break;
 
-  case 22:
+  case 22: /* owner: PREV  */
 #line 190 "zparser.y"
     {
 	    (yyval.domain) = parser->prev_dname;
     }
-#line 2234 "zparser.c"
+#line 1992 "zparser.c"
     break;
 
-  case 23:
+  case 23: /* classttl: %empty  */
 #line 196 "zparser.y"
     {
 	    parser->current_rr.ttl = parser->default_ttl;
 	    parser->current_rr.klass = parser->default_class;
     }
-#line 2243 "zparser.c"
+#line 2001 "zparser.c"
     break;
 
-  case 24:
+  case 24: /* classttl: T_RRCLASS sp  */
 #line 201 "zparser.y"
     {
 	    parser->current_rr.ttl = parser->default_ttl;
 	    parser->current_rr.klass = (yyvsp[-1].klass);
     }
-#line 2252 "zparser.c"
+#line 2010 "zparser.c"
     break;
 
-  case 25:
+  case 25: /* classttl: T_TTL sp  */
 #line 206 "zparser.y"
     {
 	    parser->current_rr.ttl = (yyvsp[-1].ttl);
 	    parser->current_rr.klass = parser->default_class;
     }
-#line 2261 "zparser.c"
+#line 2019 "zparser.c"
     break;
 
-  case 26:
+  case 26: /* classttl: T_TTL sp T_RRCLASS sp  */
 #line 211 "zparser.y"
     {
 	    parser->current_rr.ttl = (yyvsp[-3].ttl);
 	    parser->current_rr.klass = (yyvsp[-1].klass);
     }
-#line 2270 "zparser.c"
+#line 2028 "zparser.c"
     break;
 
-  case 27:
+  case 27: /* classttl: T_RRCLASS sp T_TTL sp  */
 #line 216 "zparser.y"
     {
 	    parser->current_rr.ttl = (yyvsp[-1].ttl);
 	    parser->current_rr.klass = (yyvsp[-3].klass);
     }
-#line 2279 "zparser.c"
+#line 2037 "zparser.c"
     break;
 
-  case 29:
+  case 29: /* dname: rel_dname  */
 #line 224 "zparser.y"
     {
 	    if ((yyvsp[0].dname) == error_dname) {
@@ -2298,26 +2056,26 @@ yyreduce:
 				    domain_dname(parser->origin)));
 	    }
     }
-#line 2302 "zparser.c"
+#line 2060 "zparser.c"
     break;
 
-  case 30:
+  case 30: /* abs_dname: '.'  */
 #line 245 "zparser.y"
     {
 	    (yyval.domain) = parser->db->domains->root;
     }
-#line 2310 "zparser.c"
+#line 2068 "zparser.c"
     break;
 
-  case 31:
+  case 31: /* abs_dname: '@'  */
 #line 249 "zparser.y"
     {
 	    (yyval.domain) = parser->origin;
     }
-#line 2318 "zparser.c"
+#line 2076 "zparser.c"
     break;
 
-  case 32:
+  case 32: /* abs_dname: rel_dname '.'  */
 #line 253 "zparser.y"
     {
 	    if ((yyvsp[-1].dname) != error_dname) {
@@ -2326,10 +2084,10 @@ yyreduce:
 		    (yyval.domain) = error_domain;
 	    }
     }
-#line 2330 "zparser.c"
+#line 2088 "zparser.c"
     break;
 
-  case 33:
+  case 33: /* label: str  */
 #line 263 "zparser.y"
     {
 	    if ((yyvsp[0].data).len > MAXLABELLEN) {
@@ -2344,19 +2102,19 @@ yyreduce:
 					       (yyvsp[0].data).len);
 	    }
     }
-#line 2348 "zparser.c"
+#line 2106 "zparser.c"
     break;
 
-  case 34:
+  case 34: /* label: BITLAB  */
 #line 277 "zparser.y"
     {
 	    zc_error("bitlabels are now deprecated. RFC2673 is obsoleted.");
 	    (yyval.dname) = error_dname;
     }
-#line 2357 "zparser.c"
+#line 2115 "zparser.c"
     break;
 
-  case 36:
+  case 36: /* rel_dname: rel_dname '.' label  */
 #line 285 "zparser.y"
     {
 	    if ((yyvsp[-2].dname) == error_dname || (yyvsp[0].dname) == error_dname) {
@@ -2369,10 +2127,10 @@ yyreduce:
 		    (yyval.dname) = dname_concatenate(parser->rr_region, (yyvsp[-2].dname), (yyvsp[0].dname));
 	    }
     }
-#line 2373 "zparser.c"
+#line 2131 "zparser.c"
     break;
 
-  case 38:
+  case 38: /* wire_dname: wire_rel_dname  */
 #line 304 "zparser.y"
     {
 	    /* terminate in root label and copy the origin in there */
@@ -2395,10 +2153,10 @@ yyreduce:
 		    (yyval.data).str[ (yyvsp[0].data).len ] = 0;
 	    }
     }
-#line 2399 "zparser.c"
+#line 2157 "zparser.c"
     break;
 
-  case 39:
+  case 39: /* wire_abs_dname: '.'  */
 #line 328 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region, 1);
@@ -2406,10 +2164,10 @@ yyreduce:
 	    (yyval.data).str = result;
 	    (yyval.data).len = 1;
     }
-#line 2410 "zparser.c"
+#line 2168 "zparser.c"
     break;
 
-  case 40:
+  case 40: /* wire_abs_dname: '@'  */
 #line 335 "zparser.y"
     {
 	    if(parser->origin && domain_dname(parser->origin)) {
@@ -2422,10 +2180,10 @@ yyreduce:
 		    (yyval.data).str[0] = 0;
 	    }
     }
-#line 2426 "zparser.c"
+#line 2184 "zparser.c"
     break;
 
-  case 41:
+  case 41: /* wire_abs_dname: wire_rel_dname '.'  */
 #line 347 "zparser.y"
     {
 	    (yyval.data).len = (yyvsp[-1].data).len + 1;
@@ -2436,10 +2194,10 @@ yyreduce:
 	    memcpy((yyval.data).str, (yyvsp[-1].data).str, (yyvsp[-1].data).len);
 	    (yyval.data).str[(yyvsp[-1].data).len] = 0;
     }
-#line 2440 "zparser.c"
+#line 2198 "zparser.c"
     break;
 
-  case 42:
+  case 42: /* wire_label: str  */
 #line 359 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region,
@@ -2455,10 +2213,10 @@ yyreduce:
 	    (yyval.data).str = result;
 	    (yyval.data).len = (yyvsp[0].data).len + 1;
     }
-#line 2459 "zparser.c"
+#line 2217 "zparser.c"
     break;
 
-  case 44:
+  case 44: /* wire_rel_dname: wire_rel_dname '.' wire_label  */
 #line 377 "zparser.y"
     {
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len;
@@ -2469,86 +2227,86 @@ yyreduce:
 	    memmove((yyval.data).str, (yyvsp[-2].data).str, (yyvsp[-2].data).len);
 	    memmove((yyval.data).str + (yyvsp[-2].data).len, (yyvsp[0].data).str, (yyvsp[0].data).len);
     }
-#line 2473 "zparser.c"
+#line 2231 "zparser.c"
     break;
 
-  case 45:
+  case 45: /* str_seq: unquoted_dotted_str  */
 #line 389 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 1);
     }
-#line 2481 "zparser.c"
+#line 2239 "zparser.c"
     break;
 
-  case 46:
+  case 46: /* str_seq: QSTR  */
 #line 393 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 1);
     }
-#line 2489 "zparser.c"
+#line 2247 "zparser.c"
     break;
 
-  case 47:
+  case 47: /* str_seq: QSTR unquoted_dotted_str  */
 #line 397 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[-1].data).str, (yyvsp[-1].data).len), 1);
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2498 "zparser.c"
+#line 2256 "zparser.c"
     break;
 
-  case 48:
+  case 48: /* str_seq: str_seq QSTR  */
 #line 402 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2506 "zparser.c"
+#line 2264 "zparser.c"
     break;
 
-  case 49:
+  case 49: /* str_seq: str_seq QSTR unquoted_dotted_str  */
 #line 406 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[-1].data).str, (yyvsp[-1].data).len), 0);
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2515 "zparser.c"
+#line 2273 "zparser.c"
     break;
 
-  case 50:
+  case 50: /* str_seq: str_seq sp unquoted_dotted_str  */
 #line 411 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2523 "zparser.c"
+#line 2281 "zparser.c"
     break;
 
-  case 51:
+  case 51: /* str_seq: str_seq sp QSTR  */
 #line 415 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2531 "zparser.c"
+#line 2289 "zparser.c"
     break;
 
-  case 52:
+  case 52: /* str_seq: str_seq sp QSTR unquoted_dotted_str  */
 #line 419 "zparser.y"
     {
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[-1].data).str, (yyvsp[-1].data).len), 0);
 	    zadd_rdata_txt_wireformat(zparser_conv_text(parser->rr_region, (yyvsp[0].data).str, (yyvsp[0].data).len), 0);
     }
-#line 2540 "zparser.c"
+#line 2298 "zparser.c"
     break;
 
-  case 54:
+  case 54: /* concatenated_str_seq: '.'  */
 #line 431 "zparser.y"
     {
 	    (yyval.data).len = 1;
 	    (yyval.data).str = region_strdup(parser->rr_region, ".");
     }
-#line 2549 "zparser.c"
+#line 2307 "zparser.c"
     break;
 
-  case 55:
+  case 55: /* concatenated_str_seq: concatenated_str_seq sp str  */
 #line 436 "zparser.y"
     {
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len + 1;
@@ -2558,10 +2316,10 @@ yyreduce:
 	    memcpy((yyval.data).str + (yyvsp[-2].data).len + 1, (yyvsp[0].data).str, (yyvsp[0].data).len);
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2562 "zparser.c"
+#line 2320 "zparser.c"
     break;
 
-  case 56:
+  case 56: /* concatenated_str_seq: concatenated_str_seq '.' str  */
 #line 445 "zparser.y"
     {
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len + 1;
@@ -2571,10 +2329,10 @@ yyreduce:
 	    memcpy((yyval.data).str + (yyvsp[-2].data).len + 1, (yyvsp[0].data).str, (yyvsp[0].data).len);
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2575 "zparser.c"
+#line 2333 "zparser.c"
     break;
 
-  case 57:
+  case 57: /* nxt_seq: str  */
 #line 457 "zparser.y"
     {
 	    uint16_t type = rrtype_from_string((yyvsp[0].data).str);
@@ -2584,10 +2342,10 @@ yyreduce:
 		    zc_error("bad type %d in NXT record", (int) type);
 	    }
     }
-#line 2588 "zparser.c"
+#line 2346 "zparser.c"
     break;
 
-  case 58:
+  case 58: /* nxt_seq: nxt_seq sp str  */
 #line 466 "zparser.y"
     {
 	    uint16_t type = rrtype_from_string((yyvsp[0].data).str);
@@ -2597,24 +2355,24 @@ yyreduce:
 		    zc_error("bad type %d in NXT record", (int) type);
 	    }
     }
-#line 2601 "zparser.c"
+#line 2359 "zparser.c"
     break;
 
-  case 59:
+  case 59: /* nsec_more: SP nsec_more  */
 #line 477 "zparser.y"
     {
     }
-#line 2608 "zparser.c"
+#line 2366 "zparser.c"
     break;
 
-  case 60:
+  case 60: /* nsec_more: NL  */
 #line 480 "zparser.y"
     {
     }
-#line 2615 "zparser.c"
+#line 2373 "zparser.c"
     break;
 
-  case 61:
+  case 61: /* nsec_more: str nsec_seq  */
 #line 483 "zparser.y"
     {
 	    uint16_t type = rrtype_from_string((yyvsp[-1].data).str);
@@ -2627,10 +2385,10 @@ yyreduce:
 		    zc_error("bad type %d in NSEC record", (int) type);
 	    }
     }
-#line 2631 "zparser.c"
+#line 2389 "zparser.c"
     break;
 
-  case 65:
+  case 65: /* str_sp_seq: str_sp_seq sp str  */
 #line 506 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region,
@@ -2641,10 +2399,10 @@ yyreduce:
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len;
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2645 "zparser.c"
+#line 2403 "zparser.c"
     break;
 
-  case 67:
+  case 67: /* str_dot_seq: str_dot_seq '.' str  */
 #line 523 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region,
@@ -2655,19 +2413,19 @@ yyreduce:
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len;
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2659 "zparser.c"
+#line 2417 "zparser.c"
     break;
 
-  case 69:
+  case 69: /* unquoted_dotted_str: '.'  */
 #line 539 "zparser.y"
     {
 	(yyval.data).str = ".";
 	(yyval.data).len = 1;
     }
-#line 2668 "zparser.c"
+#line 2426 "zparser.c"
     break;
 
-  case 70:
+  case 70: /* unquoted_dotted_str: unquoted_dotted_str '.'  */
 #line 544 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region,
@@ -2678,10 +2436,10 @@ yyreduce:
 	    (yyval.data).len = (yyvsp[-1].data).len + 1;
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2682 "zparser.c"
+#line 2440 "zparser.c"
     break;
 
-  case 71:
+  case 71: /* unquoted_dotted_str: unquoted_dotted_str '.' STR  */
 #line 554 "zparser.y"
     {
 	    char *result = (char *) region_alloc(parser->rr_region,
@@ -2693,448 +2451,448 @@ yyreduce:
 	    (yyval.data).len = (yyvsp[-2].data).len + (yyvsp[0].data).len + 1;
 	    (yyval.data).str[(yyval.data).len] = '\0';
     }
-#line 2697 "zparser.c"
+#line 2455 "zparser.c"
     break;
 
-  case 75:
+  case 75: /* type_and_rdata: T_A sp rdata_unknown  */
 #line 577 "zparser.y"
                              { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2703 "zparser.c"
+#line 2461 "zparser.c"
     break;
 
-  case 77:
+  case 77: /* type_and_rdata: T_NS sp rdata_unknown  */
 #line 579 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2709 "zparser.c"
+#line 2467 "zparser.c"
     break;
 
-  case 78:
+  case 78: /* type_and_rdata: T_MD sp rdata_domain_name  */
 #line 580 "zparser.y"
                                   { zc_warning_prev_line("MD is obsolete"); }
-#line 2715 "zparser.c"
+#line 2473 "zparser.c"
     break;
 
-  case 79:
+  case 79: /* type_and_rdata: T_MD sp rdata_unknown  */
 #line 582 "zparser.y"
     {
 	    zc_warning_prev_line("MD is obsolete");
 	    (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown));
     }
-#line 2724 "zparser.c"
+#line 2482 "zparser.c"
     break;
 
-  case 80:
+  case 80: /* type_and_rdata: T_MF sp rdata_domain_name  */
 #line 586 "zparser.y"
                                   { zc_warning_prev_line("MF is obsolete"); }
-#line 2730 "zparser.c"
+#line 2488 "zparser.c"
     break;
 
-  case 81:
+  case 81: /* type_and_rdata: T_MF sp rdata_unknown  */
 #line 588 "zparser.y"
     {
 	    zc_warning_prev_line("MF is obsolete");
 	    (yyval.type) = (yyvsp[-2].type);
 	    parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown));
     }
-#line 2740 "zparser.c"
+#line 2498 "zparser.c"
     break;
 
-  case 83:
+  case 83: /* type_and_rdata: T_CNAME sp rdata_unknown  */
 #line 594 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2746 "zparser.c"
+#line 2504 "zparser.c"
     break;
 
-  case 85:
+  case 85: /* type_and_rdata: T_SOA sp rdata_unknown  */
 #line 596 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2752 "zparser.c"
+#line 2510 "zparser.c"
     break;
 
-  case 86:
+  case 86: /* type_and_rdata: T_MB sp rdata_domain_name  */
 #line 597 "zparser.y"
                                   { zc_warning_prev_line("MB is obsolete"); }
-#line 2758 "zparser.c"
+#line 2516 "zparser.c"
     break;
 
-  case 87:
+  case 87: /* type_and_rdata: T_MB sp rdata_unknown  */
 #line 599 "zparser.y"
     {
 	    zc_warning_prev_line("MB is obsolete");
 	    (yyval.type) = (yyvsp[-2].type);
 	    parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown));
     }
-#line 2768 "zparser.c"
+#line 2526 "zparser.c"
     break;
 
-  case 89:
+  case 89: /* type_and_rdata: T_MG sp rdata_unknown  */
 #line 605 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2774 "zparser.c"
+#line 2532 "zparser.c"
     break;
 
-  case 91:
+  case 91: /* type_and_rdata: T_MR sp rdata_unknown  */
 #line 607 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2780 "zparser.c"
+#line 2538 "zparser.c"
     break;
 
-  case 93:
+  case 93: /* type_and_rdata: T_WKS sp rdata_unknown  */
 #line 610 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2786 "zparser.c"
+#line 2544 "zparser.c"
     break;
 
-  case 95:
+  case 95: /* type_and_rdata: T_PTR sp rdata_unknown  */
 #line 612 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2792 "zparser.c"
+#line 2550 "zparser.c"
     break;
 
-  case 97:
+  case 97: /* type_and_rdata: T_HINFO sp rdata_unknown  */
 #line 614 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2798 "zparser.c"
+#line 2556 "zparser.c"
     break;
 
-  case 99:
+  case 99: /* type_and_rdata: T_MINFO sp rdata_unknown  */
 #line 616 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2804 "zparser.c"
+#line 2562 "zparser.c"
     break;
 
-  case 101:
+  case 101: /* type_and_rdata: T_MX sp rdata_unknown  */
 #line 618 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2810 "zparser.c"
+#line 2568 "zparser.c"
     break;
 
-  case 103:
+  case 103: /* type_and_rdata: T_TXT sp rdata_unknown  */
 #line 620 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2816 "zparser.c"
+#line 2574 "zparser.c"
     break;
 
-  case 105:
+  case 105: /* type_and_rdata: T_SPF sp rdata_unknown  */
 #line 622 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2822 "zparser.c"
+#line 2580 "zparser.c"
     break;
 
-  case 107:
+  case 107: /* type_and_rdata: T_AVC sp rdata_unknown  */
 #line 624 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2828 "zparser.c"
+#line 2586 "zparser.c"
     break;
 
-  case 109:
+  case 109: /* type_and_rdata: T_RP sp rdata_unknown  */
 #line 626 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2834 "zparser.c"
+#line 2592 "zparser.c"
     break;
 
-  case 111:
+  case 111: /* type_and_rdata: T_AFSDB sp rdata_unknown  */
 #line 628 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2840 "zparser.c"
+#line 2598 "zparser.c"
     break;
 
-  case 113:
+  case 113: /* type_and_rdata: T_X25 sp rdata_unknown  */
 #line 630 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2846 "zparser.c"
+#line 2604 "zparser.c"
     break;
 
-  case 115:
+  case 115: /* type_and_rdata: T_ISDN sp rdata_unknown  */
 #line 632 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2852 "zparser.c"
+#line 2610 "zparser.c"
     break;
 
-  case 117:
+  case 117: /* type_and_rdata: T_IPSECKEY sp rdata_unknown  */
 #line 634 "zparser.y"
                                     { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2858 "zparser.c"
+#line 2616 "zparser.c"
     break;
 
-  case 119:
+  case 119: /* type_and_rdata: T_DHCID sp rdata_unknown  */
 #line 636 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2864 "zparser.c"
+#line 2622 "zparser.c"
     break;
 
-  case 121:
+  case 121: /* type_and_rdata: T_RT sp rdata_unknown  */
 #line 638 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2870 "zparser.c"
+#line 2628 "zparser.c"
     break;
 
-  case 123:
+  case 123: /* type_and_rdata: T_NSAP sp rdata_unknown  */
 #line 640 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2876 "zparser.c"
+#line 2634 "zparser.c"
     break;
 
-  case 125:
+  case 125: /* type_and_rdata: T_SIG sp rdata_unknown  */
 #line 642 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2882 "zparser.c"
+#line 2640 "zparser.c"
     break;
 
-  case 127:
+  case 127: /* type_and_rdata: T_KEY sp rdata_unknown  */
 #line 644 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2888 "zparser.c"
+#line 2646 "zparser.c"
     break;
 
-  case 129:
+  case 129: /* type_and_rdata: T_PX sp rdata_unknown  */
 #line 646 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2894 "zparser.c"
+#line 2652 "zparser.c"
     break;
 
-  case 131:
+  case 131: /* type_and_rdata: T_AAAA sp rdata_unknown  */
 #line 648 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2900 "zparser.c"
+#line 2658 "zparser.c"
     break;
 
-  case 133:
+  case 133: /* type_and_rdata: T_LOC sp rdata_unknown  */
 #line 650 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2906 "zparser.c"
+#line 2664 "zparser.c"
     break;
 
-  case 135:
+  case 135: /* type_and_rdata: T_NXT sp rdata_unknown  */
 #line 652 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2912 "zparser.c"
+#line 2670 "zparser.c"
     break;
 
-  case 137:
+  case 137: /* type_and_rdata: T_SRV sp rdata_unknown  */
 #line 654 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2918 "zparser.c"
+#line 2676 "zparser.c"
     break;
 
-  case 139:
+  case 139: /* type_and_rdata: T_NAPTR sp rdata_unknown  */
 #line 656 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2924 "zparser.c"
+#line 2682 "zparser.c"
     break;
 
-  case 141:
+  case 141: /* type_and_rdata: T_KX sp rdata_unknown  */
 #line 658 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2930 "zparser.c"
+#line 2688 "zparser.c"
     break;
 
-  case 143:
+  case 143: /* type_and_rdata: T_CERT sp rdata_unknown  */
 #line 660 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2936 "zparser.c"
+#line 2694 "zparser.c"
     break;
 
-  case 145:
+  case 145: /* type_and_rdata: T_DNAME sp rdata_unknown  */
 #line 662 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2942 "zparser.c"
+#line 2700 "zparser.c"
     break;
 
-  case 148:
+  case 148: /* type_and_rdata: T_APL sp rdata_unknown  */
 #line 665 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2948 "zparser.c"
+#line 2706 "zparser.c"
     break;
 
-  case 150:
+  case 150: /* type_and_rdata: T_DS sp rdata_unknown  */
 #line 667 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2954 "zparser.c"
+#line 2712 "zparser.c"
     break;
 
-  case 151:
+  case 151: /* type_and_rdata: T_DLV sp rdata_dlv  */
 #line 668 "zparser.y"
                            { if (dlv_warn) { dlv_warn = 0; zc_warning_prev_line("DLV is experimental"); } }
-#line 2960 "zparser.c"
+#line 2718 "zparser.c"
     break;
 
-  case 152:
+  case 152: /* type_and_rdata: T_DLV sp rdata_unknown  */
 #line 669 "zparser.y"
                                { if (dlv_warn) { dlv_warn = 0; zc_warning_prev_line("DLV is experimental"); } (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2966 "zparser.c"
+#line 2724 "zparser.c"
     break;
 
-  case 154:
+  case 154: /* type_and_rdata: T_SSHFP sp rdata_unknown  */
 #line 671 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); check_sshfp(); }
-#line 2972 "zparser.c"
+#line 2730 "zparser.c"
     break;
 
-  case 156:
+  case 156: /* type_and_rdata: T_RRSIG sp rdata_unknown  */
 #line 673 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2978 "zparser.c"
+#line 2736 "zparser.c"
     break;
 
-  case 158:
+  case 158: /* type_and_rdata: T_NSEC sp rdata_unknown  */
 #line 675 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2984 "zparser.c"
+#line 2742 "zparser.c"
     break;
 
-  case 160:
+  case 160: /* type_and_rdata: T_NSEC3 sp rdata_unknown  */
 #line 677 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2990 "zparser.c"
+#line 2748 "zparser.c"
     break;
 
-  case 162:
+  case 162: /* type_and_rdata: T_NSEC3PARAM sp rdata_unknown  */
 #line 679 "zparser.y"
                                       { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 2996 "zparser.c"
+#line 2754 "zparser.c"
     break;
 
-  case 164:
+  case 164: /* type_and_rdata: T_DNSKEY sp rdata_unknown  */
 #line 681 "zparser.y"
                                   { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3002 "zparser.c"
+#line 2760 "zparser.c"
     break;
 
-  case 166:
+  case 166: /* type_and_rdata: T_TLSA sp rdata_unknown  */
 #line 683 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3008 "zparser.c"
+#line 2766 "zparser.c"
     break;
 
-  case 168:
+  case 168: /* type_and_rdata: T_SMIMEA sp rdata_unknown  */
 #line 685 "zparser.y"
                                   { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3014 "zparser.c"
+#line 2772 "zparser.c"
     break;
 
-  case 170:
+  case 170: /* type_and_rdata: T_NID sp rdata_unknown  */
 #line 687 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3020 "zparser.c"
+#line 2778 "zparser.c"
     break;
 
-  case 172:
+  case 172: /* type_and_rdata: T_L32 sp rdata_unknown  */
 #line 689 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3026 "zparser.c"
+#line 2784 "zparser.c"
     break;
 
-  case 174:
+  case 174: /* type_and_rdata: T_L64 sp rdata_unknown  */
 #line 691 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3032 "zparser.c"
+#line 2790 "zparser.c"
     break;
 
-  case 176:
+  case 176: /* type_and_rdata: T_LP sp rdata_unknown  */
 #line 693 "zparser.y"
                               { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3038 "zparser.c"
+#line 2796 "zparser.c"
     break;
 
-  case 178:
+  case 178: /* type_and_rdata: T_EUI48 sp rdata_unknown  */
 #line 695 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3044 "zparser.c"
+#line 2802 "zparser.c"
     break;
 
-  case 180:
+  case 180: /* type_and_rdata: T_EUI64 sp rdata_unknown  */
 #line 697 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3050 "zparser.c"
+#line 2808 "zparser.c"
     break;
 
-  case 182:
+  case 182: /* type_and_rdata: T_CAA sp rdata_unknown  */
 #line 699 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3056 "zparser.c"
+#line 2814 "zparser.c"
     break;
 
-  case 184:
+  case 184: /* type_and_rdata: T_CDS sp rdata_unknown  */
 #line 701 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3062 "zparser.c"
+#line 2820 "zparser.c"
     break;
 
-  case 186:
+  case 186: /* type_and_rdata: T_CDNSKEY sp rdata_unknown  */
 #line 703 "zparser.y"
                                    { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3068 "zparser.c"
+#line 2826 "zparser.c"
     break;
 
-  case 188:
+  case 188: /* type_and_rdata: T_OPENPGPKEY sp rdata_unknown  */
 #line 705 "zparser.y"
                                       { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3074 "zparser.c"
+#line 2832 "zparser.c"
     break;
 
-  case 190:
+  case 190: /* type_and_rdata: T_CSYNC sp rdata_unknown  */
 #line 707 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3080 "zparser.c"
+#line 2838 "zparser.c"
     break;
 
-  case 192:
+  case 192: /* type_and_rdata: T_ZONEMD sp rdata_unknown  */
 #line 709 "zparser.y"
                                   { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3086 "zparser.c"
+#line 2844 "zparser.c"
     break;
 
-  case 194:
+  case 194: /* type_and_rdata: T_SVCB sp rdata_unknown  */
 #line 711 "zparser.y"
                                 { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3092 "zparser.c"
+#line 2850 "zparser.c"
     break;
 
-  case 196:
+  case 196: /* type_and_rdata: T_HTTPS sp rdata_unknown  */
 #line 713 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3098 "zparser.c"
+#line 2856 "zparser.c"
     break;
 
-  case 198:
+  case 198: /* type_and_rdata: T_URI sp rdata_unknown  */
 #line 715 "zparser.y"
                                { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3104 "zparser.c"
+#line 2862 "zparser.c"
     break;
 
-  case 199:
+  case 199: /* type_and_rdata: T_UTYPE sp rdata_unknown  */
 #line 716 "zparser.y"
                                  { (yyval.type) = (yyvsp[-2].type); parse_unknown_rdata((yyvsp[-2].type), (yyvsp[0].unknown)); }
-#line 3110 "zparser.c"
+#line 2868 "zparser.c"
     break;
 
-  case 200:
+  case 200: /* type_and_rdata: str error NL  */
 #line 718 "zparser.y"
     {
 	    zc_error_prev_line("unrecognized RR type '%s'", (yyvsp[-2].data).str);
     }
-#line 3118 "zparser.c"
+#line 2876 "zparser.c"
     break;
 
-  case 201:
+  case 201: /* rdata_a: dotted_str trail  */
 #line 730 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_a(parser->region, (yyvsp[-1].data).str));
     }
-#line 3126 "zparser.c"
+#line 2884 "zparser.c"
     break;
 
-  case 202:
+  case 202: /* rdata_domain_name: dname trail  */
 #line 736 "zparser.y"
     {
 	    /* convert a single dname record */
 	    zadd_rdata_domain((yyvsp[-1].domain));
     }
-#line 3135 "zparser.c"
+#line 2893 "zparser.c"
     break;
 
-  case 203:
+  case 203: /* rdata_soa: dname sp dname sp str sp str sp str sp str sp str trail  */
 #line 743 "zparser.y"
     {
 	    /* convert the soa data */
@@ -3146,107 +2904,107 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_period(parser->region, (yyvsp[-3].data).str)); /* expire */
 	    zadd_rdata_wireformat(zparser_conv_period(parser->region, (yyvsp[-1].data).str)); /* minimum */
     }
-#line 3150 "zparser.c"
+#line 2908 "zparser.c"
     break;
 
-  case 204:
+  case 204: /* rdata_wks: dotted_str sp str sp concatenated_str_seq trail  */
 #line 756 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_a(parser->region, (yyvsp[-5].data).str)); /* address */
 	    zadd_rdata_wireformat(zparser_conv_services(parser->region, (yyvsp[-3].data).str, (yyvsp[-1].data).str)); /* protocol and services */
     }
-#line 3159 "zparser.c"
+#line 2917 "zparser.c"
     break;
 
-  case 205:
+  case 205: /* rdata_hinfo: str sp str trail  */
 #line 763 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-3].data).str, (yyvsp[-3].data).len)); /* CPU */
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* OS*/
     }
-#line 3168 "zparser.c"
+#line 2926 "zparser.c"
     break;
 
-  case 206:
+  case 206: /* rdata_minfo: dname sp dname trail  */
 #line 770 "zparser.y"
     {
 	    /* convert a single dname record */
 	    zadd_rdata_domain((yyvsp[-3].domain));
 	    zadd_rdata_domain((yyvsp[-1].domain));
     }
-#line 3178 "zparser.c"
+#line 2936 "zparser.c"
     break;
 
-  case 207:
+  case 207: /* rdata_mx: str sp dname trail  */
 #line 778 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str));  /* priority */
 	    zadd_rdata_domain((yyvsp[-1].domain));	/* MX host */
     }
-#line 3187 "zparser.c"
+#line 2945 "zparser.c"
     break;
 
-  case 208:
+  case 208: /* rdata_txt: str_seq trail  */
 #line 785 "zparser.y"
     {
 	zadd_rdata_txt_clean_wireformat();
     }
-#line 3195 "zparser.c"
+#line 2953 "zparser.c"
     break;
 
-  case 209:
+  case 209: /* rdata_rp: dname sp dname trail  */
 #line 792 "zparser.y"
     {
 	    zadd_rdata_domain((yyvsp[-3].domain)); /* mbox d-name */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* txt d-name */
     }
-#line 3204 "zparser.c"
+#line 2962 "zparser.c"
     break;
 
-  case 210:
+  case 210: /* rdata_afsdb: str sp dname trail  */
 #line 800 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str)); /* subtype */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* domain name */
     }
-#line 3213 "zparser.c"
+#line 2971 "zparser.c"
     break;
 
-  case 211:
+  case 211: /* rdata_x25: str trail  */
 #line 808 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* X.25 address. */
     }
-#line 3221 "zparser.c"
+#line 2979 "zparser.c"
     break;
 
-  case 212:
+  case 212: /* rdata_isdn: str trail  */
 #line 815 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* address */
     }
-#line 3229 "zparser.c"
+#line 2987 "zparser.c"
     break;
 
-  case 213:
+  case 213: /* rdata_isdn: str sp str trail  */
 #line 819 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-3].data).str, (yyvsp[-3].data).len)); /* address */
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* sub-address */
     }
-#line 3238 "zparser.c"
+#line 2996 "zparser.c"
     break;
 
-  case 214:
+  case 214: /* rdata_rt: str sp dname trail  */
 #line 827 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str)); /* preference */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* intermediate host */
     }
-#line 3247 "zparser.c"
+#line 3005 "zparser.c"
     break;
 
-  case 215:
+  case 215: /* rdata_nsap: str_dot_seq trail  */
 #line 835 "zparser.y"
     {
 	    /* String must start with "0x" or "0X".	 */
@@ -3256,46 +3014,46 @@ yyreduce:
 		    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str + 2, (yyvsp[-1].data).len - 2)); /* NSAP */
 	    }
     }
-#line 3260 "zparser.c"
+#line 3018 "zparser.c"
     break;
 
-  case 216:
+  case 216: /* rdata_px: str sp dname sp dname trail  */
 #line 847 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-5].data).str)); /* preference */
 	    zadd_rdata_domain((yyvsp[-3].domain)); /* MAP822 */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* MAPX400 */
     }
-#line 3270 "zparser.c"
+#line 3028 "zparser.c"
     break;
 
-  case 217:
+  case 217: /* rdata_aaaa: dotted_str trail  */
 #line 855 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_aaaa(parser->region, (yyvsp[-1].data).str));  /* IPv6 address */
     }
-#line 3278 "zparser.c"
+#line 3036 "zparser.c"
     break;
 
-  case 218:
+  case 218: /* rdata_loc: concatenated_str_seq trail  */
 #line 861 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_loc(parser->region, (yyvsp[-1].data).str)); /* Location */
     }
-#line 3286 "zparser.c"
+#line 3044 "zparser.c"
     break;
 
-  case 219:
+  case 219: /* rdata_nxt: dname sp nxt_seq trail  */
 #line 867 "zparser.y"
     {
 	    zadd_rdata_domain((yyvsp[-3].domain)); /* nxt name */
 	    zadd_rdata_wireformat(zparser_conv_nxt(parser->region, nxtbits)); /* nxt bitlist */
 	    memset(nxtbits, 0, sizeof(nxtbits));
     }
-#line 3296 "zparser.c"
+#line 3054 "zparser.c"
     break;
 
-  case 220:
+  case 220: /* rdata_srv: str sp str sp str sp dname trail  */
 #line 875 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-7].data).str)); /* prio */
@@ -3303,10 +3061,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str)); /* port */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* target name */
     }
-#line 3307 "zparser.c"
+#line 3065 "zparser.c"
     break;
 
-  case 221:
+  case 221: /* rdata_naptr: str sp str sp str sp str sp str sp dname trail  */
 #line 885 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-11].data).str)); /* order */
@@ -3316,19 +3074,19 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_text(parser->region, (yyvsp[-3].data).str, (yyvsp[-3].data).len)); /* regexp */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* target name */
     }
-#line 3320 "zparser.c"
+#line 3078 "zparser.c"
     break;
 
-  case 222:
+  case 222: /* rdata_kx: str sp dname trail  */
 #line 897 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str)); /* preference */
 	    zadd_rdata_domain((yyvsp[-1].domain)); /* exchanger */
     }
-#line 3329 "zparser.c"
+#line 3087 "zparser.c"
     break;
 
-  case 223:
+  case 223: /* rdata_cert: str sp str sp str sp str_sp_seq trail  */
 #line 905 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_certificate_type(parser->region, (yyvsp[-7].data).str)); /* type */
@@ -3336,26 +3094,26 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_algorithm(parser->region, (yyvsp[-3].data).str)); /* algorithm */
 	    zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str)); /* certificate or CRL */
     }
-#line 3340 "zparser.c"
+#line 3098 "zparser.c"
     break;
 
-  case 225:
+  case 225: /* rdata_apl_seq: dotted_str  */
 #line 918 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_apl_rdata(parser->region, (yyvsp[0].data).str));
     }
-#line 3348 "zparser.c"
+#line 3106 "zparser.c"
     break;
 
-  case 226:
+  case 226: /* rdata_apl_seq: rdata_apl_seq sp dotted_str  */
 #line 922 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_apl_rdata(parser->region, (yyvsp[0].data).str));
     }
-#line 3356 "zparser.c"
+#line 3114 "zparser.c"
     break;
 
-  case 227:
+  case 227: /* rdata_ds: str sp str sp str sp str_sp_seq trail  */
 #line 928 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-7].data).str)); /* keytag */
@@ -3363,10 +3121,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-3].data).str)); /* type */
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* hash */
     }
-#line 3367 "zparser.c"
+#line 3125 "zparser.c"
     break;
 
-  case 228:
+  case 228: /* rdata_dlv: str sp str sp str sp str_sp_seq trail  */
 #line 937 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-7].data).str)); /* keytag */
@@ -3374,10 +3132,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-3].data).str)); /* type */
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* hash */
     }
-#line 3378 "zparser.c"
+#line 3136 "zparser.c"
     break;
 
-  case 229:
+  case 229: /* rdata_sshfp: str sp str sp str_sp_seq trail  */
 #line 946 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-5].data).str)); /* alg */
@@ -3385,18 +3143,18 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* hash */
 	    check_sshfp();
     }
-#line 3389 "zparser.c"
+#line 3147 "zparser.c"
     break;
 
-  case 230:
+  case 230: /* rdata_dhcid: str_sp_seq trail  */
 #line 955 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str)); /* data blob */
     }
-#line 3397 "zparser.c"
+#line 3155 "zparser.c"
     break;
 
-  case 231:
+  case 231: /* rdata_rrsig: str sp str sp str sp str sp str sp str sp str sp wire_dname sp str_sp_seq trail  */
 #line 961 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_rrtype(parser->region, (yyvsp[-17].data).str)); /* rr covered */
@@ -3410,10 +3168,10 @@ yyreduce:
 				(const uint8_t*) (yyvsp[-3].data).str,(yyvsp[-3].data).len)); /* sig name */
 	    zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str)); /* sig data */
     }
-#line 3414 "zparser.c"
+#line 3172 "zparser.c"
     break;
 
-  case 232:
+  case 232: /* rdata_nsec: wire_dname nsec_seq  */
 #line 976 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_dns_name(parser->region, 
@@ -3422,10 +3180,10 @@ yyreduce:
 	    memset(nsecbits, 0, sizeof(nsecbits));
             nsec_highest_rcode = 0;
     }
-#line 3426 "zparser.c"
+#line 3184 "zparser.c"
     break;
 
-  case 233:
+  case 233: /* rdata_nsec3: str sp str sp str sp str sp str nsec_seq  */
 #line 986 "zparser.y"
     {
 #ifdef NSEC3
@@ -3439,10 +3197,10 @@ yyreduce:
 	    zc_error_prev_line("nsec3 not supported");
 #endif /* NSEC3 */
     }
-#line 3443 "zparser.c"
+#line 3201 "zparser.c"
     break;
 
-  case 234:
+  case 234: /* rdata_nsec3_param: str sp str sp str sp str trail  */
 #line 1001 "zparser.y"
     {
 #ifdef NSEC3
@@ -3451,10 +3209,10 @@ yyreduce:
 	    zc_error_prev_line("nsec3 not supported");
 #endif /* NSEC3 */
     }
-#line 3455 "zparser.c"
+#line 3213 "zparser.c"
     break;
 
-  case 235:
+  case 235: /* rdata_tlsa: str sp str sp str sp str_sp_seq trail  */
 #line 1011 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-7].data).str)); /* usage */
@@ -3462,10 +3220,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-3].data).str)); /* matching type */
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* ca data */
     }
-#line 3466 "zparser.c"
+#line 3224 "zparser.c"
     break;
 
-  case 236:
+  case 236: /* rdata_smimea: str sp str sp str sp str_sp_seq trail  */
 #line 1020 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-7].data).str)); /* usage */
@@ -3473,10 +3231,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-3].data).str)); /* matching type */
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* ca data */
     }
-#line 3477 "zparser.c"
+#line 3235 "zparser.c"
     break;
 
-  case 237:
+  case 237: /* rdata_dnskey: str sp str sp str sp str_sp_seq trail  */
 #line 1029 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-7].data).str)); /* flags */
@@ -3484,10 +3242,10 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_algorithm(parser->region, (yyvsp[-3].data).str)); /* alg */
 	    zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str)); /* hash */
     }
-#line 3488 "zparser.c"
+#line 3246 "zparser.c"
     break;
 
-  case 238:
+  case 238: /* rdata_ipsec_base: str sp str sp str sp dotted_str  */
 #line 1038 "zparser.y"
     {
 	    const dname_type* name = 0;
@@ -3531,98 +3289,98 @@ yyreduce:
 			zc_error_prev_line("unknown IPSECKEY gateway type");
 	    }
     }
-#line 3535 "zparser.c"
+#line 3293 "zparser.c"
     break;
 
-  case 239:
+  case 239: /* rdata_ipseckey: rdata_ipsec_base sp str_sp_seq trail  */
 #line 1083 "zparser.y"
     {
 	   zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str)); /* public key */
     }
-#line 3543 "zparser.c"
+#line 3301 "zparser.c"
     break;
 
-  case 241:
+  case 241: /* rdata_nid: str sp dotted_str trail  */
 #line 1091 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str));  /* preference */
 	    zadd_rdata_wireformat(zparser_conv_ilnp64(parser->region, (yyvsp[-1].data).str));  /* NodeID */
     }
-#line 3552 "zparser.c"
+#line 3310 "zparser.c"
     break;
 
-  case 242:
+  case 242: /* rdata_l32: str sp dotted_str trail  */
 #line 1098 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str));  /* preference */
 	    zadd_rdata_wireformat(zparser_conv_a(parser->region, (yyvsp[-1].data).str));  /* Locator32 */
     }
-#line 3561 "zparser.c"
+#line 3319 "zparser.c"
     break;
 
-  case 243:
+  case 243: /* rdata_l64: str sp dotted_str trail  */
 #line 1105 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str));  /* preference */
 	    zadd_rdata_wireformat(zparser_conv_ilnp64(parser->region, (yyvsp[-1].data).str));  /* Locator64 */
     }
-#line 3570 "zparser.c"
+#line 3328 "zparser.c"
     break;
 
-  case 244:
+  case 244: /* rdata_lp: str sp dname trail  */
 #line 1112 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str));  /* preference */
 	    zadd_rdata_domain((yyvsp[-1].domain));  /* FQDN */
     }
-#line 3579 "zparser.c"
+#line 3337 "zparser.c"
     break;
 
-  case 245:
+  case 245: /* rdata_eui48: str trail  */
 #line 1119 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_eui(parser->region, (yyvsp[-1].data).str, 48));
     }
-#line 3587 "zparser.c"
+#line 3345 "zparser.c"
     break;
 
-  case 246:
+  case 246: /* rdata_eui64: str trail  */
 #line 1125 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_eui(parser->region, (yyvsp[-1].data).str, 64));
     }
-#line 3595 "zparser.c"
+#line 3353 "zparser.c"
     break;
 
-  case 247:
+  case 247: /* rdata_uri: str sp str sp dotted_str trail  */
 #line 1132 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-5].data).str)); /* priority */
 	    zadd_rdata_wireformat(zparser_conv_short(parser->region, (yyvsp[-3].data).str)); /* weight */
 	    zadd_rdata_wireformat(zparser_conv_long_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* target */
     }
-#line 3605 "zparser.c"
+#line 3363 "zparser.c"
     break;
 
-  case 248:
+  case 248: /* rdata_caa: str sp str sp dotted_str trail  */
 #line 1141 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-5].data).str)); /* Flags */
 	    zadd_rdata_wireformat(zparser_conv_tag(parser->region, (yyvsp[-3].data).str, (yyvsp[-3].data).len)); /* Tag */
 	    zadd_rdata_wireformat(zparser_conv_long_text(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* Value */
     }
-#line 3615 "zparser.c"
+#line 3373 "zparser.c"
     break;
 
-  case 249:
+  case 249: /* rdata_openpgpkey: str_sp_seq trail  */
 #line 1150 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_b64(parser->region, (yyvsp[-1].data).str));
     }
-#line 3623 "zparser.c"
+#line 3381 "zparser.c"
     break;
 
-  case 250:
+  case 250: /* rdata_csync: str sp str nsec_seq  */
 #line 1157 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_serial(parser->region, (yyvsp[-3].data).str));
@@ -3631,10 +3389,10 @@ yyreduce:
 	    memset(nsecbits, 0, sizeof(nsecbits));
             nsec_highest_rcode = 0;
     }
-#line 3635 "zparser.c"
+#line 3393 "zparser.c"
     break;
 
-  case 251:
+  case 251: /* rdata_zonemd: str sp str sp str sp str_sp_seq trail  */
 #line 1168 "zparser.y"
     {
 	    zadd_rdata_wireformat(zparser_conv_serial(parser->region, (yyvsp[-7].data).str)); /* serial */
@@ -3642,28 +3400,28 @@ yyreduce:
 	    zadd_rdata_wireformat(zparser_conv_byte(parser->region, (yyvsp[-3].data).str)); /* hash algorithm */
 	    zadd_rdata_wireformat(zparser_conv_hex(parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len)); /* digest */
     }
-#line 3646 "zparser.c"
+#line 3404 "zparser.c"
     break;
 
-  case 252:
+  case 252: /* svcparam: dotted_str QSTR  */
 #line 1177 "zparser.y"
     {
 	zadd_rdata_wireformat(zparser_conv_svcbparam(
 		parser->region, (yyvsp[-1].data).str, (yyvsp[-1].data).len, (yyvsp[0].data).str, (yyvsp[0].data).len));
     }
-#line 3655 "zparser.c"
+#line 3413 "zparser.c"
     break;
 
-  case 253:
+  case 253: /* svcparam: dotted_str  */
 #line 1182 "zparser.y"
     {
 	zadd_rdata_wireformat(zparser_conv_svcbparam(
 		parser->region, (yyvsp[0].data).str, (yyvsp[0].data).len, NULL, 0));
     }
-#line 3664 "zparser.c"
+#line 3422 "zparser.c"
     break;
 
-  case 256:
+  case 256: /* rdata_svcb_base: str sp dname  */
 #line 1192 "zparser.y"
     {
 	    /* SvcFieldPriority */
@@ -3671,45 +3429,45 @@ yyreduce:
 	    /* SvcDomainName */
 	    zadd_rdata_domain((yyvsp[0].domain));
     }
-#line 3675 "zparser.c"
+#line 3433 "zparser.c"
     break;
 
-  case 257:
+  case 257: /* rdata_svcb: rdata_svcb_base sp svcparams trail  */
 #line 1199 "zparser.y"
     {
         zadd_rdata_svcb_check_wireformat();
     }
-#line 3683 "zparser.c"
+#line 3441 "zparser.c"
     break;
 
-  case 259:
+  case 259: /* rdata_unknown: URR sp str sp str_sp_seq trail  */
 #line 1206 "zparser.y"
     {
 	    /* $2 is the number of octets, currently ignored */
 	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, (yyvsp[-1].data).str, (yyvsp[-1].data).len);
 
     }
-#line 3693 "zparser.c"
+#line 3451 "zparser.c"
     break;
 
-  case 260:
+  case 260: /* rdata_unknown: URR sp str trail  */
 #line 1212 "zparser.y"
     {
 	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, "", 0);
     }
-#line 3701 "zparser.c"
+#line 3459 "zparser.c"
     break;
 
-  case 261:
+  case 261: /* rdata_unknown: URR error NL  */
 #line 1216 "zparser.y"
     {
 	    (yyval.unknown) = zparser_conv_hex(parser->rr_region, "", 0);
     }
-#line 3709 "zparser.c"
+#line 3467 "zparser.c"
     break;
 
 
-#line 3713 "zparser.c"
+#line 3471 "zparser.c"
 
       default: break;
     }
@@ -3869,13 +3627,13 @@ yyabortlab:
 yyexhaustedlab:
   yyerror (YY_("memory exhausted"));
   yyresult = 2;
-  /* Fall through.  */
+  goto yyreturn;
 #endif
 
 
-/*-----------------------------------------------------.
-| yyreturn -- parsing is finished, return the result.  |
-`-----------------------------------------------------*/
+/*-------------------------------------------------------.
+| yyreturn -- parsing is finished, clean up and return.  |
+`-------------------------------------------------------*/
 yyreturn:
   if (yychar != YYEMPTY)
     {

@@ -33,7 +33,7 @@ Forwarded: not-needed
  .TP
 --- a/options.c
 +++ b/options.c
-@@ -136,7 +136,7 @@
+@@ -137,7 +137,7 @@
  	opt->answer_cookie = 0;
  	opt->cookie_secret = NULL;
  	opt->cookie_secret_file = CONFIGDIR"/nsd_cookiesecrets.txt";

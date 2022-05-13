@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.6.4.  */
+/* A Bison parser, made by GNU Bison 3.7.6.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -171,15 +171,20 @@ extern int c_debug;
     VAR_SIZE_LIMIT_XFR = 372,      /* VAR_SIZE_LIMIT_XFR  */
     VAR_ZONESTATS = 373,           /* VAR_ZONESTATS  */
     VAR_INCLUDE_PATTERN = 374,     /* VAR_INCLUDE_PATTERN  */
-    VAR_ZONE = 375,                /* VAR_ZONE  */
-    VAR_RRL_WHITELIST = 376,       /* VAR_RRL_WHITELIST  */
-    VAR_SERVERS = 377,             /* VAR_SERVERS  */
-    VAR_BINDTODEVICE = 378,        /* VAR_BINDTODEVICE  */
-    VAR_SETFIB = 379               /* VAR_SETFIB  */
+    VAR_STORE_IXFR = 375,          /* VAR_STORE_IXFR  */
+    VAR_IXFR_SIZE = 376,           /* VAR_IXFR_SIZE  */
+    VAR_IXFR_NUMBER = 377,         /* VAR_IXFR_NUMBER  */
+    VAR_CREATE_IXFR = 378,         /* VAR_CREATE_IXFR  */
+    VAR_ZONE = 379,                /* VAR_ZONE  */
+    VAR_RRL_WHITELIST = 380,       /* VAR_RRL_WHITELIST  */
+    VAR_SERVERS = 381,             /* VAR_SERVERS  */
+    VAR_BINDTODEVICE = 382,        /* VAR_BINDTODEVICE  */
+    VAR_SETFIB = 383               /* VAR_SETFIB  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 /* Token kinds.  */
+#define YYEMPTY -2
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
@@ -300,11 +305,15 @@ extern int c_debug;
 #define VAR_SIZE_LIMIT_XFR 372
 #define VAR_ZONESTATS 373
 #define VAR_INCLUDE_PATTERN 374
-#define VAR_ZONE 375
-#define VAR_RRL_WHITELIST 376
-#define VAR_SERVERS 377
-#define VAR_BINDTODEVICE 378
-#define VAR_SETFIB 379
+#define VAR_STORE_IXFR 375
+#define VAR_IXFR_SIZE 376
+#define VAR_IXFR_NUMBER 377
+#define VAR_CREATE_IXFR 378
+#define VAR_ZONE 379
+#define VAR_RRL_WHITELIST 380
+#define VAR_SERVERS 381
+#define VAR_BINDTODEVICE 382
+#define VAR_SETFIB 383
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -319,7 +328,7 @@ union YYSTYPE
   struct range_option *range;
   struct cpu_option *cpu;
 
-#line 323 "configparser.h"
+#line 332 "configparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
