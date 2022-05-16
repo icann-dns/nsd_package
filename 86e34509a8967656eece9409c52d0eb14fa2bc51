@@ -1,0 +1,3 @@
+  * New upstream version 4.5.0
+  * Update copyright years
+  * Rename debian/nsd.tmpfile to debian/nsd.tmpfiles
