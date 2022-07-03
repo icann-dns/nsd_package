@@ -6,6 +6,7 @@ Uploaders:
  Ondřej Surý <ondrej@debian.org>,
  Markus Schade <markus.schade@gmail.com>,
  Daniel Kahn Gillmor <dkg@fifthhorseman.net>,
+ Simon Josefsson <simon@josefsson.org>,
 Build-Depends:
  bison,
  debhelper-compat (= 13),
@@ -21,7 +22,7 @@ Build-Depends:
  protobuf-c-compiler,
  po-debconf,
 Rules-Requires-Root: no
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1
 Vcs-Browser: https://salsa.debian.org/dns-team/nsd
 Vcs-Git: https://salsa.debian.org/dns-team/nsd.git
 Homepage: https://www.nlnetlabs.nl/projects/nsd/about/

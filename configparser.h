@@ -179,7 +179,15 @@ extern int c_debug;
     VAR_RRL_WHITELIST = 380,       /* VAR_RRL_WHITELIST  */
     VAR_SERVERS = 381,             /* VAR_SERVERS  */
     VAR_BINDTODEVICE = 382,        /* VAR_BINDTODEVICE  */
-    VAR_SETFIB = 383               /* VAR_SETFIB  */
+    VAR_SETFIB = 383,              /* VAR_SETFIB  */
+    VAR_VERIFY = 384,              /* VAR_VERIFY  */
+    VAR_ENABLE = 385,              /* VAR_ENABLE  */
+    VAR_VERIFY_ZONE = 386,         /* VAR_VERIFY_ZONE  */
+    VAR_VERIFY_ZONES = 387,        /* VAR_VERIFY_ZONES  */
+    VAR_VERIFIER = 388,            /* VAR_VERIFIER  */
+    VAR_VERIFIER_COUNT = 389,      /* VAR_VERIFIER_COUNT  */
+    VAR_VERIFIER_FEED_ZONE = 390,  /* VAR_VERIFIER_FEED_ZONE  */
+    VAR_VERIFIER_TIMEOUT = 391     /* VAR_VERIFIER_TIMEOUT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -314,12 +322,20 @@ extern int c_debug;
 #define VAR_SERVERS 381
 #define VAR_BINDTODEVICE 382
 #define VAR_SETFIB 383
+#define VAR_VERIFY 384
+#define VAR_ENABLE 385
+#define VAR_VERIFY_ZONE 386
+#define VAR_VERIFY_ZONES 387
+#define VAR_VERIFIER 388
+#define VAR_VERIFIER_COUNT 389
+#define VAR_VERIFIER_FEED_ZONE 390
+#define VAR_VERIFIER_TIMEOUT 391
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 41 "configparser.y"
+#line 47 "configparser.y"
 
   char *str;
   long long llng;
@@ -327,8 +343,10 @@ union YYSTYPE
   struct ip_address_option *ip;
   struct range_option *range;
   struct cpu_option *cpu;
+  char **strv;
+  struct component *comp;
 
-#line 332 "configparser.h"
+#line 350 "configparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
