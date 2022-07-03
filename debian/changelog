@@ -1,3 +1,12 @@
+nsd (4.6.0-1) unstable; urgency=medium
+
+  * New upstream version 4.6.0
+  * Update standards version to 4.6.1.
+  * Add myself as uploader.
+  * Fix lintian overrides syntax.
+
+ -- Simon Josefsson <simon@josefsson.org>  Sun, 03 Jul 2022 12:50:04 +0200
+
 nsd (4.5.0-1) unstable; urgency=medium
 
   * New upstream version 4.5.0
