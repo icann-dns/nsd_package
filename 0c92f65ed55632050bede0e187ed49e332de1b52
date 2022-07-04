@@ -1,0 +1,4 @@
+  * New upstream version 4.6.0
+  * Update standards version to 4.6.1.
+  * Add myself as uploader.
+  * Fix lintian overrides syntax.
