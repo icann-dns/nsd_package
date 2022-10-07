@@ -1,3 +1,9 @@
+nsd (4.6.0-1build1) kinetic; urgency=medium
+
+  * No-change rebuild against libevent-2.1-7a (LP: #1990941)
+
+ -- Benjamin Drung <bdrung@ubuntu.com>  Fri, 07 Oct 2022 19:53:52 +0200
+
 nsd (4.6.0-1) unstable; urgency=medium
 
   * New upstream version 4.6.0
