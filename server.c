@@ -1526,8 +1526,8 @@ server_shutdown(struct nsd *nsd)
 	}
 
 	tsig_finalize();
-#ifdef HAVE_SSL
 	daemon_remote_delete(nsd->rc); /* ssl-delete secret keys */
+#ifdef HAVE_SSL
 	if (nsd->tls_ctx)
 		SSL_CTX_free(nsd->tls_ctx);
 #endif
@@ -1703,9 +1703,7 @@ server_send_soa_xfrd(struct nsd* nsd, int shortsoa)
 			log_msg(LOG_WARNING, "signal received, shutting down...");
 			server_close_all_sockets(nsd->udp, nsd->ifs);
 			server_close_all_sockets(nsd->tcp, nsd->ifs);
-#ifdef HAVE_SSL
 			daemon_remote_close(nsd->rc);
-#endif
 			/* Unlink it if possible... */
 			unlinkpid(nsd->pidfile);
 			unlink(nsd->task[0]->fname);
@@ -2804,9 +2802,7 @@ server_main(struct nsd *nsd)
 	/* close opened ports to avoid race with restart of nsd */
 	server_close_all_sockets(nsd->udp, nsd->ifs);
 	server_close_all_sockets(nsd->tcp, nsd->ifs);
-#ifdef HAVE_SSL
 	daemon_remote_close(nsd->rc);
-#endif
 	send_children_quit_and_wait(nsd);
 
 	/* Unlink it if possible... */
@@ -2920,11 +2916,13 @@ nsd_event_method(void)
 	return "select";
 #else
 	struct event_base* b = nsd_child_event_base();
-	const char* m = "?";
+	const char* m;
 #  ifdef EV_FEATURE_BACKENDS
 	m = ub_ev_backend2str(ev_backend((struct ev_loop*)b));
 #  elif defined(HAVE_EVENT_BASE_GET_METHOD)
 	m = event_base_get_method(b);
+#  else
+	m = "?";
 #  endif
 #  ifdef MEMCLEAN
 	event_base_free(b);
@@ -3034,7 +3032,11 @@ void server_verify(struct nsd *nsd, int cmdsocket)
 	nsd->verifier_count = 0;
 	nsd->verifier_limit = nsd->options->verifier_count;
 	size = sizeof(struct verifier) * nsd->verifier_limit;
-	pipe(nsd->verifier_pipe);
+	if(pipe(nsd->verifier_pipe) == -1) {
+		log_msg(LOG_ERR, "verify: could not create pipe: %s",
+				strerror(errno));
+		goto fail_pipe;
+	}
 	fcntl(nsd->verifier_pipe[0], F_SETFD, FD_CLOEXEC);
 	fcntl(nsd->verifier_pipe[1], F_SETFD, FD_CLOEXEC);
 	nsd->verifiers = region_alloc_zero(nsd->server_region, size);
@@ -3124,9 +3126,10 @@ void server_verify(struct nsd *nsd, int cmdsocket)
 	assert(nsd->next_zone_to_verify == NULL || nsd->mode == NSD_QUIT);
 	assert(nsd->verifier_count == 0 || nsd->mode == NSD_QUIT);
 fail:
-	event_base_free(nsd->event_base);
 	close(nsd->verifier_pipe[0]);
 	close(nsd->verifier_pipe[1]);
+fail_pipe:
+	event_base_free(nsd->event_base);
 	region_destroy(nsd->server_region);
 
 	nsd->event_base = NULL;
