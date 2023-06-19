@@ -5,7 +5,7 @@ Source: https://www.nlnetlabs.nl/projects/nsd/about/
 
 Files: *
 Copyright:
-  2001-2022, NLnet Labs.  All rights reserved.
+  2001-2023, NLnet Labs.  All rights reserved.
 License: NSD-BSD-like
 
 License: BSD-2-clause
@@ -108,5 +108,5 @@ Copyright:
   2006-2007, Pierre Habouzit <madcoder@debian.org>.
   2009-2012, Ondřej Surý <ondrej@debian.org>.
   2011-2012, Jeroen Schot <schot@a-eskwadraat.nl>.
-  2018-2022, Markus Schade <markus.schade@gmail.com>
+  2018-2023, Markus Schade <markus.schade@gmail.com>
 License: BSD-2-clause
