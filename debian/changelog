@@ -1,3 +1,10 @@
+nsd (4.8.0-1) unstable; urgency=medium
+
+  * New upstream version 4.8.0.
+  * Wrap-and-sort -satbk.
+
+ -- Simon Josefsson <simon@josefsson.org>  Fri, 08 Dec 2023 17:18:10 +0100
+
 nsd (4.7.0-1) unstable; urgency=medium
 
   * New upstream version 4.7.0
