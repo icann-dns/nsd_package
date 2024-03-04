@@ -1,7 +1,8 @@
 Source: nsd
 Section: net
 Priority: optional
-Maintainer: nsd packagers <nsd@packages.debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: nsd packagers <nsd@packages.debian.org>
 Uploaders:
  Ondřej Surý <ondrej@debian.org>,
  Markus Schade <markus.schade@gmail.com>,
