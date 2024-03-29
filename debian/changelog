@@ -1,3 +1,9 @@
+nsd (4.8.0-1build2) noble; urgency=medium
+
+  * No-change rebuild against libevent-2.1-7t64
+
+ -- Simon Chopin <schopin@ubuntu.com>  Fri, 29 Mar 2024 17:27:47 +0100
+
 nsd (4.8.0-1build1) noble; urgency=medium
 
   * No-change rebuild against libssl3t64
