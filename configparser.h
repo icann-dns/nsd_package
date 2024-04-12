@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.7.6.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -174,7 +174,7 @@ extern int c_debug;
     VAR_MAX_RETRY_TIME = 375,      /* VAR_MAX_RETRY_TIME  */
     VAR_MIN_RETRY_TIME = 376,      /* VAR_MIN_RETRY_TIME  */
     VAR_MIN_EXPIRE_TIME = 377,     /* VAR_MIN_EXPIRE_TIME  */
-    VAR_MULTI_MASTER_CHECK = 378,  /* VAR_MULTI_MASTER_CHECK  */
+    VAR_MULTI_PRIMARY_CHECK = 378, /* VAR_MULTI_PRIMARY_CHECK  */
     VAR_SIZE_LIMIT_XFR = 379,      /* VAR_SIZE_LIMIT_XFR  */
     VAR_ZONESTATS = 380,           /* VAR_ZONESTATS  */
     VAR_INCLUDE_PATTERN = 381,     /* VAR_INCLUDE_PATTERN  */
@@ -182,19 +182,22 @@ extern int c_debug;
     VAR_IXFR_SIZE = 383,           /* VAR_IXFR_SIZE  */
     VAR_IXFR_NUMBER = 384,         /* VAR_IXFR_NUMBER  */
     VAR_CREATE_IXFR = 385,         /* VAR_CREATE_IXFR  */
-    VAR_ZONE = 386,                /* VAR_ZONE  */
-    VAR_RRL_WHITELIST = 387,       /* VAR_RRL_WHITELIST  */
-    VAR_SERVERS = 388,             /* VAR_SERVERS  */
-    VAR_BINDTODEVICE = 389,        /* VAR_BINDTODEVICE  */
-    VAR_SETFIB = 390,              /* VAR_SETFIB  */
-    VAR_VERIFY = 391,              /* VAR_VERIFY  */
-    VAR_ENABLE = 392,              /* VAR_ENABLE  */
-    VAR_VERIFY_ZONE = 393,         /* VAR_VERIFY_ZONE  */
-    VAR_VERIFY_ZONES = 394,        /* VAR_VERIFY_ZONES  */
-    VAR_VERIFIER = 395,            /* VAR_VERIFIER  */
-    VAR_VERIFIER_COUNT = 396,      /* VAR_VERIFIER_COUNT  */
-    VAR_VERIFIER_FEED_ZONE = 397,  /* VAR_VERIFIER_FEED_ZONE  */
-    VAR_VERIFIER_TIMEOUT = 398     /* VAR_VERIFIER_TIMEOUT  */
+    VAR_CATALOG = 386,             /* VAR_CATALOG  */
+    VAR_CATALOG_MEMBER_PATTERN = 387, /* VAR_CATALOG_MEMBER_PATTERN  */
+    VAR_CATALOG_PRODUCER_ZONE = 388, /* VAR_CATALOG_PRODUCER_ZONE  */
+    VAR_ZONE = 389,                /* VAR_ZONE  */
+    VAR_RRL_WHITELIST = 390,       /* VAR_RRL_WHITELIST  */
+    VAR_SERVERS = 391,             /* VAR_SERVERS  */
+    VAR_BINDTODEVICE = 392,        /* VAR_BINDTODEVICE  */
+    VAR_SETFIB = 393,              /* VAR_SETFIB  */
+    VAR_VERIFY = 394,              /* VAR_VERIFY  */
+    VAR_ENABLE = 395,              /* VAR_ENABLE  */
+    VAR_VERIFY_ZONE = 396,         /* VAR_VERIFY_ZONE  */
+    VAR_VERIFY_ZONES = 397,        /* VAR_VERIFY_ZONES  */
+    VAR_VERIFIER = 398,            /* VAR_VERIFIER  */
+    VAR_VERIFIER_COUNT = 399,      /* VAR_VERIFIER_COUNT  */
+    VAR_VERIFIER_FEED_ZONE = 400,  /* VAR_VERIFIER_FEED_ZONE  */
+    VAR_VERIFIER_TIMEOUT = 401     /* VAR_VERIFIER_TIMEOUT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -323,7 +326,7 @@ extern int c_debug;
 #define VAR_MAX_RETRY_TIME 375
 #define VAR_MIN_RETRY_TIME 376
 #define VAR_MIN_EXPIRE_TIME 377
-#define VAR_MULTI_MASTER_CHECK 378
+#define VAR_MULTI_PRIMARY_CHECK 378
 #define VAR_SIZE_LIMIT_XFR 379
 #define VAR_ZONESTATS 380
 #define VAR_INCLUDE_PATTERN 381
@@ -331,25 +334,28 @@ extern int c_debug;
 #define VAR_IXFR_SIZE 383
 #define VAR_IXFR_NUMBER 384
 #define VAR_CREATE_IXFR 385
-#define VAR_ZONE 386
-#define VAR_RRL_WHITELIST 387
-#define VAR_SERVERS 388
-#define VAR_BINDTODEVICE 389
-#define VAR_SETFIB 390
-#define VAR_VERIFY 391
-#define VAR_ENABLE 392
-#define VAR_VERIFY_ZONE 393
-#define VAR_VERIFY_ZONES 394
-#define VAR_VERIFIER 395
-#define VAR_VERIFIER_COUNT 396
-#define VAR_VERIFIER_FEED_ZONE 397
-#define VAR_VERIFIER_TIMEOUT 398
+#define VAR_CATALOG 386
+#define VAR_CATALOG_MEMBER_PATTERN 387
+#define VAR_CATALOG_PRODUCER_ZONE 388
+#define VAR_ZONE 389
+#define VAR_RRL_WHITELIST 390
+#define VAR_SERVERS 391
+#define VAR_BINDTODEVICE 392
+#define VAR_SETFIB 393
+#define VAR_VERIFY 394
+#define VAR_ENABLE 395
+#define VAR_VERIFY_ZONE 396
+#define VAR_VERIFY_ZONES 397
+#define VAR_VERIFIER 398
+#define VAR_VERIFIER_COUNT 399
+#define VAR_VERIFIER_FEED_ZONE 400
+#define VAR_VERIFIER_TIMEOUT 401
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 47 "configparser.y"
+#line 48 "configparser.y"
 
   char *str;
   long long llng;
@@ -359,8 +365,9 @@ union YYSTYPE
   struct cpu_option *cpu;
   char **strv;
   struct component *comp;
+  int role;
 
-#line 364 "configparser.h"
+#line 371 "configparser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -371,6 +378,8 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE c_lval;
 
+
 int c_parse (void);
+
 
 #endif /* !YY_C_CONFIGPARSER_H_INCLUDED  */
