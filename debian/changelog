@@ -1,3 +1,16 @@
+nsd (4.10.1~rc2-2) experimental; urgency=medium
+
+  * New upstream version 4.10.1~rc2
+  * Build-Depend on pkgconf instead of pkg-config.
+  * Bump Standards-Version to 4.7.0.
+  * Fix nonexistent file in comment.  Closes: #1050608.
+  * 0003-Fix-Hurd-build-error-due-to-log_err.patch: New patch,
+    attempting to improve Hurd builds.
+  * Drop -D_XOPEN_SOURCE=600 via
+    <https://github.com/NLnetLabs/nsd/issues/330>.
+
+ -- Simon Josefsson <simon@josefsson.org>  Thu, 25 Jul 2024 14:28:56 +0200
+
 nsd (4.9.1-1) unstable; urgency=medium
 
   * New upstream version 4.9.1

@@ -5,7 +5,9 @@ dnl
 sinclude(acx_nlnetlabs.m4)
 sinclude(dnstap/dnstap.m4)
 
-AC_INIT([NSD],[4.9.1],[https://github.com/NLnetLabs/nsd/issues or nsd-bugs@nlnetlabs.nl])
+# autoconf-2.70 is needed for @runstatedir@
+AC_PREREQ([2.70])
+AC_INIT([NSD],[4.10.1],[https://github.com/NLnetLabs/nsd/issues or nsd-bugs@nlnetlabs.nl])
 AC_CONFIG_HEADERS([config.h])
 
 #
@@ -1045,7 +1047,7 @@ if test x$HAVE_SSL = x"yes"; then
 	fi
 	SSL_LIBS="-lssl"
 	AC_SUBST(SSL_LIBS)
-	AC_CHECK_HEADERS([openssl/ssl.h openssl/err.h openssl/rand.h openssl/ocsp.h openssl/core_names.h],,, [AC_INCLUDES_DEFAULT])
+	AC_CHECK_HEADERS([openssl/ssl.h openssl/err.h openssl/rand.h openssl/ocsp.h openssl/core_names.h openssl/x509v3.h],,, [AC_INCLUDES_DEFAULT])
 	AC_CHECK_FUNCS([HMAC_CTX_reset HMAC_CTX_new EVP_cleanup ERR_load_crypto_strings OPENSSL_init_crypto CRYPTO_memcmp EC_KEY_new_by_curve_name EVP_MAC_CTX_new EVP_MAC_CTX_set_params EVP_MAC_CTX_get_mac_size SHA1_Init])
 	if test "$ac_cv_func_SHA1_Init" = "yes"; then
 		ACX_FUNC_DEPRECATED([SHA1_Init], [(void)SHA1_Init(NULL);], [
@@ -1071,6 +1073,9 @@ AC_INCLUDES_DEFAULT
 #endif
 #include <openssl/ssl.h>
 #include <openssl/evp.h>
+#ifdef HAVE_OPENSSL_X509V3_h
+#include <openssl/x509v3.h>
+#endif
 ])
 	AC_CHECK_DECL([TLS1_3_VERSION], 
 		[AC_DEFINE([HAVE_TLS_1_3], [1], [Define if TLS 1.3 is supported by OpenSSL])],
@@ -1399,4 +1404,9 @@ if test "$enable_checking" = "yes"; then
 fi
 
 AC_CONFIG_FILES([Makefile $dnstap_config])
+
+# Arguments introduced specifically for simdzone.
+AC_ARG_ENABLE(westmere, AS_HELP_STRING([--disable-westmere], [Disable Westmere (SSE4.2) parser kernel]))
+AC_ARG_ENABLE(haswell, AS_HELP_STRING([--disable-haswell], [Disable Haswell (AVX2) parser kernel]))
+AC_CONFIG_SUBDIRS([simdzone])
 AC_OUTPUT
