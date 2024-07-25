@@ -1,9 +1,129 @@
+23 July 2024: Jeroen
+	- Update simdzone.
+	- Tag for 4.10.1rc2.
+
+23 July 2024: Jeroen
+	- Update simdzone.
+	- Tag for 4.10.1rc1.
+
+22 July 2024: Jeroen
+	- Initialize tls_auth_port and tls_auth_xfr_only options.
+
+22 July 2024: Wouter
+	- Fix link of xfr-inspect for libssl dependency.
+
+19 July 2024: Willem
+	- Do not log ACL mismatch on followed CNAMEs.
+
+18 July 2024: Jeroen
+	- Fix propagation of Makefile targets to simdzone.
+
+18 July 2024: Wouter
+	- Merge #337 from bilias: Mutual TLS-AUTH.
+
+16 July 2024: Wouter
+	- Merge #352 from orlitzky: contrib: add OpenRC service script, config
+	  file, and tmpfiles entry.
+
+12 July 2024: Jeroen
+	- Use MAKE variable rather than make command.
+	  On platforms where make is not the same make executing the Makefile,
+	  build issues might arise. The MAKE variable expands to the command
+	  used on the command line.
+
+11 July 2024: Jeroen
+	- Serialize WKS RRs using numeric values rather than names.
+	  simdzone does not use getprotobyname and getservbyname. Secondary
+	  zones received via IXFR/AXFR might fail to load because WKS RRs
+	  used "unsupported" protocols or services.
+
+8 July 2024: Wouter
+	- Merge #349: log file name before loading.
+
+5 July 2024: Wouter
+	- Fix #347: Adjust verbosity for TLS (+TCP) to be 5.
+	- Merge #348: Move TLS logging to verbosity level 5.
+	- For #347: Also adjust verbosity of log message for remaining TCP
+	  connections.
+
+27 June 2024: Wouter
+	- Fix #344: Update simdzone.
+
+26 June 2024: Wouter
+	- Fix test script from making spurious output.
+	- Fix cpu_affinity and socket_partitioning tests for --enable-log-role.
+
+24 June 2024: Wouter
+	- Add unit test for #343 relative include in zone file.
+
+20 June 2024: Wouter
+	- Merge #341: Fix allow-query wording in nsd.conf.5.in.
+
+17 June 2024: Wouter
+	- Fix for OpenSSL 3.0 deprecated functions.
+
+11 June 2024: Wouter
+	- Fix #334: RFC8482 behavior documentation.
+
+23 May 2024: Wouter
+	- Fix for #317, document more text on pidfile permissions.
+
+29 April 2024: Wouter
+	- Fix incorrect punctuation of log messages.
+
+25 April 2024: Wouter
+	- The tag for the 4.10.0rc1 release became the release 4.10.0,
+	  on 13 June 2024, the code repository continues with 4.10.1 under
+	  development. The release contains the additional fix to change
+	  simdzone version.
+	- Bump simdzone to include minor fixes. This is included in 4.10.0.
+
+25 April 2024: Jeroen
+	- Bump simdzone to fix OpenBSD build issues.
+	- Tag for 4.10.0rc1.
+
+24 April 2024: Wouter
+	- Fix that the reload handler for sigchild uses signal_add, and
+	  also that the signal handler is restored when done.
+	- Fix that when server verify is done it resets the sigchild handler.
+	- Fix makedist.sh for simdzone inclusion.
+	- Fix makedist.sh to remove simdzone git tracking information and
+	  scripting temporaries from tarball.
+	- Fix error output of makedist.sh.
+
+23 April 2024: Wouter
+	- Fix #329: TCP accept queues number.
+
+22 April 2024: Jeroen
+	- Use simdzone version with name parser fix.
+
+16 April 2024: Jeroen
+	- Replace Flex+Bison based zone parser with simdzone.
+
+15 April 2024: Wouter
+	- Unit test for dname subdomain test used by xfrd-tcp.c.
+
+9 April 2024: Wouter
+	- Fix IXFR requests upstream for zones with a long name. Thanks for
+	  the report to Yuuki Wakisaka from Internet Initiative Japan Inc.
+
+8 April 2024: Wouter
+	- For #317: Modify nsd service script to stop NSD from creating a
+	  pid file that systemd is not using.
+	- Fix #324: Clarify the purpose of contrib/bug390.patch.
+
 4 April 2024: Jeroen
 	- Use rooted temporary path in makedist.sh.
+	- Tag for 4.9.1.
 
 3 April 2024: Jeroen
 	- Replace multiple strcat and strcpy by snprintf.
 	- Tag for 4.9.0.
+
+27 March 2024: Wouter
+	- Fix that when the server truncates the pidfile, it does not follow
+	  symbolic links.
+	- Fix #317: nsd should not chown its PID file.
 
 26 March 2024: Jeroen
 	- Test if debug is available in do-tests.
