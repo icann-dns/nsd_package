@@ -1,0 +1,35 @@
+From: Simon Josefsson <simon@josefsson.org>
+Date: Thu, 25 Jul 2024 14:53:29 +0200
+Subject: [PATCH] Fix Hurd build error due to log_err.
+Forwarded: https://github.com/NLnetLabs/nsd/pull/358
+
+Build log at https://buildd.debian.org/status/fetch.php?pkg=nsd&arch=hurd-i386&ver=4.9.1-1&stamp=1712912870&raw=0
+failing like this:
+
+util.c: In function ‘set_cpu_affinity’:
+util.c:1226:9: error: implicit declaration of function ‘log_err’ [-Werror=implicit-function-declaration]
+ 1226 |         log_err("sched_setaffinity: not available on this system");
+      |         ^~~~~~~
+cc1: some warnings being treated as errors
+
+Signed-off-by: Simon Josefsson <simon@josefsson.org>
+---
+ util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util.c b/util.c
+index f8107c84..f417db7f 100644
+--- a/util.c
++++ b/util.c
+@@ -1069,7 +1069,7 @@ int number_of_cpus(void)
+  * with a linker error, we print an error when it is used */
+ int set_cpu_affinity(cpuset_t *ATTR_UNUSED(set))
+ {
+-	log_err("sched_setaffinity: not available on this system");
++	log_msg(LOG_ERR, "sched_setaffinity: not available on this system");
+ 	return -1;
+ }
+ #elif defined(HAVE_SCHED_SETAFFINITY)
+-- 
+2.45.2
+
