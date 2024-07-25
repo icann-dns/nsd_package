@@ -374,6 +374,7 @@ struct	nsd
 #ifdef HAVE_SSL
 	/* TLS specific configuration */
 	SSL_CTX *tls_ctx;
+	SSL_CTX *tls_auth_ctx;
 #endif
 };
 
@@ -382,7 +383,7 @@ extern struct nsd nsd;
 /* nsd.c */
 pid_t readpid(const char *file);
 int writepid(struct nsd *nsd);
-void unlinkpid(const char* file);
+void unlinkpid(const char* file, const char* username);
 void sig_handler(int sig);
 void bind8_stats(struct nsd *nsd);
 
