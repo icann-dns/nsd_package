@@ -1,0 +1,8 @@
+  [ Markus Schade ]
+  * New upstream version 4.10.1
+  [ Simon Josefsson ]
+  * Build-Depend on pkgconf instead of pkg-config.
+  * Bump Standards-Version to 4.7.0.
+  * Fix nonexistent file in comment.  Closes: #1050608.
+  * Drop -D_XOPEN_SOURCE=600 via
+    <https://github.com/NLnetLabs/nsd/issues/330>.
