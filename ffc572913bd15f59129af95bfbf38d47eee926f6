@@ -1,0 +1,3 @@
+  * New upstream version 4.11.0
+  * Refresh patches
+  * Remove nsd user on removal (Closes: #1050984)
