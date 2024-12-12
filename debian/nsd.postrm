@@ -12,8 +12,13 @@ if test "$1" = "purge"; then
 
     # remove server/control keys on purge
     for f in nsd_control.key nsd_control.pem nsd_server.key nsd_server.pem; do
-	rm -f "/etc/nsd/$f"
+        rm -f "/etc/nsd/$f"
     done
+
+    # delete nsd daemon user, if it exists
+    if getent passwd nsd > /dev/null ; then
+        deluser  --quiet nsd > /dev/null || true
+    fi
 fi
 
 exit 0

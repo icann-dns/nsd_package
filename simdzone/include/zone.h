@@ -157,6 +157,10 @@ extern "C" {
 #define ZONE_TYPE_SMIMEA (53u)
 /** Host Identity Protocol @rfc{8005} */
 #define ZONE_TYPE_HIP (55u)
+/** NINFO */
+#define ZONE_TYPE_NINFO (56u)
+/** RKEY */
+#define ZONE_TYPE_RKEY (57u)
 /** Child DS @rfc{7344} */
 #define ZONE_TYPE_CDS (59u)
 /** DNSKEY(s) the Child wants reflected in DS @rfc{7344} */
@@ -191,7 +195,15 @@ extern "C" {
 #define ZONE_TYPE_CAA (257u)
 /** DNS Authoritative Source (DNS-AS) */
 #define ZONE_TYPE_AVC (258u)
-/** DNSSEC Lookaside Validation @rfc{4431} */
+/** Resolver Information as Key/Value Pairs @rfc{9606} */
+#define ZONE_TYPE_RESINFO (261u)
+/** Public wallet address */
+#define ZONE_TYPE_WALLET (262u)
+/** BP Convergence Layer Adapter */
+#define ZONE_TYPE_CLA (263u)
+/** DNSSEC Trust Authorities */
+#define ZONE_TYPE_TA (32768u)
+/** DNSSEC Lookaside Validation @rfc{4431} @obsolete */
 #define ZONE_TYPE_DLV (32769u)
 /** @} */
 
@@ -221,8 +233,10 @@ extern "C" {
 #define ZONE_SVC_PARAM_KEY_IPV6HINT (6u)
 /** URI template in relative form @rfc{9461} */
 #define ZONE_SVC_PARAM_KEY_DOHPATH (7u)
-/** Target is an Oblivious HTTP service @draft{ohai,svcb-config} */
+/** Target is an Oblivious HTTP service @rfc{9540} */
 #define ZONE_SVC_PARAM_KEY_OHTTP (8u)
+/** Supported groups in TLS @draft{ietf, tls-key-share-prediction} */
+#define ZONE_SVC_PARAM_KEY_TLS_SUPPORTED_GROUPS (9u)
 /** Reserved ("invalid key") @rfc{9460} */
 #define ZONE_SVC_PARAM_KEY_INVALID_KEY (65535u)
 /** @} */
@@ -279,8 +293,6 @@ struct zone_rdata_buffer {
  */
 #define ZONE_TAPE_SIZE ((100 * ZONE_BLOCK_SIZE) + ZONE_BLOCK_SIZE)
 
-// @private
-
 typedef struct zone_file zone_file_t;
 struct zone_file {
   /** @private */
@@ -289,12 +301,19 @@ struct zone_file {
   zone_name_buffer_t origin, owner;
   /** @private */
   uint16_t last_type;
-  /** @private */
-  uint32_t last_ttl, default_ttl;
+  /** Last stated TTL. */
+  uint32_t last_ttl;
+  /** Last parsed TTL in $TTL entry. */
+  uint32_t dollar_ttl;
+  /** TTL passed to accept callback. */
+  uint32_t *ttl;
+  /** Default TTL passed to accept. */
+  /** Last stated TTL is used as default unless $TTL entry was found. */
+  uint32_t *default_ttl;
   /** @private */
   uint16_t last_class;
   /** Number of lines spanned by RR. */
-  /** non-terminating line feeds, i.e. escaped line feeds, line feeds in
+  /** Non-terminating line feeds, i.e. escaped line feeds, line feeds in
       quoted sections or within parentheses, are counted, but deferred for
       consistency in error reports */
   size_t span;
@@ -380,6 +399,18 @@ typedef int32_t(*zone_accept_t)(
   void *); // user data
 
 /**
+ * @brief Signature of callback function invoked on $INCLUDE.
+ *
+ * Signal file name in $INCLUDE directive to application. Useful for
+ * dependency tracking, etc.
+ */
+typedef int32_t(*zone_include_t)(
+  zone_parser_t *,
+  const char *, // name in $INCLUDE entry
+  const char *, // fully qualified path
+  void *); // user data
+
+/**
  * @brief Available configuration options.
  */
 typedef struct {
@@ -411,6 +442,10 @@ typedef struct {
     /** Callback invoked for each RR. */
     zone_accept_t callback;
   } accept;
+  struct {
+    /** Callback invoked for each $INCLUDE entry. */
+    zone_include_t callback;
+  } include;
 } zone_options_t;
 
 /**

@@ -19,6 +19,13 @@ This project provides a lightning fast presentation format deserializer (and
 serializer eventually) for other projects to leverage. Learn more about
 simdzone by reading the [documentation](https://simdzone.docs.nlnetlabs.nl/).
 
+## Research paper
+
+* Jeroen Koekkoek and Daniel Lemire, [Parsing Millions of DNS Records per Second](https://arxiv.org/abs/2411.12035), Software: Practice and Experience (to appear)
+
+
+
+
 ## Motivation
 Zone files can become quite large (.com ~24G, .se ~1.3G) and the parser in
 NSD left something to be desired. simdjson demonstrates that applying SIMD
@@ -84,3 +91,5 @@ $ cmake --build .
 ## Contributing
 Contributions in any way, shape or form are very welcome! Please see
 [CONTRIBUTING.md](CONTRIBUTING.md) to find out how you can help.
+
+Design decisions and notes on the [FORMAT](FORMAT.md).

@@ -1,3 +1,11 @@
+nsd (4.11.0-1) unstable; urgency=medium
+
+  * New upstream version 4.11.0
+  * Refresh patches
+  * Remove nsd user on removal (Closes: #1050984)
+
+ -- Markus Schade <markus.schade@gmail.com>  Thu, 12 Dec 2024 15:32:29 +0100
+
 nsd (4.10.1-1) unstable; urgency=medium
 
   [ Markus Schade ]

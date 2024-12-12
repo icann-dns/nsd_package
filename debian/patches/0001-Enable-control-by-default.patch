@@ -22,7 +22,7 @@ Forwarded: not-needed
  # openssl x509 -in $CTL_BASE.pem -addtrust clientAuth -out $CTL_BASE"_trust.pem"
 --- a/nsd-control.8.in
 +++ b/nsd-control.8.in
-@@ -226,8 +226,6 @@
+@@ -230,8 +230,6 @@
  If you change the access control permissions on the key files you can decide
  who can use nsd\-control, by default owner and group but not all users.
  The script preserves private keys present in the directory.
@@ -33,10 +33,10 @@ Forwarded: not-needed
  .TP
 --- a/options.c
 +++ b/options.c
-@@ -137,7 +137,7 @@
- 	opt->answer_cookie = 0;
- 	opt->cookie_secret = NULL;
- 	opt->cookie_secret_file = CONFIGDIR"/nsd_cookiesecrets.txt";
+@@ -155,7 +155,7 @@
+ 	opt->cookie_staging_secret = NULL;
+ 	opt->cookie_secret_file = NULL;
+ 	opt->cookie_secret_file_is_default = 1;
 -	opt->control_enable = 0;
 +	opt->control_enable = 1;
  	opt->control_interface = NULL;

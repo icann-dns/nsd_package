@@ -21,6 +21,9 @@
 /* Pathname to the NSD configuration file */
 #undef CONFIGFILE
 
+/* Pathname to the NSD cookies secrets file. */
+#undef COOKIESECRETSFILE
+
 /* number of arguments for CPU_OR is three */
 #undef CPU_OR_THREE_ARGS
 

@@ -9,11 +9,9 @@ Signed-off-by: Pierre Habouzit <madcoder@debian.org>
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index d613720..a4fff20 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -79,7 +79,7 @@ AC_SUBST(logfile)
+@@ -81,7 +81,7 @@
  #
  # Database directory
  #

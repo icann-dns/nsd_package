@@ -216,7 +216,7 @@ static really_inline int32_t accept_rr(
     &(zone_name_t){ (uint8_t)parser->owner->length, parser->owner->octets },
     parser->file->last_type,
     parser->file->last_class,
-    parser->file->last_ttl,
+    *parser->file->ttl,
     (uint16_t)length,
     parser->rdata->octets,
     parser->user_data);
@@ -1291,8 +1291,26 @@ static int32_t check_ds_rr(
       (r = check(&c, check_int8(parser, type, &f[2], o+c, n-c))))
     return r;
 
-  // FIXME: can implement checking for digest length based on algorithm here.
-  //        e.g. SHA-1 digest is 20 bytes, see RFC3658 section 2.4
+  const uint8_t digest_algorithm = parser->rdata->octets[3];
+
+  if ((digest_algorithm & 0x7) == digest_algorithm) {
+    // https://www.iana.org/assignments/ds-rr-types
+    static const uint8_t digest_sizes[8] = {
+      0,  // 0: Reserved
+      20, // 1: SHA-1
+      32, // 2: SHA-256
+      32, // 3: GOST R 34.11-94
+      48, // 4: SHA-384
+      48, // 5: GOST R 34.10-2012
+      48, // 6: SM3
+      0   // 7: Unassigned
+    };
+
+    const uint8_t digest_size = digest_sizes[ digest_algorithm ];
+
+    if (digest_size && n - 4 != digest_size)
+      SEMANTIC_ERROR(parser, "Invalid digest in %s", NAME(type));
+  }
 
   if (c >= n)
     SYNTAX_ERROR(parser, "Invalid %s", NAME(type));
@@ -1321,6 +1339,28 @@ static int32_t parse_ds_rdata(
   take(parser, token);
   if ((code = parse_base16_sequence(parser, type, &fields[3], rdata, token)) < 0)
     return code;
+
+  const uint8_t digest_algorithm = parser->rdata->octets[3];
+
+  if ((digest_algorithm & 0x7) == digest_algorithm) {
+    // https://www.iana.org/assignments/ds-rr-types
+    static const uint8_t digest_sizes[8] = {
+      0,  // 0: Reserved
+      20, // 1: SHA-1
+      32, // 2: SHA-256
+      32, // 3: GOST R 34.11-94
+      48, // 4: SHA-384
+      48, // 5: GOST R 34.10-2012
+      48, // 6: SM3
+      0   // 7: Unassigned
+    };
+
+    const uint8_t digest_size = digest_sizes[ digest_algorithm ];
+    size_t length = (uintptr_t)rdata->octets - (uintptr_t)parser->rdata->octets;
+
+    if (digest_size && length - 4 != digest_size)
+      SEMANTIC_ERROR(parser, "Invalid digest in %s", NAME(type));
+  }
 
   return accept_rr(parser, type, rdata);
 }
@@ -2005,10 +2045,32 @@ nonnull_all
 static int32_t check_zonemd_rr(
   parser_t *parser, const type_info_t *type, const rdata_t *rdata)
 {
-  // FIXME: RDATA contains digests, do extra checks?
-  assert(rdata->octets >= parser->rdata->octets);
-  if ((uintptr_t)rdata->octets - (uintptr_t)parser->rdata->octets < 6)
-    SYNTAX_ERROR(parser, "Invalid %s", NAME(type));
+  int32_t r;
+  size_t c = 0;
+  const size_t n = (uintptr_t)rdata->octets - (uintptr_t)parser->rdata->octets;
+  const uint8_t *o = parser->rdata->octets;
+  const rdata_info_t *f = type->rdata.fields;
+
+  if ((r = check(&c, check_int32(parser, type, &f[0], o, n))) ||
+      (r = check(&c, check_int8(parser, type, &f[1], o+c, n-c))) ||
+      (r = check(&c, check_int8(parser, type, &f[2], o+c, n-c))))
+    return r;
+
+  const uint8_t digest_algorithm = parser->rdata->octets[5];
+  if ((digest_algorithm & 0x3) == digest_algorithm) {
+    // https://www.iana.org/assignments/dns-parameters#zonemd-hash-algorithms
+    static const uint8_t digest_sizes[4] = {
+      0,  // 0: Reserved
+      48, // 1: SHA-384
+      64, // 2: SHA-512
+      0   // 3: Unassigned
+    };
+
+    const uint8_t digest_size = digest_sizes[ digest_algorithm ];
+    if (digest_size && n - 6 != digest_size)
+      SEMANTIC_ERROR(parser, "Invalid digest in %s", NAME(type));
+  }
+
   return accept_rr(parser, type, rdata);
 }
 
@@ -2034,6 +2096,22 @@ static int32_t parse_zonemd_rdata(
   take(parser, token);
   if ((code = parse_base16_sequence(parser, type, &fields[3], rdata, token)) < 0)
     return code;
+
+  const uint8_t digest_algorithm = parser->rdata->octets[5];
+  if ((digest_algorithm & 0x3) == digest_algorithm) {
+    // https://www.iana.org/assignments/dns-parameters#zonemd-hash-algorithms
+    static const uint8_t digest_sizes[4] = {
+      0,  // 0: Reserved
+      48, // 1: SHA-384
+      64, // 2: SHA-512
+      0   // 3: Unassigned
+    };
+
+    const uint8_t digest_size = digest_sizes[ digest_algorithm ];
+    size_t length = (uintptr_t)rdata->octets - (uintptr_t)parser->rdata->octets;
+    if (digest_size && length - 6 != digest_size)
+      SEMANTIC_ERROR(parser, "Invalid digest in %s", NAME(type));
+  }
 
   return accept_rr(parser, type, rdata);
 }
@@ -2727,6 +2805,19 @@ static const rdata_info_t hip_rdata_fields[] = {
   FIELD("Rendezvous Servers")
 };
 
+// https://www.iana.org/assignments/dns-parameters/NINFO/ninfo-completed-template
+static const rdata_info_t ninfo_rdata_fields[] = {
+  FIELD("text")
+};
+
+// https://www.iana.org/assignments/dns-parameters/RKEY/rkey-completed-template
+static const rdata_info_t rkey_rdata_fields[] = {
+  FIELD("flags"),
+  FIELD("protocol"),
+  FIELD("algorithm"),
+  FIELD("publickey")
+};
+
 static const rdata_info_t openpgpkey_rdata_fields[] = {
   FIELD("key")
 };
@@ -2806,6 +2897,28 @@ static const rdata_info_t caa_rdata_fields[] = {
 // https://www.iana.org/assignments/dns-parameters/AVC/avc-completed-template
 static const rdata_info_t avc_rdata_fields[] = {
   FIELD("text")
+};
+
+// RFC 9606
+static const rdata_info_t resinfo_rdata_fields[] = {
+  FIELD("text")
+};
+
+// https://www.iana.org/assignments/dns-parameters/WALLET/wallet-completed-template
+static const rdata_info_t wallet_rdata_fields[] = {
+  FIELD("text")
+};
+
+// https://www.iana.org/assignments/dns-parameters/CLA/cla-completed-template
+static const rdata_info_t cla_rdata_fields[] = {
+  FIELD("text")
+};
+
+static const rdata_info_t ta_rdata_fields[] = {
+  FIELD("key"),
+  FIELD("algorithm"),
+  FIELD("type"),
+  FIELD("digest")
 };
 
 static const rdata_info_t dlv_rdata_fields[] = {
@@ -2932,9 +3045,11 @@ static const type_info_t types[] = {
 
   TYPE("HIP", ZONE_TYPE_HIP, ZONE_CLASS_ANY, FIELDS(hip_rdata_fields),
               check_hip_rr, parse_hip_rdata),
+  TYPE("NINFO", ZONE_TYPE_NINFO, ZONE_CLASS_ANY, FIELDS(ninfo_rdata_fields),
+              check_txt_rr, parse_txt_rdata),
+  TYPE("RKEY", ZONE_TYPE_RKEY, ZONE_CLASS_ANY, FIELDS(rkey_rdata_fields),
+                 check_dnskey_rr, parse_dnskey_rdata),
 
-  UNKNOWN_TYPE(56),
-  UNKNOWN_TYPE(57),
   UNKNOWN_TYPE(58),
 
   TYPE("CDS", ZONE_TYPE_CDS, ZONE_CLASS_ANY, FIELDS(cds_rdata_fields),
@@ -3160,6 +3275,23 @@ static const type_info_t types[] = {
               check_caa_rr, parse_caa_rdata),
   TYPE("AVC", ZONE_TYPE_AVC, ZONE_CLASS_ANY, FIELDS(avc_rdata_fields),
               check_txt_rr, parse_txt_rdata),
+
+  UNKNOWN_TYPE(259),
+  UNKNOWN_TYPE(260),
+
+  TYPE("RESINFO", ZONE_TYPE_RESINFO, ZONE_CLASS_ANY, FIELDS(resinfo_rdata_fields),
+              check_txt_rr, parse_txt_rdata),
+  TYPE("WALLET", ZONE_TYPE_WALLET, ZONE_CLASS_ANY, FIELDS(wallet_rdata_fields),
+              check_txt_rr, parse_txt_rdata),
+  TYPE("CLA", ZONE_TYPE_CLA, ZONE_CLASS_ANY, FIELDS(cla_rdata_fields),
+              check_txt_rr, parse_txt_rdata),
+
+  UNKNOWN_TYPE(264),
+
+  /* Map 32768 in hash.c to 265 */
+  TYPE("TA", ZONE_TYPE_TA, ZONE_CLASS_ANY, FIELDS(ta_rdata_fields), // obsolete
+              check_ds_rr, parse_ds_rdata),
+  /* Map 32769 in hash.c to 266 */
   TYPE("DLV", ZONE_TYPE_DLV, ZONE_CLASS_ANY, FIELDS(dlv_rdata_fields), // obsolete
               check_ds_rr, parse_ds_rdata)
 };
