@@ -14,7 +14,7 @@ if test "$1" = "configure"; then
 
     # Generate the control certificates if needed
     if ! [ -f /etc/nsd/nsd_control.key ]; then
-	nsd-control-setup >/dev/null 2>&1 || true
+        nsd-control-setup >/dev/null 2>&1 || true
     fi
 fi
 

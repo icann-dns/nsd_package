@@ -10,7 +10,7 @@
 # platform not supported by NSD here is undesirable. Builds for standalone use
 # or development/testing are required to use CMake.
 
-AC_INIT([simdzone],[0.1.0],[https://github.com/NLnetLabs/simdzone/issues])
+AC_INIT([simdzone],[0.2.0],[https://github.com/NLnetLabs/simdzone/issues])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
@@ -18,7 +18,16 @@ AC_CONFIG_FILES([Makefile])
 m4_include(m4/ax_check_compile_flag.m4)
 m4_version_prereq([2.70], [AC_PROG_CC], [AC_PROG_CC_STDC])
 
-AC_CHECK_HEADER(endian.h, AC_DEFINE(HAVE_ENDIAN_H, 1, [Define to 1 if you have the <endian.h> header file.]))
+AC_CHECK_HEADERS([endian.h sys/endian.h],,, [AC_INCLUDES_DEFAULT])
+AC_CHECK_DECLS([bswap16,bswap32,bswap64], [], [], [
+AC_INCLUDES_DEFAULT
+#ifdef HAVE_ENDIAN_H
+#include <endian.h>
+#endif
+#ifdef HAVE_SYS_ENDIAN_H
+#include <sys/endian.h>
+#endif
+])
 
 AC_ARG_ENABLE(westmere, AS_HELP_STRING([--disable-westmere],[Disable Westmere (SSE4.2) kernel]))
 case "$enable_westmere" in
@@ -66,7 +75,7 @@ if test $x86_64 = "yes"; then
           $ac_cv_header_immintrin_h = "yes" ; then
     AC_MSG_CHECKING(whether -march=westmere works)
     BAKCFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS -march=westmere"
+    CFLAGS="-march=westmere $CFLAGS"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 AC_INCLUDES_DEFAULT
 [
@@ -76,7 +85,7 @@ AC_INCLUDES_DEFAULT
 int main(int argc, char *argv[])
 {
   (void)argv;
-  uint64_t popcnt = _mm_popcnt_64((uint64_t)argc);
+  uint64_t popcnt = _mm_popcnt_u64((uint64_t)argc);
   return popcnt == 11;
 }
 ]])
@@ -95,7 +104,7 @@ int main(int argc, char *argv[])
           $ac_cv_header_immintrin_h = "yes" ; then
     AC_MSG_CHECKING(whether -march=haswell works)
     BAKCFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS -march=haswell"
+    CFLAGS="-march=haswell $CFLAGS"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 AC_INCLUDES_DEFAULT
 [

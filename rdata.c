@@ -69,7 +69,8 @@ lookup_table_type dns_algorithms[] = {
 
 const char *svcparamkey_strs[] = {
 		"mandatory", "alpn", "no-default-alpn", "port",
-		"ipv4hint", "ech", "ipv6hint", "dohpath"
+		"ipv4hint", "ech", "ipv6hint", "dohpath", "ohttp",
+		"tls-supported-groups"
 	};
 
 typedef int (*rdata_to_string_type)(buffer_type *output,
@@ -197,6 +198,57 @@ rdata_long_text_to_string(buffer_type *output, rdata_atom_type rdata,
 		}
 	}
 	buffer_printf(output, "\"");
+	return 1;
+}
+
+static int
+rdata_unquoted_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	const uint8_t *data = rdata_atom_data(rdata);
+	uint8_t length = data[0];
+	size_t i;
+
+	for (i = 1; i <= length; ++i) {
+		char ch = (char) data[i];
+		if (isprint((unsigned char)ch)) {
+			if (ch == '"' || ch == '\\'
+			||  isspace((unsigned char)ch)) {
+				buffer_printf(output, "\\");
+			}
+			buffer_printf(output, "%c", ch);
+		} else {
+			buffer_printf(output, "\\%03u", (unsigned) data[i]);
+		}
+	}
+	return 1;
+}
+
+static int
+rdata_unquoteds_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+	uint16_t pos = 0;
+	const uint8_t *data = rdata_atom_data(rdata);
+	uint16_t length = rdata_atom_size(rdata);
+	size_t i;
+
+	while (pos < length && pos + data[pos] < length) {
+		for (i = 1; i <= data[pos]; ++i) {
+			char ch = (char) data[pos + i];
+			if (isprint((unsigned char)ch)) {
+				if (ch == '"' || ch == '\\'
+				||  isspace((unsigned char)ch)) {
+					buffer_printf(output, "\\");
+				}
+				buffer_printf(output, "%c", ch);
+			} else {
+				buffer_printf(output, "\\%03u", (unsigned) data[pos+i]);
+			}
+		}
+		pos += data[pos]+1;
+		buffer_printf(output, pos < length?" ":"");
+	}
 	return 1;
 }
 
@@ -806,6 +858,21 @@ rdata_svcparam_alpn_to_string(buffer_type *output, uint16_t val_len,
 }
 
 static int
+rdata_svcparam_tls_supported_groups_to_string(buffer_type *output,
+		uint16_t val_len, uint16_t *data)
+{
+	assert(val_len > 0); /* Guaranteed by rdata_svcparam_to_string */
+
+	if ((val_len % sizeof(uint16_t)) == 1)
+		return 0; /* A series of uint16_t is an even number of bytes */
+
+	buffer_printf(output, "=%d", (int)ntohs(*data++));
+	while ((val_len -= sizeof(uint16_t)) > 0) 
+		buffer_printf(output, ",%d", (int)ntohs(*data++));
+	return 1;
+}
+
+static int
 rdata_svcparam_to_string(buffer_type *output, rdata_atom_type rdata,
 	rr_type* ATTR_UNUSED(rr))
 {
@@ -832,6 +899,7 @@ rdata_svcparam_to_string(buffer_type *output, rdata_atom_type rdata,
 		case SVCB_KEY_IPV6HINT:
 		case SVCB_KEY_MANDATORY:
 		case SVCB_KEY_DOHPATH:
+		case SVCB_KEY_TLS_SUPPORTED_GROUPS:
 			return 0;
 		default:
 			return 1;
@@ -852,6 +920,10 @@ rdata_svcparam_to_string(buffer_type *output, rdata_atom_type rdata,
 		return rdata_svcparam_alpn_to_string(output, val_len, data+2);
 	case SVCB_KEY_ECH:
 		return rdata_svcparam_ech_to_string(output, val_len, data+2);
+	case SVCB_KEY_OHTTP:
+		return 0; /* wireformat error, should not have a value */
+	case SVCB_KEY_TLS_SUPPORTED_GROUPS:
+		return rdata_svcparam_tls_supported_groups_to_string(output, val_len, data+2);
 	case SVCB_KEY_DOHPATH:
 		/* fallthrough */
 	default:
@@ -872,6 +944,34 @@ rdata_svcparam_to_string(buffer_type *output, rdata_atom_type rdata,
 		break;
 	}
 	return 1;
+}
+
+static int
+rdata_hip_to_string(buffer_type *output, rdata_atom_type rdata,
+	rr_type* ATTR_UNUSED(rr))
+{
+ 	uint16_t size = rdata_atom_size(rdata);
+	uint8_t hit_length;
+	uint16_t pk_length;
+	int length = 0;
+
+	if(size < 4)
+		return 0;
+	hit_length = rdata_atom_data(rdata)[0];
+	pk_length  = read_uint16(rdata_atom_data(rdata) + 2);
+	length     = 4 + hit_length + pk_length;
+	if(hit_length == 0 || pk_length == 0 || size < length)
+		return 0;
+	buffer_printf(output, "%u ", (unsigned)rdata_atom_data(rdata)[1]);
+	hex_to_string(output, rdata_atom_data(rdata) + 4, hit_length);
+	buffer_printf(output, " ");
+	buffer_reserve(output, pk_length * 2 + 1);
+	length = b64_ntop(rdata_atom_data(rdata) + 4 + hit_length, pk_length,
+			  (char *) buffer_current(output), pk_length * 2);
+	if (length > 0) {
+		buffer_skip(output, length);
+	}
+	return length != -1;
 }
 
 static int
@@ -914,8 +1014,11 @@ static rdata_to_string_type rdata_to_string_table[RDATA_ZF_UNKNOWN + 1] = {
 	rdata_eui48_to_string,
 	rdata_eui64_to_string,
 	rdata_long_text_to_string,
+	rdata_unquoted_to_string,
+	rdata_unquoteds_to_string,
 	rdata_tag_to_string,
 	rdata_svcparam_to_string,
+	rdata_hip_to_string,
 	rdata_unknown_to_string
 };
 
@@ -1042,8 +1145,16 @@ rdata_wireformat_to_rdata_atoms(region_type *region,
 				    read_uint16(buffer_current(packet) + 2);
 			}
 			break;
+		case RDATA_WF_HIP:
+			/* Length is stored in the first byte (HIT length)
+			 * plus the third and fourth byte (PK length) */
+			length = 4;
+			if (buffer_position(packet) + length <= end) {
+				length += buffer_current(packet)[0];
+				length += read_uint16(buffer_current(packet) + 2);
+			}
+			break;
 		}
-
 		if (is_domain) {
 			const dname_type *dname;
 
