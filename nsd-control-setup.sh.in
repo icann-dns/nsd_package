@@ -206,7 +206,7 @@ chmod o-rw \
 
 cleanup
 
-echo "Setup success. Certificates created. Enable in nsd.conf file to use"
+echo "Setup success. Certificates created."
 
 # create trusted usage pem
 # openssl x509 -in $CTL_BASE.pem -addtrust clientAuth -out $CTL_BASE"_trust.pem"
