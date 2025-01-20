@@ -1,3 +1,10 @@
+nsd (4.11.1-1) unstable; urgency=medium
+
+  * New upstream version 4.11.1
+  * Update copyright years
+
+ -- Markus Schade <markus.schade@gmail.com>  Mon, 20 Jan 2025 09:56:22 +0100
+
 nsd (4.11.0-1) unstable; urgency=medium
 
   * New upstream version 4.11.0
