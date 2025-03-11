@@ -1,0 +1,46 @@
+---
+name: Release
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+jobs:
+  build-deb:
+    strategy:
+      matrix:
+        codename:
+          - trixie
+          - bookworm
+        platform:
+          - amd64
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: andy5995/gh-action-build-deb@v1
+      with:
+        args: |
+          --no-sign
+          --compression=xz
+        codename: ${{ matrix.codename }}
+        platform: ${{ matrix.platform }}
+
+    - name: Create sha256sum
+      run: |
+        DEB_FILENAME=$(basename `find output/*deb`)
+        echo "DEB_FILENAME=$DEB_FILENAME" >> $GITHUB_ENV
+        cd output
+        sha256sum "$DEB_FILENAME" > "../$DEB_FILENAME.sha256sum"
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.DEB_FILENAME }}
+        path: |
+          output/*.deb
+          *deb.sha256sum
+        if-no-files-found: error
