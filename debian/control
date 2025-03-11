@@ -9,7 +9,7 @@ Uploaders:
  Simon Josefsson <simon@josefsson.org>,
 Build-Depends:
  bison,
- debhelper-compat (= 13),
+ debhelper (>= 12),
  flex,
  libevent-dev,
  libfstrm-dev,
