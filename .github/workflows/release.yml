@@ -26,8 +26,8 @@ jobs:
       - name: Build package
         run: |
           uscan --verbose --force-download
-          mk-build-deps --remove  --install --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes" debian/control
-          rm -rf nsd-build-deps*
+          sudo mk-build-deps --remove  --install --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes" debian/control
+          sudo rm -rf nsd-build-deps*
           dpkg-buildpackage --build=source
 
       - name: set version
@@ -52,7 +52,10 @@ jobs:
         with:
           name: nsd-srcpkg
           if-no-files-found: error
-          path: "${{ env.artifacts_path }}/nsd_*.dsc"
+          path: |
+            ${{ env.artifacts_path }}/nsd*
+            !${{ env.artifacts_path }}/nsd_package
+
 
   binary_packages:
     name: build the binary package
