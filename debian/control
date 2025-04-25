@@ -8,8 +8,8 @@ Uploaders:
  Daniel Kahn Gillmor <dkg@fifthhorseman.net>,
  Simon Josefsson <simon@josefsson.org>,
 Build-Depends:
- bison,
  debhelper-compat (= 13),
+ bison,
  flex,
  libevent-dev,
  libfstrm-dev,

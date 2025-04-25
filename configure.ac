@@ -7,7 +7,7 @@ sinclude(dnstap/dnstap.m4)
 
 # autoconf-2.70 is needed for @runstatedir@
 AC_PREREQ([2.70])
-AC_INIT([NSD],[4.11.1],[https://github.com/NLnetLabs/nsd/issues or nsd-bugs@nlnetlabs.nl])
+AC_INIT([NSD],[4.12.0],[https://github.com/NLnetLabs/nsd/issues or nsd-bugs@nlnetlabs.nl])
 AC_CONFIG_HEADERS([config.h])
 
 #
@@ -490,8 +490,18 @@ You can restart ./configure --with-libevent=no to use a builtin alternative.])
 	AC_CHECK_FUNCS([event_base_get_method]) # only in libevent 1.4.3 and later
 	AC_CHECK_FUNCS([ev_loop]) # only in libev. (tested on 3.51)
 	AC_CHECK_FUNCS([ev_default_loop]) # only in libev. (tested on 4.00)
+
+	# prometheus metrics depend on libevent 2.0 and later, and is therefore
+	# only enabled when the required version is found and used
+	AC_CHECK_FUNCS([evhttp_free], [
+		AC_DEFINE_UNQUOTED([USE_METRICS], [], [Define this to expose NSD statistics via a prometheus metrics HTTP endpoint.])
+		AC_DEFINE_UNQUOTED([NSD_METRICS_PORT], [9100], [Define the default metrics HTTP endpoint port.])
+	], [
+		AC_MSG_NOTICE([disabling prometheus metrics])
+	])
 else
 	AC_DEFINE(USE_MINI_EVENT, 1, [Define if you want to use internal select based events])
+	AC_MSG_NOTICE([Prometheus metrics are disabled with the builtin libevent alternative])
 fi
 
 # Checks for header files.

@@ -1,3 +1,85 @@
+17 April 2025: Wouter
+	- Add autoconf files to gitignore.
+
+8 April 2025: Wouter
+	- Fix nsd-checkzone ixfr create cleanup on exit.
+
+4 April 2025: Wouter
+	- Fix to update common.sh for speed of kill_pid.
+
+1 April 2025: Wouter
+	- Fix escape more characters when printing an RR type with an
+	  unquoted string.
+	- Fix memory leak in the process of addzone.
+
+27 March 2025: Wouter
+	- Fix test checkconf for metrics options.
+	- Updated simdzone to include fixes for NSAP-PTR, LOC,
+	  uninitialized reads, and comment nit.
+	- Fix #436: Fix print of RR type NSAP-PTR.
+	- Fix unit test call to zone_parse_string and initialize padding.
+
+26 March 2025: Wouter
+	- Fix multiple zone transfers in one reload so that xfrd does not
+	  check the update as failed and restart the transfer.
+	- Test for the multiple transfer failure, xfr_over_notify.
+	- Fix read of ixfr file with rdata subdomain.
+	- Test for the ixfr rdata subdomain, ixfrout_deldomain.
+	- Fix note in ixfrout_deldomain test.
+
+25 March 2025: Wouter
+	- Fix to please sanitizer for ixfr store of data in cancelled state.
+
+24 March 2025: Jannik
+	- Merge #429: Add prometheus metrics
+
+14 March 2025: Wouter
+	- Fix log print assert in server sockets for printing '-' empty.
+	- Fix notify_fmt test for xfrd file location.
+	- Fix sanitizer warnings in read_uint32.
+	- Fix sanitizer warning in tsig write of zero length mac and otherdata.
+
+13 March 2025: Wouter
+	- Fix ixfr file read to manage numlist in temp domains.
+	- Fix nsd-mem to clean ixfr storage.
+
+12 March 2025: Wouter
+	- Fix ixfr read routine for use after the temp region is freed of rr.
+
+11 March 2025: Wouter
+	- Fix in nsd-mem for a zone with ixfr data.
+
+3 March 2025: Wouter
+	- Fix that nsec3 prehash after a full transfer can create the nsec3
+	  zone trees if they are needed.
+
+19 February 2025: Wouter
+	- Fix for #430: Confusing documentation: word "outgoing". Add wording
+	  to tcp-count, xfrd-tcp-max, xfrd-tcp-pipeline options.
+
+18 February 2025: Wouter
+	- Fix for #430: Confusing documentation: word "outgoing".
+
+11 February 2025: Willem
+	- Merge #420: Zones get state "old-serial" with
+	  `nsd-control zonestatus` when the served serial is older than
+	  the one received by the transfer daemon.
+
+23 January 2025: Willem
+	- Merge #418: Support for DSYNC, EID, NIMLOC, SINK, TALINK, DOA,
+	  AMTRELAY and IPN resource record types.
+
+22 January 2025: Wouter
+	- Fix #426: nsd crashes with patterns in config_apply_pattern.
+
+20 January 2025: Willem
+	- code repository continues with 4.11.2 under development.
+	- Fix re-enable to configure dns-cookies from config file, which
+	  was accidentally removed with the 4.11.1 release.
+
+19 January 2025: Willem
+	- NSD 4.11.1 emergency quick-fix release
+
 17 January 2025: Willem
 	- Fix #424: Stalled updates after corrupt transfer.
 

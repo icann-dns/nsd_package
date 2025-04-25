@@ -162,6 +162,12 @@ nsd_options_create(region_type* region)
 	opt->server_cert_file = CONFIGDIR"/nsd_server.pem";
 	opt->control_key_file = CONFIGDIR"/nsd_control.key";
 	opt->control_cert_file = CONFIGDIR"/nsd_control.pem";
+#ifdef USE_METRICS
+	opt->metrics_enable = 0;
+	opt->metrics_interface = NULL;
+	opt->metrics_port = NSD_METRICS_PORT;
+	opt->metrics_path = "/metrics";
+#endif /* USE_METRICS */
 
 	opt->verify_enable = 0;
 	opt->verify_ip_addresses = NULL;
@@ -2773,8 +2779,8 @@ config_apply_pattern(struct pattern_options *dest, const char* name)
 		c_error("could not find pattern %s", name);
 		return;
 	}
-	if(strncmp(dest->pname, PATTERN_IMPLICIT_MARKER,
-				strlen(PATTERN_IMPLICIT_MARKER)) == 0
+	if( (!dest->pname || strncmp(dest->pname, PATTERN_IMPLICIT_MARKER,
+				strlen(PATTERN_IMPLICIT_MARKER)) == 0)
 	&& pat->catalog_producer_zone) {
 		c_error("patterns with an catalog-producer-zone option are to "
 		        "be used with \"nsd-control addzone\" only and cannot "
@@ -3082,6 +3088,10 @@ resolve_interface_names(struct nsd_options* options)
 			addrs, options->region);
 	resolve_interface_names_for_ref(&options->control_interface, 
 			addrs, options->region);
+#ifdef USE_METRICS
+	resolve_interface_names_for_ref(&options->metrics_interface,
+			addrs, options->region);
+#endif /* USE_METRICS */
 
 	freeifaddrs(addrs);
 #else
