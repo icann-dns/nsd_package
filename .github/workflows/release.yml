@@ -7,40 +7,103 @@ on:
     tags:
       - '*'
   workflow_dispatch:
+
 jobs:
-  build-deb:
+  build_source:
+    # Can't currently build on ubuntu-latest
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.version_step.outputs.VERSION }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install software
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper dpkg-dev devscripts equivs
+
+      - name: Build package
+        run: |
+          uscan --verbose --force-download --download-current-version
+          sudo mk-build-deps --remove  --install --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes" debian/control
+          sudo rm -rf nsd-build-deps*
+          dpkg-buildpackage --build=source
+
+      - name: set version
+        id: version_step
+        run: |
+          VERSION=$(awk 'NR==1 {print $2}' debian/changelog | tr -d '()' | cut -d '-' -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Output which branch or PR we're building plus name of .dsc file
+        run: |
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
+          echo "- $(find . -name nsd_\*.dsc)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Workaround actions/upload-artifact#176
+        run: |
+          echo "artifacts_path=$(realpath ..)" >> $GITHUB_ENV
+
+      - name: Store source package
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+        with:
+          name: nsd-srcpkg
+          if-no-files-found: error
+          path: |
+            ${{ env.artifacts_path }}/nsd*
+            !${{ env.artifacts_path }}/nsd_package
+
+
+  binary_packages:
+    name: build the binary package
+    needs: build_source
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        codename:
-          - trixie
-          - bookworm
-        platform:
-          - amd64
+        dist: [focal, jammy]
+        arch: [amd64]
 
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      with:
+        path: artifacts
+
+    - name: Build
+      uses: sillsdev/gha-ubuntu-packaging@v0.9
+      with:
+        dist: "${{ matrix.dist }}"
+        platform: "${{ matrix.arch }}"
+        source_dir: "artifacts/"
+        sourcepackage: "nsd-srcpkg/nsd_${{ needs.build_source.outputs.VERSION }}-1.dsc"
+        deb_fullname: icann-dns
+        deb_email: noc@dns.icann.org
+
+    - name: Store binary packages
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      with:
+        name: nsd-${{ needs.build_source.outputs.VERSION }}-${{ matrix.dist }}
+        path: artifacts/*.deb
+
+#    - name: Setup upterm session
+#      uses: lhotari/action-upterm@v1
+#      if: ${{ failure() }}
+
+  release:
+    name: Create a new release
+    needs: binary_packages
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-
-    - uses: andy5995/gh-action-build-deb@v1
+    - name: Download Artifacts
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
-        args: |
-          --no-sign
-          --compression=xz
-        codename: ${{ matrix.codename }}
-        platform: ${{ matrix.platform }}
-
-    - name: Create sha256sum
-      run: |
-        DEB_FILENAME=$(basename `find output/*deb`)
-        echo "DEB_FILENAME=$DEB_FILENAME" >> $GITHUB_ENV
-        cd output
-        sha256sum "$DEB_FILENAME" > "../$DEB_FILENAME.sha256sum"
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+        path: artifacts
+    - name: Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: ${{ env.DEB_FILENAME }}
-        path: |
-          output/*.deb
-          *deb.sha256sum
-        if-no-files-found: error
+        files: |
+          artifacts/**/*.deb
